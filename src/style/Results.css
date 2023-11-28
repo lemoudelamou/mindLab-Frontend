@@ -13,8 +13,8 @@
   z-index: 1;
 }
 
-.pad {
-  max-width: 800px;
+.pad-container {
+  max-width: 900px;
   max-height: 1000px;
   z-index: 1;
   align-items: center;
@@ -58,4 +58,10 @@ tbody tr:hover {
   text-align: center;
   color: #fff; /* Set your desired text color */
   font-size: 28pt; /* Set your desired font size */
+}
+
+
+.transfer {
+  margin-top: 15px;
+  margin-bottom: 10px;
 }

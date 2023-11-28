@@ -16,6 +16,10 @@
 
 }
 
+.title-data{
+  margin-top: 150px;
+}
+
 
 .container-back:before {
   content: '';
@@ -26,12 +30,30 @@
 }
 
 .sec{
-  z-index: 1;
+  overflow: scroll;
+}
+
+.table-container {
+  box-shadow: 0px 8px 100px rgba(178, 172, 178, 0.9); /* Add shadow to the top */
 
 }
 
+.diag-box {
+  width: 500px;
+  height: 300px;
+  background-color: #fff;
+  border: 2px solid #2980b9;
+  border-radius: 10px;
+  margin: 20px;
+  padding: 20px;
+  color: #000;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0px 8px 100px rgba(178, 172, 178, 0.9); /* Add shadow to the top */
 
-
+}
 
 
 

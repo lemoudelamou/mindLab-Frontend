@@ -37,7 +37,7 @@ function AppRouter() {
         <Route path="/ReactionTimeExperiment" element={<ReactionTimeExperiment/>}/>
         <Route path="/results" element={<Results />} />
         <Route path="/Home" element={<Home />}/>
-        <Route path="/Data" element={<Data />}/>
+        <Route path="/data" element={<Data />}/>
 
       </Routes>
       {location.pathname === '' ? null : <Footer/>}

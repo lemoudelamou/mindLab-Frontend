@@ -1,8 +1,11 @@
 import React from "react";
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Button } from 'react-bootstrap';
 import '../style/Results.css'
 
 const Results = () => {
+
+  const navigate = useNavigate();
   const location = useLocation();
   const resultData = location.state && location.state.resultData;
 
@@ -14,9 +17,14 @@ const Results = () => {
   // Access data from resultData
   const { experimentSettings, patientInfo, reactionTimes, averageReactionTimes } = resultData;
 
+
+  const handleSubmit =  (event) => {
+    navigate('/data', { state: { resultData } });
+    console.log('submitted resultData from results page:', resultData);
+  }
   return (
     <div className="results-container">
-        <div className="pad">
+        <div className="pad-container">
       <h2>Experiment Results</h2>
 
       {/* Display patient information */}
@@ -119,6 +127,11 @@ const Results = () => {
           </tr>
         </tbody>
       </table>
+          <div className='transfer'>
+          {/* Button to transfer resultData to /Data */}
+
+            <Button className="transfer-button" type="submit" onClick={handleSubmit}>Transfer to Data</Button>
+          </div>
 
     </div>
     </div>
