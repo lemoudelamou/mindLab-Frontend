@@ -1,0 +1,170 @@
+/* Resetting some default styles */
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+/* Importing fonts and Bootstrap */
+@import url("https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;700&display=swap");
+@import url("https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css");
+
+/* Custom styling */
+:root {
+  --mainColor: #2346d1;
+  --secondaryColor: #9b8787;
+  --textColor: #eee;
+}
+
+.navbar-fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 50%; /* Adjust to your desired width */
+  margin: 0 auto; /* Center the navbar */
+  z-index: 200;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 80px;
+  padding: 0 2rem;
+  color: var(--textColor);
+}
+
+nav a {
+  margin: 0 1rem;
+  font-size: 14pt;
+  padding-right: 10px;
+  color: var(--textColor);
+  text-decoration: none;
+  transition: border-bottom 0.3s;
+}
+
+nav a:hover {
+  color: var(--secondaryColor);
+  /* Remove the border-bottom property */
+  border-bottom: none;
+}
+
+header .nav-btn {
+  padding: 5px;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  outline: none;
+  visibility: hidden;
+  opacity: 0;
+  font-size: 1.8rem;
+}
+
+img {
+  width: 70px;
+  height: 70px;
+  padding: 5px;
+}
+
+header div,
+nav {
+  display: flex;
+  align-items: center;
+}
+
+.home-tab,
+.data-tab,
+.experiment-tab,
+.cal,
+.login,
+.reg {
+  width: 45px;
+  height: 45px;
+  background-color: white; /* Add background color for icons */
+  border-radius: 50%; /* Optional: Add border-radius for circular icons */
+}
+
+.navbar-wrapper {
+  position: fixed;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50%;
+  z-index: 100;
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 15px;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 80px;
+  padding: 0 2rem;
+  color: var(--textColor);
+}
+
+.logo-div {
+  margin-right: 200px;
+}
+
+/* Responsive styles */
+@media only screen and (max-width: 1024px) {
+  .navbar-wrapper {
+    width: 100%;
+    left: 0;
+    top: 0;
+    transform: none;
+    border-radius: 0;
+  }
+
+  header .nav-btn {
+    visibility: visible;
+    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  header nav {
+    position: fixed;
+    top: -102vh;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    background-color: rgba(0, 0, 0, 0.9);
+    transition: 1s;
+    z-index: 1;
+  }
+
+  header .responsive_nav {
+    transform: translateY(100vh);
+  }
+
+  nav .nav-close-btn {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+  }
+
+  nav a {
+    position: relative; /* Set position to relative */
+    text-align: center; /* Center the text horizontally */
+    margin-top: 10px; /* Add margin to separate text and logos vertically */
+  }
+
+  /* Updated styles for logos */
+  .home-tab,
+  .data-tab,
+  .experiment-tab,
+  .cal,
+  .login,
+  .reg {
+    width: 45px;
+    height: 45px;
+    margin-bottom: 10px; /* Add margin to separate logos vertically */
+  }
+}

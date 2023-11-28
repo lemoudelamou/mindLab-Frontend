@@ -1,0 +1,90 @@
+.SplashScreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.SplashScreen-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
+
+.SplashScreen-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  background-color: #0070f3;
+  color: #fff;
+  font-size: 3vw;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+
+.Skip-button {
+  position: absolute;
+  bottom: 5vw;
+  right: 5vw;
+  padding: 2vw;
+  background-color: #0070f3;
+  color: #fff;
+  font-size: 3vw;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.SplashScreen-text {
+  font-family: 'Open Sans', sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  color: #fff;
+  font-size: 4vw;
+  transform: scale(0.2);
+  transform-origin: center center;
+  opacity: 0;
+  animation: appear 10s ease forwards;
+}
+
+@keyframes appear {
+  0% {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.2);
+    opacity: 0;
+  }
+}
+
+
+@media only screen and (min-width: 1024px) {
+  .Skip-button {
+    padding: 1vw;
+    font-size: 2vw;
+  }
+}
+

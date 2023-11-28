@@ -1,0 +1,222 @@
+body {
+  overflow-y: scroll;
+  background: url("/src/assets/back.png") center/cover no-repeat fixed;
+  margin: 0; /* Reset margin to ensure full width */
+}
+
+.banner-section {
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.first-part {
+  z-index: 1;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 250px;
+  height: 250px;
+  border-radius: 100%;
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+.logo-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.home-title {
+  color: #fff;
+  text-align: center;
+  margin-top: 20px;
+  font-size: 36pt;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.banner-section::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7));
+}
+
+
+  .white-box {
+    background-color: #fff;
+    width: 100%;
+    min-height: 100vh; /* Adjust the height as needed */
+    display: flex;
+    margin: 0;
+    padding-bottom: 0;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0px -16px 100px rgba(255, 255, 255, 0.4); /* Add shadow to the top */
+  }
+
+
+
+
+
+.carousel-container {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  box-shadow: 0px 8px 100px rgba(178, 172, 178, 0.9); /* Add shadow to the top */
+  width: 1000px; /* Set your desired max-width */
+  margin: 0 auto; /* Center the carousel container */
+}
+
+.carousel-item img {
+  width: 100%;
+  height: 100%;
+}
+
+.carousel-caption {
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 5px;
+  padding: 20px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  color: #fff;
+}
+
+.carousel-caption h2,
+.carousel-caption p {
+  margin: 0;
+}
+
+.carousel-caption h2 {
+  margin-bottom: 10px;
+}
+
+.light-gray-box {
+  background-color: #f5f5f5;
+  display: flex;
+  width: 100%;
+  min-height: 400px; /* Set a minimum height */
+  justify-content: space-between;
+  padding: 40px;
+  box-shadow: 0px -8px 100px rgba(178, 172, 178, 0.5); /* Add shadow to the top */
+}
+
+.section {
+  width: 30%; /* Adjust as needed */
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Center text vertically */
+  align-items: center;
+}
+
+.section img {
+  width: 64px; /* Fixed width for the circular image */
+  height: 64px; /* Fixed height for the circular image */
+  border: 1px solid #000;
+  border-radius: 50%; /* Make the image round */
+  max-width: 64px; /* Adjust as needed */
+  margin-bottom: 1px; /* Add space between image and text */
+  margin: 5px auto; /* Center the image horizontally */
+}
+
+
+.section-text {
+  font-size: 12pt;
+  font-family: 'Montserrat', sans-serif;
+  color: #000;
+  max-width: 55%;
+  text-align: center; /* Center text horizontally */
+}
+
+.transparent-box {
+  display: flex;
+  width: 100%;
+  min-height: 400px; /* Set a minimum height */
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.2));;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+
+}
+
+
+.bottom-text {
+  font-size: 32pt; /* Adjust the font size as needed */
+  font-family: 'Montserrat', sans-serif;
+  color: #fff; /* Set the desired text color */
+  text-align: center;
+  max-width: 60%; /* Set a maximum width to control the line length */
+  z-index: 1;
+
+}
+
+.section-text{
+  font-size: 12pt; /* Adjust the font size as needed */
+  font-family: 'Montserrat', sans-serif;
+  color: #000;
+  max-width: 60%; /* Set a maximum width to control the line length */
+
+}
+
+.section h4{
+  font-family: 'Montserrat', sans-serif;
+  font-weight:bold;
+  color: #000;
+}
+
+.show-button {
+
+  margin-bottom: 300px;
+}
+
+@media only screen and (max-width: 1024px) {
+  .card {
+    min-height: 400px; /* Adjust as needed for small screens */
+  }
+
+  .home-title{
+    font-size: 18pt;
+  }
+
+  .logo-img {
+    width: 50%; 
+    height: 50%;
+    border-radius: 50%;
+
+
+    .section-text{
+      font-size: 6pt; /* Adjust the font size as needed */
+      font-family: 'Montserrat', sans-serif;
+      
+    }
+  }
+
+ 
+
+  .carousel-container {
+    max-width: 600px; /* Set your desired max-width for smaller screens */
+  }
+
+
+  .bottom-text {
+    font-size: 18pt; /* Adjust the font size as needed */
+    font-family: 'Montserrat', sans-serif;
+    color: #fff; /* Set the desired text color */
+    text-align: center;
+    max-width: 60%; /* Set a maximum width to control the line length */
+  
+  }
+
+
+}
