@@ -4,12 +4,12 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import {Bar, Line, Doughnut} from 'react-chartjs-2';
 import Chart from 'chart.js/auto';
 import {useLocation} from 'react-router-dom';
-import {getExperimentsData} from "../Api/Api";
-import Navbar from "./Navbar";
+import Navbar from "../Componenets/Navbar";
+
 
 import '../style/Data.css';
 
-const Data = () => {
+const DemoData = () => {
     const [data, setData] = useState([]);
     const [cf, setCrossfilter] = useState(null);
     const [categoryDimension, setCategoryDimension] = useState(null);
@@ -21,44 +21,31 @@ const Data = () => {
     const [isFullscreen, setIsFullscreen] = useState(false);
 
 
-    // Inside Data component
+    const location = useLocation();
+    const resultData = location.state && location.state.resultData;
+
     useEffect(() => {
-        const fetchData = async () => {
-            console.log('Starting fetch data');
-            try {
-                const experimentsData = await getExperimentsData(); // Call the function
-                console.log('Fetch data done', experimentsData);
+        if (resultData && resultData.reactionTimes) {
+            const rawData = resultData.reactionTimes.map((item) => ({
+                category: item.status,
+                value: item.time,
+            }));
 
-                if (Array.isArray(experimentsData)) {
-                    // Assuming each experimentData has a property named 'reactionTimes'
-                    const rawData = experimentsData.flatMap((item) =>
-                        item.reactionTimes.map((reactionTime) => ({
-                            category: reactionTime.status,
-                            value: reactionTime.time,
-                        }))
-                    );
+            // Initialize Crossfilter
+            const crossfilterInstance = crossfilter(rawData);
+            console.log('result data in data: ', rawData);
 
-                    // Initialize Crossfilter
-                    const crossfilterInstance = crossfilter(rawData);
+            // Create dimensions and groups
+            const dimension = crossfilterInstance.dimension((d) => d.category);
 
-                    // Create dimensions and groups
-                    const dimension = crossfilterInstance.dimension((d) => d.category);
+            setData(rawData);
+            setCrossfilter(crossfilterInstance);
+            setCategoryDimension(dimension);
 
-                    setData(rawData);
-                    setCrossfilter(crossfilterInstance);
-                    setCategoryDimension(dimension);
-
-                    // Clean up on unmount
-                    return () => crossfilterInstance.remove();
-                }
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
-
-        // Call the fetchData function when the component mounts
-        fetchData();
-    }, []);
+            // Clean up on unmount
+            return () => crossfilterInstance.remove();
+        }
+    }, [resultData])
 
 
     useEffect(() => {
@@ -232,10 +219,8 @@ const Data = () => {
     };
 
     return (
-
         <div className='data-container'>
             <Navbar/>
-
             <h1 className='title-data'>Crossfilter</h1>
             <div className='sec'>
                 {Array.isArray(data) && data.length > 0 ? (
@@ -329,4 +314,4 @@ const Data = () => {
     );
 };
 
-export default Data;
+export default DemoData;

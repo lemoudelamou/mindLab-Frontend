@@ -1,8 +1,8 @@
 /* Resetting some default styles */
 * {
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
 }
 
 /* Importing fonts and Bootstrap */
@@ -11,160 +11,233 @@
 
 /* Custom styling */
 :root {
-  --mainColor: #2346d1;
-  --secondaryColor: #9b8787;
-  --textColor: #eee;
+    --mainColor: #2346d1;
+    --secondaryColor: #9b8787;
+    --textColor: #eee;
 }
 
 .navbar-fixed {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 50%; /* Adjust to your desired width */
-  margin: 0 auto; /* Center the navbar */
-  z-index: 200;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 50%; /* Adjust to your desired width */
+    margin: 0 auto; /* Center the navbar */
+    z-index: 200;
 }
 
 header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 80px;
-  padding: 0 2rem;
-  color: var(--textColor);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 80px;
+    padding: 0 2rem;
+    color: var(--textColor);
 }
 
 nav a {
-  margin: 0 1rem;
-  font-size: 14pt;
-  padding-right: 10px;
-  color: var(--textColor);
-  text-decoration: none;
-  transition: border-bottom 0.3s;
+    margin: 0 1rem;
+    font-size: 14pt;
+    padding-right: 20px;
+    color: var(--textColor);
+    text-decoration: none;
+    transition: border-bottom 0.3s;
 }
 
 nav a:hover {
-  color: var(--secondaryColor);
-  /* Remove the border-bottom property */
-  border-bottom: none;
+    color: var(--secondaryColor);
+    /* Remove the border-bottom property */
+    border-bottom: none;
 }
 
 header .nav-btn {
-  padding: 5px;
-  cursor: pointer;
-  background: transparent;
-  border: none;
-  outline: none;
-  visibility: hidden;
-  opacity: 0;
-  font-size: 1.8rem;
+    padding: 5px;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    outline: none;
+    visibility: hidden;
+    opacity: 0;
+    font-size: 1.8rem;
 }
 
 img {
-  width: 70px;
-  height: 70px;
-  padding: 5px;
+    width: 70px;
+    height: 70px;
+    padding: 5px;
 }
 
 header div,
 nav {
-  display: flex;
-  align-items: center;
+    display: flex;
+    align-items: center;
 }
 
 .home-tab,
 .data-tab,
-.experiment-tab,
-.cal,
-.login,
-.reg {
-  width: 45px;
-  height: 45px;
-  background-color: white; /* Add background color for icons */
-  border-radius: 50%; /* Optional: Add border-radius for circular icons */
+.experiment-tab
+{
+    width: 50px;
+    height: 50px;
 }
 
 .navbar-wrapper {
-  position: fixed;
-  top: 15px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 50%;
-  z-index: 100;
-  background-color: rgba(0, 0, 0, 0.7);
-  border-radius: 15px;
+    position: fixed;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70%;
+    z-index: 100;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 15px;
 }
 
 header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 80px;
-  padding: 0 2rem;
-  color: var(--textColor);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 80px;
+    padding: 0 2rem;
+    color: var(--textColor);
 }
 
 .logo-div {
-  margin-right: 200px;
+    margin-right: 200px;
 }
+
+.demo-tag {
+    background-color: #007bff; /* Blue color, you can customize this */
+    color: #ffffff; /* White color, you can customize this */
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+
+/* Add these styles to your CSS or styling file */
+.quit-demo-button {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    background-color: #e74c3c; /* Change to your desired background color */
+    color: #fff; /* Change to your desired text color */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.quit-demo-image {
+    width: 20px; /* Adjust the width of the image */
+    height: 20px; /* Adjust the height of the image */
+    margin-right: 8px;
+}
+
+.quit-demo-text {
+    font-size: 14px; /* Adjust the font size of the text */
+}
+
+
+.separator {
+    height: 30px;
+    border-right: 1px solid white;
+    margin-right: 15px;
+}
+
+.dropdown-list {
+    flex-direction: column;
+    padding-top: 0;
+}
+
 
 /* Responsive styles */
 @media only screen and (max-width: 1024px) {
-  .navbar-wrapper {
-    width: 100%;
-    left: 0;
-    top: 0;
-    transform: none;
-    border-radius: 0;
-  }
+    .navbar-wrapper {
+        width: 100%;
+        left: 0;
+        top: 0;
+        transform: none;
+        border-radius: 0;
+    }
 
-  header .nav-btn {
-    visibility: visible;
-    opacity: 1;
-    background-color: rgba(0, 0, 0, 0.5);
-  }
+    header .nav-btn {
+        visibility: visible;
+        opacity: 1;
+        background-color: rgba(0, 0, 0, 0.2);
+    }
 
-  header nav {
-    position: fixed;
-    top: -102vh;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1.5rem;
-    background-color: rgba(0, 0, 0, 0.9);
-    transition: 1s;
-    z-index: 1;
-  }
+    header nav {
+        position: fixed;
+        top: -102vh;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1.5rem;
+        background-color: rgba(0, 0, 0, 0.9);
+        transition: 1s;
+        z-index: 1;
+    }
 
-  header .responsive_nav {
-    transform: translateY(100vh);
-  }
+    header .responsive_nav {
+        transform: translateY(100vh);
+    }
 
-  nav .nav-close-btn {
-    position: absolute;
-    top: 2rem;
-    right: 2rem;
-  }
+    nav .nav-close-btn {
+        position: absolute;
+        top: 2rem;
+        right: 2rem;
+    }
 
-  nav a {
-    position: relative; /* Set position to relative */
-    text-align: center; /* Center the text horizontally */
-    margin-top: 10px; /* Add margin to separate text and logos vertically */
-  }
 
-  /* Updated styles for logos */
-  .home-tab,
-  .data-tab,
-  .experiment-tab,
-  .cal,
-  .login,
-  .reg {
-    width: 45px;
-    height: 45px;
-    margin-bottom: 10px; /* Add margin to separate logos vertically */
-  }
+
+    .separator {
+        width: 100%; /* Adjust the width of the horizontal line */
+        height: 1px; /* Set the height to 1px for a horizontal line */
+        border-bottom: 1px solid white; /* Use border-bottom for a horizontal line */
+        margin-right: 15px;
+    }
+
+    /* Updated styles for logos */
+    .home-tab,
+    .data-tab{
+        width: 50px;
+        height: 50px;
+        padding-bottom: 10px;
+    }
+
+    .experiment-tab{
+        width: 50px;
+        height: 50px;
+        margin-left: 55px;
+    }
+
+
+
+
+    .nav-item-content:hover .custom-dropdown-menu {
+        display: flex;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        flex-direction: column;
+    }
+
+    .dropdown-list {
+        flex-direction: column;
+    }
+
+
+    .custom-dropdown-menu.show {
+        display: flex; /* Keep the default style for show class */
+        }
+
+    .custom-dropdown-menu a {
+        padding: 20px;
+        text-align: center;
+        width: 100%; /* Make the links take the full width */
+    }
 }

@@ -1,34 +1,34 @@
 /* default styles */
 footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  color: #fff;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.7rem; /* Adjust the padding to reduce the height */
-  -webkit-box-shadow: 0px -5px 5px rgba(0, 0, 0, 0.2);
-  box-shadow: 0px -5px 5px rgba(0, 0, 0, 0.2);
-  background-color: #000; /* Black color */
-  z-index: 2;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.7rem; /* Adjust the padding to reduce the height */
+    -webkit-box-shadow: 0px -5px 5px rgba(0, 0, 0, 0.2);
+    box-shadow: 0px -5px 5px rgba(0, 0, 0, 0.2);
+    background-color: #000; /* Black color */
+    z-index: 2;
 }
 
 .text {
-  margin-bottom: 10px;
-  color: #fff;
-  font-size: 14pt;
-  font-style: italic;
-  font-weight: bold;
+    margin-bottom: 10px;
+    color: #fff;
+    font-size: 14pt;
+    font-style: italic;
+    font-weight: bold;
 }
 
 /* styles for smaller screens */
 @media screen and (max-width: 600px) {
-  footer {
-    flex-direction: column;
-    justify-content: center;
-    text-align: center;
-    padding: 0.5rem; /* Adjust the padding for smaller screens */
-  }
+    footer {
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        padding: 0.5rem; /* Adjust the padding for smaller screens */
+    }
 }

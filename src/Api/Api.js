@@ -27,11 +27,36 @@ export const saveSettingsData = async (patientId, settingsData) => {
 
 export const saveExperimentResults = async (settingsId, payload) => {
     try {
-        const response = await axios.post(`http://localhost:8081/api/settings/${settingsId}/results`, payload);
+        const response = await axios.post(`http://localhost:8081/api/data/${settingsId}/results`, payload);
         console.log('Server response:', response.data);
         return response.data;
     } catch (error) {
         console.error('Error saving experiment results:', error);
-        throw error; // You can handle the error as needed
+        throw error;
+    }
+};
+
+
+
+export const getExperimentsData = async () => {
+    try {
+        const response = await axios.get('http://localhost:8081/api/data/');
+        console.log('Server response:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error getting experiment data:', error);
+        throw error;
+    }
+};
+
+
+export const getAllPatients = async () => {
+    try {
+        const response = await axios.get('http://localhost:8081/api/patients');
+        console.log('Server response:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error getting experiment data:', error);
+        throw error;
     }
 };

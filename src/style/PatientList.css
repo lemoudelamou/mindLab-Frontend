@@ -1,0 +1,67 @@
+/* ../style/ExperimentsList.css */
+
+.search-container {
+    margin-top: 100px;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+.title-search {
+    margin-bottom: 20px;
+    color: #FFFFFF;
+    font-family: SansSerif;
+}
+
+.custom-search-input {
+    width: 70%;
+    border-radius: 5px;
+}
+
+.custom-search-button {
+    border-radius: 5px;
+}
+
+.list-group {
+    margin: 20px 0;
+}
+
+.custom-list {
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+
+}
+
+.custom-list-item {
+    background-color: #fff;
+    border: 1px solid #dbf;
+    border-radius: 5px;
+
+}
+
+.custom-list-item:hover {
+    background-color: #c6c6cb;
+}
+
+.collapsed-box {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+.btn-cd {
+    height: 40px;
+    margin-bottom: 2px;
+    margin-left: 10px;
+    border: #FFFFFF;
+    border-radius: 8px;
+}
+
+.no-result-text {
+    text-align: center;
+    font-size: 20pt;
+    color: #FFFFFF;
+    margin-top: 100px;
+}

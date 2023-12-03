@@ -1,37 +1,24 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import '../style/Home.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {Carousel, Card, Row, Col, Modal, Button, Nav} from 'react-bootstrap';
+import {Card, Row, Col, Modal, Button, Nav} from 'react-bootstrap';
 import { House, Speedometer2, Table, Heart, Info, Window } from 'react-bootstrap-icons';
-import {useEffect} from "react";
-import {useNavigate} from 'react-router-dom';
-import {toggleDemoMode} from '../utils/LocalStorageUtils';
 import mindLab from '../assets/mindlab.png';
 import Logo from '../assets/mindlab.png';
 import Person from '../assets/person.png';
 import Settings from '../assets/settings.png';
 import Experience from '../assets/experience.png';
-import Navbar from "./Navbar";
-import MenuBar from "./Menubar";
+import Navbar from "../Componenets/Navbar";
+import MenuBar from "../Componenets/Menubar";
 
 
-function Home() {
-
-    const [isDemoMode, setIsDemoMode] = useState(false);
+function DemoHome() {
     const [showModal, setShowModal] = useState(false);
     const [selectedCard, setSelectedCard] = useState(null);
     const currentMode = JSON.parse(localStorage.getItem('isDemoMode'));
 
 
 
-    const navigate = useNavigate();
-
-
-    const enterDemoMode = () => {
-        const newMode = toggleDemoMode();
-        setIsDemoMode(newMode);
-        navigate("/demoHome");
-    };
 
 
     const handleCardClick = (index) => {
@@ -42,7 +29,6 @@ function Home() {
     const handleCloseModal = () => {
         setShowModal(false);
     };
-
 
     const cardsData = [
         {
@@ -89,6 +75,7 @@ function Home() {
         },
     ];
 
+
     useEffect(() => {
         // Calculate the maximum height among all cards
         const cards = document.querySelectorAll('.custom-card');
@@ -107,15 +94,14 @@ function Home() {
         });
     }, []); // Run this effect only once, on mount
 
-
     return (
         <div className="hp-back">
             <div className='home-container'>
-                    <Navbar/>
-
+                <Navbar/>
 
                 {/* Left-side Menu Bar */}
                 <MenuBar currentMode={currentMode} />
+
 
                 <div className="main-content">
                     {/* Banner Section */}
@@ -141,9 +127,6 @@ function Home() {
                                 <div className="quote-mark-down">”</div>
                             </div>
 
-                            <div className='demo-container'>
-                                <button className="demo-button-on" onClick={enterDemoMode}>Try Demo</button>
-                            </div>
 
                             {/* Add any additional content or styling for this section */}
                         </div>
@@ -188,18 +171,17 @@ function Home() {
                         </Row>
                     </div>
 
-
                     {/* Light Gray Box with Three Sections */}
                     <div className="light-gray-box">
                         <div className="section">
                             <img className="d-block w-100" src={Person} alt="First slide"/>
-                            <h4 className="part3-text">Patient's personal details</h4>
+                            <h4>Patient's personal details</h4>
                             <p className='section-text'>The patient is asked to fill in the form with his/her personal
                                 information.</p>
                         </div>
                         <div className="section">
                             <img className="d-block w-100" src={Settings} alt="First slide"/>
-                            <h4 className="part3-text">Set the experiment Parameters</h4>
+                            <h4>Set the experiment Parameters</h4>
                             <p className='section-text'>The test supervisor defines the parameters of the experiment
                                 according
                                 to the nature of the results he wants to achieve.</p>
@@ -207,7 +189,7 @@ function Home() {
                         <div className="section">
                             <img className="d-block w-100" src={Experience} alt="First slide"/>
 
-                            <h4 className="part3-text">Perform the experiment</h4>
+                            <h4>Perform the experiment</h4>
                             <p className='section-text'>Finally, the patient is asked to read the instructions and then
                                 carry
                                 out the experiment.</p>
@@ -269,4 +251,4 @@ function Home() {
     );
 }
 
-export default Home;
+export default DemoHome;

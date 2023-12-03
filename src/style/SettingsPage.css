@@ -1,44 +1,85 @@
-body{
-  overflow: scroll;
+body {
+    overflow: scroll;
 }
 
-
 .experiment-settings-container {
-    max-width: 400px;
+    max-width: 250px;
     color: #000;
     padding: 20px;
-    background-color: #f8f9fa; /* Light gray background color */
+    background-color: #f8f9fa;
     border-radius: 10px;
-    margin: auto; /* Center horizontally and vertically */
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Center horizontally */
-    justify-content: center; /* Center vertically */
-    box-shadow: 20px 16px 100px rgba(0, 0, 0, 0.9); /* Add shadow to the top */
-    margin-top: 180px;
-  }
-
-  .title-settings{
-    color: #000;
-    padding-bottom: 20px;
-  }
-  
-  .experiment-settings {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .form-options {
-    margin-bottom: 10px;
-  }
-  
-  .flex-container {
-    display: flex;
-    margin-bottom: 10px;
-  }
-  
-  .btn-settings{
+    margin: 10% auto; /* Center vertically with 10% from the top */
     display: flex;
     flex-direction: column;
     align-items: center;
-  }
+    justify-content: center;
+    box-shadow: 20px 16px 100px rgba(21, 17, 17, 0.2);
+}
+
+.title-settings {
+    color: #000;
+    padding-bottom: 20px;
+    text-align: center;
+    font-size: 18pt;
+}
+
+.experiment-settings {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-options {
+    margin-bottom: 10px;
+}
+
+.flex-container {
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.btn-settings {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Media queries for responsiveness */
+
+@media only screen and (max-width: 767px) {
+    .experiment-settings-container {
+        max-width: 90%; /* Adjusted for smaller screens */
+        margin-top: 30%; /* Adjusted for smaller screens */
+        overflow-y: scroll;
+        margin-bottom: 30%;
+    }
+
+    .title-settings {
+        font-size: 16pt;
+    }
+}
+
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+    .experiment-settings-container {
+        max-width: 60%; /* Adjusted for medium screens */
+        margin-top: 35%; /* Adjusted for medium screens */
+    }
+}
+
+@media only screen and (min-width: 992px) and (max-width: 1199px) {
+    .experiment-settings-container {
+        max-width: 70%; /* Adjusted for larger screens */
+    }
+}
+
+@media only screen and (min-width: 1200px)  and (max-width: 1367px){
+    .experiment-settings-container {
+        max-width: 30%; /* Adjusted for extra-large screens */
+        margin-top: 30%;
+    }
+}
+
+
+@media only screen and (min-width: 1368px) {
+    .experiment-settings-container {
+        max-width: 20%; /* Adjusted for extra-large screens */
+    }
+}

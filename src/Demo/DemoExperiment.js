@@ -3,16 +3,15 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import '../style/ReactionTimeExperiment.css';
 import {useNavigate} from 'react-router-dom';
 import {useLocation} from 'react-router-dom';
-import InfoBox from "./InfoBox";
-import {saveExperimentResults} from '../Api/Api'; // Import the savePatientData function
-import RedoExperimentModal from './RedoExperimentModal'
+import DemoInfoBox from "./DemoInfoBox";
+import RedoExperimentModal from './DemoRedoExperimentModal'
 import {formatTime, saveToFile, calculateAverageReactionTime} from '../utils/ExperimentUtils';
-import Navbar from "./Navbar";
+import Navbar from "../Componenets/Navbar";
 import '@fortawesome/fontawesome-free/css/all.css';
 
 
 
-const ReactionTimeExperiment = () => {
+const DemoExperiment = () => {
     // State variables for the experiment
     const [shape, setShape] = useState("circle");
     const [backgroundColor, setBackgroundColor] = useState("white");
@@ -54,7 +53,7 @@ const ReactionTimeExperiment = () => {
         hasDiseases: false,
         diseases: '',
     });
-    const [showInfoBox, setShowInfoBox] = useState(false);
+    const [showDemoInfoBox, setShowDemoInfoBox] = useState(false);
 
 
     // Function to clear the text content of the target element
@@ -225,7 +224,7 @@ const ReactionTimeExperiment = () => {
 
 
     // Function to handle saving results
-    const handleSaveResults = async () => {
+    const handleSaveResults = () => {
         setShowSaveButton(false);
 
         // Calculate average reaction time for "positive" and "negative" tries
@@ -271,27 +270,13 @@ const ReactionTimeExperiment = () => {
 
 
         // Check if patient data is available
-        if (settingsId) {
-            try {
-                console.log('Saving settings data...');
 
-                // Save settings data to the server
-                await saveExperimentResults(settingsId, payload);
-
-            } catch (error) {
-                console.error('Error saving settings data:', error);
-                // Handle error as needed
-            }
-        }
-
-        // Log the result data to the console
-        console.log('Result Data:', resultData);
 
         // Save the resultData to a file
         saveToFile(resultData);
 
         // Pass resultData to the Results page using react-router-dom
-        navigate('/results', {state: {resultData}});
+        navigate('/demo-results', {state: {resultData}});
 
         // Reset experiment-related state variables
         resetExperiment();
@@ -434,16 +419,18 @@ const ReactionTimeExperiment = () => {
                             </button>
                         )}
                     </div>
+
+
                     {/* Toggle Info Box button with icon */}
                     <div className="button-container">
-                        <button className="btn btn-info" onClick={() => setShowInfoBox(!showInfoBox)}>
-                            <i className={`fas ${showInfoBox ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                        <button className="btn btn-info" onClick={() => setShowDemoInfoBox(!showDemoInfoBox)}>
+                            <i className={`fas ${showDemoInfoBox ? 'fa-eye-slash' : 'fa-eye'}`}></i>
                         </button>
                     </div>
 
                     {/* Display patient info and experiment settings based on visibility state */}
-                    {showInfoBox && (
-                        <InfoBox patientInfo={patientData?.fullname ? patientInfo : {}} experimentSettings={experimentSettings} />
+                    {showDemoInfoBox && (
+                        <DemoInfoBox patientInfo={patientData?.fullname ? patientInfo : {}} experimentSettings={experimentSettings} />
                     )}
                     {/* Render the RedoExperimentModal */}
                     <RedoExperimentModal show={showRedoModal} onHide={() => setShowRedoModal(false)}
@@ -453,6 +440,6 @@ const ReactionTimeExperiment = () => {
         </div>
     );
 };
-export default ReactionTimeExperiment;
+export default DemoExperiment;
 
 

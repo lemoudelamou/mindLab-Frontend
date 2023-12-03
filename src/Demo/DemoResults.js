@@ -1,8 +1,8 @@
 import React from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
-import Navbar from "./Navbar";
-import '../style/Results.css'
+import Navbar from "../Componenets/Navbar";
+import '../style/Results.css';
 
 const Results = () => {
 
@@ -23,7 +23,7 @@ const Results = () => {
 
 
     const handleSubmit =  (event) => {
-        navigate('/data', { state: { resultData } });
+        navigate('/demo-data', { state: { resultData } });
         console.log('submitted resultData from results page:', resultData);
     }
     return (

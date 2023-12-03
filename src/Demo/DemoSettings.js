@@ -3,12 +3,12 @@ import React, {useState} from 'react';
 import {useNavigate, useLocation} from 'react-router-dom';
 import {saveSettingsData} from '../Api/Api';
 import '../style/SettingsPage.css';
-import Navbar from "./Navbar";
+import Navbar from "../Componenets/Navbar";
 import {Modal} from "react-bootstrap";
 import ntc from "ntc";
 
 
-const SettingsPage = ({selectedShape}) => {
+const DemoSettings = ({selectedShape}) => {
     const defaultShapes = ['circle', 'square', 'rectangle'];
     const defaultDifficultyLevels = ['Easy', 'Medium', 'Hard'];
     const defaultExperiments = ['Reaction Time'];
@@ -17,7 +17,6 @@ const SettingsPage = ({selectedShape}) => {
     const [shapes, setShapes] = useState(defaultShapes);
     const [experiments, setExperiments] = useState(defaultExperiments);
     const [settingsData, setSettingsData] = useState({
-        selectedExperiment: defaultExperiments[0],
         selectedShape: selectedShape || defaultShapes[0],
         experimentLength: 60,
         isColorBlind: '',
@@ -31,8 +30,8 @@ const SettingsPage = ({selectedShape}) => {
     const navigate = useNavigate();
     const location = useLocation();
     const patientData = location.state && location.state.patientData;
-    const patientId = location.state && location.state.patientId;
     const [showModal, setShowModal] = useState(false);
+
 
 
     const getColorName = () => {
@@ -40,11 +39,23 @@ const SettingsPage = ({selectedShape}) => {
         return colorName[1]; // colorName is an array, and the name is at index 1
     };
 
-    const handleSaveSettings = async () =>{
+
+
+
+    const handleSaveSettings = () =>{
+
+        if (settingsData.color1 === settingsData.color2 && settingsData.difficultyLevel === 'Easy') {
+            // Show an error message (you can implement your own way to display errors)
+            alert("Please choose different colors for color1, color2.");
+            return; // Do not proceed with saving settings and navigating
+        } else if (settingsData.color1 === settingsData.color2 && settingsData.color1 === settingsData.color3 && settingsData.difficultyLevel === 'Medium' || settingsData.difficultyLevel === 'Hard') {
+            alert("Please choose different colors for color1, color2 and color3.");
+
+        }
+
         console.log('Handling save changes...');
 
         let savedData = {
-            experiment: settingsData.selectedExperiment,
             shape: settingsData.selectedShape,
             experimentLength: settingsData.experimentLength,
             isColorBlind: settingsData.isColorBlind,
@@ -68,39 +79,28 @@ const SettingsPage = ({selectedShape}) => {
 
 
         // Check if patient data is available
-        if (patientId) {
-            try {
-                console.log('Saving settings data...');
+        if (patientData) {
+            console.log('Saving settings data...');
 
-                // Save settings data to the server
-                const savedSettingsData = await saveSettingsData(patientId, savedData);
+            // Save settings data to the server
 
-                // Redirect to the experiment page with patient and settings data
-                navigate('/ReactiontimeExperiment', {
-                    state: {
-                        patientData,
-                        settingsId: savedSettingsData.id,
-                        settingsData: savedSettingsData
-                    }
-                });
-                console.log('PatientData inside Api response:', location.state.patientData);
-            } catch (error) {
-                console.error('Error saving settings data:', error);
-                // Handle error as needed
-            }
+            // Redirect to the experiment page with patient and settings data
+            navigate('/demo-experiment', {
+                state: {
+                    patientData,
+                    settingsData: savedData
+                }
+            });
+
         } else {
             // If patient data is null, allow the user to proceed with the experiment
-            navigate('/ReactiontimeExperiment', {state: {settingsData: savedData}});
+            navigate('/demo-experiment', {state: {settingsData: savedData}});
             console.log('Form submitted without patient data');
         }
-
+        setShowModal(false);
     }
-
-
-
     const handleShowModal = () => setShowModal(true);
-    const handleCloseModal = () => setShowModal(false);
-
+    const handleCloseModal = () => setShowModal(false)
 
 
 
@@ -117,10 +117,7 @@ const SettingsPage = ({selectedShape}) => {
         }));
     };
 
-    const handleSaveChanges =  () => {
-        handleShowModal()
 
-    };
 
 
     return (
@@ -132,10 +129,10 @@ const SettingsPage = ({selectedShape}) => {
                     <label>Select Experiment:</label>
                     <select
                         className="form-control"
-                        name="selectedExperiment"
+                        name="selectedShape"
                         value={settingsData.selectedExperiment}
                     >
-                        <option value="" disabled>Select Experiment</option>
+                        <option value="Reaction Time" disabled>Select Experiment</option>
                         {experiments.map((experimentOption) => (
                             <option key={experimentOption} value={experimentOption}>
                                 {experimentOption}
@@ -303,11 +300,11 @@ const SettingsPage = ({selectedShape}) => {
                     </>
                 )}
                 <div className="btn-settings">
-                    <button className="btn btn-primary" onClick={handleSaveChanges}>
+                    <button className="btn btn-primary" onClick={handleShowModal}>
                         Save Changes
                     </button>
                 </div>
-                <Modal show={showModal} onHide={handleCloseModal} centered>
+                <Modal show={showModal}  onHide={handleCloseModal} centered>
                     <Modal.Header closeButton>
                         <Modal.Title>Notice</Modal.Title>
                     </Modal.Header>
@@ -329,4 +326,4 @@ const SettingsPage = ({selectedShape}) => {
     );
 };
 
-export default SettingsPage;
+export default DemoSettings;

@@ -1,67 +1,67 @@
 .results-container {
-  max-width: 100%;
-  max-height: 100px;
-  margin: 0 auto;
-  padding: 120px;
-  max-height: 100vh;
-  overflow-y: auto;
-  background: url("/src/assets/back.png") center/cover no-repeat fixed;
-  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 120px;
+    max-height: 150vh;
+    overflow-y: auto;
+    background: url("/src/assets/back.png") center/cover no-repeat fixed;
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
 }
 
 .pad-container {
-  max-width: 900px;
-  max-height: 1000px;
-  z-index: 1;
-  align-items: center;
-  text-align: center;
-  overflow-y: scroll;
+    max-width: 900px;
+    min-height: 1000px;
+    z-index: 1;
+    padding-top: 200px;
+    align-items: center;
+    text-align: center;
+    overflow-y: auto;
 
 }
 
 h2, h3 {
-  margin-top: 40px;
-  color: #fff;
+    margin-top: 40px;
+    color: #fff;
 }
 
 table {
-  width: 100%;
-  margin-top: 10px;
-  border-collapse: collapse;
-  border-spacing: 0;
-  border: 1px solid #ddd;
+    width: 100%;
+    margin-top: 10px;
+    border-collapse: collapse;
+    border-spacing: 0;
+    border: 1px solid #ddd;
 
 }
 
 th, td {
-  padding: 12px;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
-  color: #fff;
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    color: #fff;
 }
 
 tbody tr:hover {
-  background-color:aqua;
+    background-color:aqua;
 }
 
 
 .no-results-message {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Montserrat', sans-serif;
-  height: 100vh; /* Ensures the container takes the full height of the viewport */
-  text-align: center;
-  color: #fff; /* Set your desired text color */
-  font-size: 28pt; /* Set your desired font size */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Montserrat', sans-serif;
+    height: 100vh; /* Ensures the container takes the full height of the viewport */
+    text-align: center;
+    color: #fff; /* Set your desired text color */
+    font-size: 28pt; /* Set your desired font size */
 }
 
 
 .transfer {
-  margin-top: 15px;
-  margin-bottom: 10px;
+    margin-top: 15px;
+    margin-bottom: 10px;
 }

@@ -7,10 +7,10 @@ import {savePatientData} from '../Api/Api'; // Import the savePatientData functi
 import 'rsuite/dist/rsuite.min.css';
 import '../style/PatientInfoPage.css';
 import {calculateAge} from '../utils/ExperimentUtils'
-import Navbar from "./Navbar";
+import Navbar from "../Componenets/Navbar";
 
 
-function PatientInfoPage() {
+function DemoPatientInfoPage() {
     const [patientData, setPatientData] = useState({
         fullname: '',
         age: '',
@@ -46,24 +46,16 @@ function PatientInfoPage() {
         });
     };
 
-    const handleSubmit = async (event) => {
+    const handleSubmit = (event) => {
         event.preventDefault();
 
-        try {
 
 
-            const savedPatientData = await savePatientData({
-                ...patientData,
+        console.log('Patient data are passed', patientData);
 
-            });
+        // Redirect to settings page with patient data
+        navigate('/demo-settings', {state: {patientData}});
 
-            // Redirect to settings page with patient ID
-            navigate('/settings', {state: {patientId: savedPatientData.id, patientData: savedPatientData}});
-            console.log('Form submitted with data:', savedPatientData.id);
-        } catch (error) {
-            console.error('Error saving patient data:', error);
-            // Handle error as needed
-        }
     };
 
     return (
@@ -175,6 +167,6 @@ function PatientInfoPage() {
     );
 }
 
-export default PatientInfoPage;
+export default DemoPatientInfoPage;
 
 
