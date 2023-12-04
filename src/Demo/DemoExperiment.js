@@ -1,16 +1,13 @@
-import React, {useState, useEffect, useRef} from "react";
+import React, { useState, useEffect, useRef } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../style/ReactionTimeExperiment.css';
-import {useNavigate} from 'react-router-dom';
-import {useLocation} from 'react-router-dom';
-import DemoInfoBox from "./DemoInfoBox";
+import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import InfoBox from "./DemoInfoBox";
+import { saveExperimentResults } from '../Api/Api'; // Import the savePatientData function
 import RedoExperimentModal from './DemoRedoExperimentModal'
-import {formatTime, saveToFile, calculateAverageReactionTime} from '../utils/ExperimentUtils';
+import { formatTime, saveToFile, calculateAverageReactionTime} from '../utils/ExperimentUtils';
 import Navbar from "../Componenets/Navbar";
-import '@fortawesome/fontawesome-free/css/all.css';
-import {Modal} from "react-bootstrap";
-import ntc from "ntc";
-
 
 
 const DemoExperiment = () => {
@@ -30,13 +27,13 @@ const DemoExperiment = () => {
     const [showSaveButton, setShowSaveButton] = useState(false);
     const [spacebarEnabled, setSpacebarEnabled] = useState(true);
     const [isColorBlind, setIsColorBlind] = useState("");
-    const [selectedColors, setSelectedColors] = useState({richtigColor: 'red', falschColor: 'green'});
+    const [selectedColors, setSelectedColors] = useState({ richtigColor: 'red', falschColor: 'green' });
     const shapes = ['circle', 'square', 'rectangle'];
     const [showRedoModal, setShowRedoModal] = useState(false);
     const [intervalId, setIntervalId] = useState(null); // New state variable to store the interval ID
     const navigate = useNavigate();
     const location = useLocation();
-    const {state} = location;
+    const { state } = location;
     const patientData = state?.patientData || null;
     const settingsData = state?.settingsData || null;
     const settingsId = state?.settingsId || null;
@@ -55,17 +52,6 @@ const DemoExperiment = () => {
         hasDiseases: false,
         diseases: '',
     });
-    const [showDemoInfoBox, setShowDemoInfoBox] = useState(false);
-    const [showModal, setShowModal] = useState(false);
-
-    useEffect(() => {
-        if (location.state && location.state.showModal) {
-            setShowModal(true);
-        }
-    }, [location.state]);
-
-
-
 
     // Function to clear the text content of the target element
     const clearTargetText = () => {
@@ -74,24 +60,29 @@ const DemoExperiment = () => {
         }
     };
 
-
-
-    const handleCloseModal = () => setShowModal(false)
-
-
-
-
-    const getColorName = () => {
-        const colorName = ntc.name(settingsData.color1);
-        return colorName[1]; // colorName is an array, and the name is at index 1
-    };
-
     // Function to apply experiment settings
     const applyExperimentSettings = () => {
         setShape(settingsData.shape);
         setExperimentLength(settingsData.experimentLength);
         setIsColorBlind(settingsData.isColorBlind);
         setBlinkDelay(settingsData.blinkDelay);
+
+        // Check if difficulty level is easy, and update the selected colors
+        if (settingsData.difficultyLevel === 'Easy') {
+            setSelectedColors({ richtigColor: settingsData.color1, falschColor: settingsData.color2 });
+        } else if (settingsData.difficultyLevel === 'Medium') {
+            setSelectedColors({
+                richtigColor: settingsData.color1,
+                falschColor: settingsData.color2,
+                color2: settingsData.color3,
+            });
+        } else if (settingsData.difficultyLevel === 'Hard') {
+            setSelectedColors({
+                richtigColor: settingsData.color1,
+                falschColor: settingsData.color2,
+                color2: settingsData.color3,
+            });
+        }
 
     };
 
@@ -222,7 +213,7 @@ const DemoExperiment = () => {
             });
         }
 
-        console.log('settingsData:', settingsData);
+        console.log('use effect settingsData:', settingsData);
 
         if (settingsData) {
             setExperimentSettings({
@@ -247,15 +238,16 @@ const DemoExperiment = () => {
 
 
     // Function to handle saving results
-    const handleSaveResults = () => {
+    const handleSaveResults = async () => {
         setShowSaveButton(false);
 
-        // Calculate average reaction time for "correct" and "incorrect" tries
-        const correctTimes = reactionTimes.filter((entry) => entry.status.includes("correct"));
-        const incorrectTimes = reactionTimes.filter((entry) => entry.status.includes("incorrect"));
-        const averageCorrectTime = calculateAverageReactionTime(correctTimes);
-        const averageIncorrectTime = calculateAverageReactionTime(incorrectTimes);
-        const age = patientData?.age;
+        // Calculate average reaction time for "positive" and "negative" tries
+        const positiveTimes = reactionTimes.filter((entry) => entry.status.includes("positive"));
+        const negativeTimes = reactionTimes.filter((entry) => entry.status.includes("negative"));
+        const averagePositiveTime = calculateAverageReactionTime(positiveTimes);
+        const averageNegativeTime = calculateAverageReactionTime(negativeTimes);
+        const age = patientData?.age ;
+
 
 
         // Combine experiment settings, patient info, and reaction times
@@ -274,16 +266,16 @@ const DemoExperiment = () => {
             },
             reactionTimes,
             averageReactionTimes: {
-                correct: averageCorrectTime,
-                incorrect: averageIncorrectTime,
+                positive: averagePositiveTime,
+                negative: averageNegativeTime,
             },
         };
 
         const payload = {
             reactionTimes,
             averageReactionTimes: {
-                correct: averageCorrectTime,
-                incorrect: averageIncorrectTime,
+                positive: averagePositiveTime,
+                negative: averageNegativeTime,
             },
         };
 
@@ -293,13 +285,27 @@ const DemoExperiment = () => {
 
 
         // Check if patient data is available
+        if (settingsId) {
+            try {
+                console.log('Saving settings data...');
 
+                // Save settings data to the server
+                await saveExperimentResults(settingsId, payload);
+
+            } catch (error) {
+                console.error('Error saving settings data:', error);
+                // Handle error as needed
+            }
+        }
+
+        // Log the result data to the console
+        console.log('Result Data:', resultData);
 
         // Save the resultData to a file
-       // saveToFile(resultData);
+        saveToFile(resultData);
 
         // Pass resultData to the Results page using react-router-dom
-        navigate('/demo-results', {state: {resultData}});
+        navigate('/results', { state: { resultData } });
 
         // Reset experiment-related state variables
         resetExperiment();
@@ -318,12 +324,12 @@ const DemoExperiment = () => {
 
             let status;
             if (isResponseCorrect) {
-                status = `correct`;
+                status = `positive`;
             } else if (backgroundColor === (isColorBlind ? "yellow" : selectedColors.falschColor)) {
-                status = `incorrect`;
+                status = `negative`;
             } else if (backgroundColor === selectedColors.color2) {
                 // Add condition for the third color in the medium difficulty level
-                status = `incorrect`;
+                status = `negative`;
             } else {
                 status = `No Reaction`;
             }
@@ -334,7 +340,7 @@ const DemoExperiment = () => {
 
             setReactionTimes((prevReactionTimes) => [
                 ...prevReactionTimes,
-                {time: reactionTime, status},
+                { time: reactionTime, status },
             ]);
 
             setTimeout(() => {
@@ -407,12 +413,11 @@ const DemoExperiment = () => {
     return (
         <div className="container-fluid">
             <Navbar/>
-            { settingsData !== null ? (
             <div className="container">
                 {/* Experiment container */}
                 <div className="experiment-container">
                     {/* Shape container */}
-                    <div className={`shape-container ${shape}`} style={{backgroundColor}} onClick={handleBarClick}>
+                    <div className={`shape-container ${shape}`} style={{ backgroundColor }} onClick={handleBarClick}>
                         <div ref={target}></div>
                     </div>
 
@@ -420,7 +425,7 @@ const DemoExperiment = () => {
                     <div className="button-container">
                         {showSaveButton && (
                             <button className="btn btn-success" onClick={handleSaveResults}>
-                                To Results
+                                Save Results
                             </button>
                         )}
                     </div>
@@ -429,8 +434,7 @@ const DemoExperiment = () => {
                     {experimentStarted && (
                         <div className="countdown-container">
                             <div className="experiment-status-box">
-                                <p className="experiment-status">Experiment in Progress - Time
-                                    Remaining: {formatTime(timeRemaining)}</p>
+                                <p className="experiment-status">Experiment in Progress - Time Remaining: {formatTime(timeRemaining)}</p>
                             </div>
                         </div>
                     )}
@@ -444,45 +448,12 @@ const DemoExperiment = () => {
                         )}
                     </div>
 
-
-                    <Modal show={showModal}  onHide={handleCloseModal} centered>
-                        <Modal.Header closeButton>
-                            <Modal.Title>Instructions</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            <p>
-                                {`When you see the color `}
-                                <strong>{`${getColorName()}`}</strong>
-                                {` (color 1) please click on the space bar`}
-                            </p>
-                        </Modal.Body>
-                        <Modal.Footer>
-                            <button className="btn btn-primary" onClick={handleCloseModal}>
-                                Confirm
-                            </button>
-                        </Modal.Footer>
-                    </Modal>
-
-
-                    {/* Toggle Info Box button with icon */}
-                    <div className="button-container">
-                        <button className="btn btn-info" onClick={() => setShowDemoInfoBox(!showDemoInfoBox)}>
-                            <i className={`fas ${showDemoInfoBox ? 'fa-eye-slash' : 'fa-eye'}`}></i>
-                        </button>
-                    </div>
-
-                    {/* Display patient info and experiment settings based on visibility state */}
-                    {showDemoInfoBox && (
-                        <DemoInfoBox patientInfo={patientData?.fullname ? patientInfo : {}} experimentSettings={experimentSettings} />
-                    )}
+                    {/* Display patient info and experiment settings */}
+                    <InfoBox patientInfo={patientData?.fullname ? patientInfo : {}} experimentSettings={experimentSettings} />
                     {/* Render the RedoExperimentModal */}
-                    <RedoExperimentModal show={showRedoModal} onHide={() => setShowRedoModal(false)}
-                                         onRedo={handleRedoExperiment}/>
+                    <RedoExperimentModal show={showRedoModal} onHide={() => setShowRedoModal(false)} onRedo={handleRedoExperiment} />
                 </div>
-            </div>) : <div className="container-fluid">
-                <h1> Please set the experiment settings first </h1>
             </div>
-            }
         </div>
     );
 };

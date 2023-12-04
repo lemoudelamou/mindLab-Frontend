@@ -42,20 +42,9 @@ const DemoSettings = ({selectedShape}) => {
 
 
 
-
-
-
-
     const handleSaveSettings = () =>{
 
-        if (settingsData.color1 === settingsData.color2 && settingsData.difficultyLevel === 'Easy') {
-            // Show an error message (you can implement your own way to display errors)
-            alert("Please choose different colors for color1, color2.");
-            return; // Do not proceed with saving settings and navigating
-        } else if (settingsData.color1 === settingsData.color2 && settingsData.color1 === settingsData.color3 && settingsData.difficultyLevel === 'Medium' || settingsData.difficultyLevel === 'Hard') {
-            alert("Please choose different colors for color1, color2 and color3.");
-
-        }
+      
 
         console.log('Handling save changes...');
 
@@ -65,7 +54,7 @@ const DemoSettings = ({selectedShape}) => {
             isColorBlind: settingsData.isColorBlind,
             blinkDelay: settingsData.blinkDelay,
             difficultyLevel: settingsData.difficultyLevel,
-            color1: settingsData.color1 || '#ff0000',
+            color1: settingsData.color1,
             color2: settingsData.color2,
             color3: settingsData.color3,
         };

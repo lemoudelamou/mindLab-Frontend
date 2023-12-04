@@ -42,11 +42,7 @@ const ReactionTimeExperiment = () => {
     const settingsData = state?.settingsData || null;
     const settingsId = state?.settingsId || null;
     const [experimentSettings, setExperimentSettings] = useState({
-        shape: "circle",
-        experimentLength: 60,
-        isColorBlind: '',
-        blinkDelay: 1,
-        difficultyLevel: 'Easy',
+
     }); // State variables for experiment settings and patient information
     const [patientInfo, setPatientInfo] = useState({
         fullname: '',
@@ -77,10 +73,7 @@ const ReactionTimeExperiment = () => {
     const handleCloseModal = () => setShowModal(false)
 
 
-    const getColorName = () => {
-        const colorName = ntc.name(settingsData.color1);
-        return colorName[1]; // colorName is an array, and the name is at index 1
-    };
+
 
 
     // Function to clear the text content of the target element
@@ -90,13 +83,29 @@ const ReactionTimeExperiment = () => {
         }
     };
 
-    // Function to apply experiment settings
+    // Function to apply experiment settings 
     const applyExperimentSettings = () => {
         setShape(settingsData.shape);
         setExperimentLength(settingsData.experimentLength);
         setIsColorBlind(settingsData.isColorBlind);
         setBlinkDelay(settingsData.blinkDelay);
 
+        // Check if difficulty level is easy, and update the selected colors
+        if (settingsData.difficultyLevel === 'Easy') {
+            setSelectedColors({ richtigColor: settingsData.color1, falschColor: settingsData.color2 });
+        } else if (settingsData.difficultyLevel === 'Medium') {
+            setSelectedColors({
+                richtigColor: settingsData.color1,
+                falschColor: settingsData.color2,
+                color2: settingsData.color3,
+            });
+        } else if (settingsData.difficultyLevel === 'Hard') {
+            setSelectedColors({
+                richtigColor: settingsData.color1,
+                falschColor: settingsData.color2,
+                color2: settingsData.color3,
+            });
+        }
     };
 
     // Function to generate a random color based on color blindness setting or selected colors
@@ -473,23 +482,6 @@ const ReactionTimeExperiment = () => {
                         )}
                     </div>
 
-                    <Modal show={showModal}  onHide={handleCloseModal} centered>
-                        <Modal.Header closeButton>
-                            <Modal.Title>Instructions</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            <p>
-                                {`When you see the color `}
-                                <strong>{`${getColorName()}`}</strong>
-                                {` (color 1) please click on the space bar`}
-                            </p>
-                        </Modal.Body>
-                        <Modal.Footer>
-                            <button className="btn btn-primary" onClick={handleCloseModal}>
-                                Confirm
-                            </button>
-                        </Modal.Footer>
-                    </Modal>
 
 
                     {/* Toggle Info Box button with icon */}

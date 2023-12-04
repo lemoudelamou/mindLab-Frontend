@@ -142,7 +142,7 @@ function Home() {
                             </div>
 
                             <div className='demo-container'>
-                                <button className="demo-button-on" onClick={enterDemoMode}>Try Demo</button>
+                                <button className="demo-button-on" onClick={enterDemoMode}>Demo</button>
                             </div>
 
                             {/* Add any additional content or styling for this section */}

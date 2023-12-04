@@ -47,18 +47,18 @@ const SettingsPage = ({selectedShape}) => {
             isColorBlind: settingsData.isColorBlind,
             blinkDelay: settingsData.blinkDelay,
             difficultyLevel: settingsData.difficultyLevel,
-            color1: settingsData.color1 || '#ff0000',
-            color2: settingsData.color2,
-            color3: settingsData.color3,
+            color1: settingsData.color1 ,
+            color2: settingsData.color2 ,
+            color3: settingsData.color3 ,
         };
-
 
         if (
             (settingsData.difficultyLevel === 'Hard' && settingsData.isColorBlind !== 'colorBlind') ||
-            (settingsData.difficultyLevel === 'Medium' && settingsData.isColorBlind === 'coloBlind')
+            (settingsData.difficultyLevel === 'Medium' && settingsData.isColorBlind === 'colorBlind') // Corrected typo
         ) {
-            savedData = {...savedData, shape: ''};
+            savedData = { ...savedData, shape: '' };
         }
+
 
         console.log('Saved data:', savedData);
         console.log('patient data:', patientData);
