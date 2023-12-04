@@ -241,11 +241,11 @@ const Data = () => {
                 {Array.isArray(data) && data.length > 0 ? (
                     <>
                         <div>
-                            <button className='btn btn-primary m-1' onClick={() => filterData('positive')}>
-                                Positive
+                            <button className='btn btn-primary m-1' onClick={() => filterData('correct')}>
+                                correct
                             </button>
-                            <button className='btn btn-primary m-1' onClick={() => filterData('negative')}>
-                                Negative
+                            <button className='btn btn-primary m-1' onClick={() => filterData('incorrect')}>
+                                incorrect
                             </button>
                             <button className='btn btn-secondary m-1' onClick={clearFilters}>
                                 Clear Filters

@@ -1,0 +1,72 @@
+/* InformationPage.css */
+
+/* General Styles */
+
+
+/* Style for the heading */
+h1 {
+    font-size: 28px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Style for the tabs container */
+#information-tabs {
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 20px auto;
+}
+
+/* Style for the individual tabs */
+.nav-link {
+    color: #555; /* Dark gray tab text color */
+    border: none;
+    border-radius: 0;
+    padding: 15px 20px;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+/* Style for the active tab */
+.nav-item.show .nav-link,
+.nav-item.active .nav-link {
+    color: #fff; /* White text color for active tab */
+    position: relative; /* Make active tab appear on top */
+    z-index: 1;
+}
+
+/* Style for the tab content container */
+.tab-content-container {
+    background-color: #fff; /* White background color for the content container */
+    border-radius: 8px;
+    max-width: 1500px;
+    min-height: 800px;
+    margin: 20px auto; /* Set top and bottom margin to 20px, and left and right margin to auto */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.7), 0 4px 8px rgba(0, 0, 0, 0.4);
+
+}
+
+/* Style for the tab content */
+.tab-content {
+    padding: 20px;
+}
+
+.tab-text {
+    margin-top: 150px;
+    padding-top:100px ;
+    line-height: 1.6;
+    text-align: center;
+    display: flex;
+    align-items: center; /* Center vertically */
+    justify-content: center; /* Center horizontally */
+    height: 100%; /* Set the height to 100% for vertical centering */
+}
+
+
+
+/* Responsive styles for smaller screens */
+@media (max-width: 576px) {
+    .nav-link {
+        font-size: 14px;
+    }
+}

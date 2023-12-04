@@ -10,16 +10,19 @@ import PatientInfoPage from './Componenets/PatientInfoPage';
 import SettingsPage from './Componenets/SettingsPage';
 import ReactionTimeExperiment from './Componenets/ReactionTimeExperiment'
 import Results from './Componenets/Results';
+import LevelsDescription from './Componenets/LevelsDescription';
+import UserGuide from './Componenets/UserGuide';
+import Contact from './Componenets/Contact'
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
-import PatientList from "./Componenets/PatientList";
-import DemoHome from "./Demo/DemoHome"
-import DemoPatientInfoPage from "./Demo/DemoPatientInfoPage";
-import DemoSettings from "./Demo/DemoSettings";
-import DemoExperiment from "./Demo/DemoExperiment";
+import PatientList from './Componenets/PatientList';
+import DemoHome from './Demo/DemoHome'
+import DemoPatientInfoPage from './Demo/DemoPatientInfoPage';
+import DemoSettings from './Demo/DemoSettings';
+import DemoExperiment from './Demo/DemoExperiment';
 import DemoResults from "./Demo/DemoResults";
-import DemoData from "./Demo/DemoData";
-import DemoPatientList from "./Demo/DemoPatientList";
+import DemoData from './Demo/DemoData';
+import DemoPatientList from './Demo/DemoPatientList';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 
@@ -54,6 +57,9 @@ function AppRouter() {
         <Route path="/results" element={<Results />} />
         <Route path="/home" element={<Home/>}/>
         <Route path="/data" element={<Data />}/>
+        <Route path="/levelsDescription" element={<LevelsDescription />}/>
+        <Route path="/userGuide" element={<UserGuide />}/>
+        <Route path="/contact" element={<Contact />}/>
         <Route path="/demoHome" element={<DemoHome />}/>
         <Route path="/demo-patient-info" element={<DemoPatientInfoPage/>}/>
         <Route path="/demo-settings" element={<DemoSettings />}/>

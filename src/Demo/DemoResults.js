@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import Navbar from "../Componenets/Navbar";
 import '../style/Results.css';
+import { calculateAge} from "../utils/ExperimentUtils";
+
 
 const Results = () => {
 
@@ -21,6 +23,7 @@ const Results = () => {
     // Access data from resultData
     const { experimentSettings, patientInfo, reactionTimes, averageReactionTimes } = resultData;
 
+    console.log("the results data are", resultData);
 
     const handleSubmit =  (event) => {
         navigate('/demo-data', { state: { resultData } });
@@ -42,11 +45,11 @@ const Results = () => {
                     </tr>
                     <tr>
                         <td>Birth Date:</td>
-                        <td>{patientInfo.birthDate instanceof Date ? patientInfo.birthDate.toLocaleDateString() : "Invalid Date"}</td>
+                        <td>{patientInfo.birthDate ? new Date(patientInfo.birthDate).toLocaleDateString() : 'N/A'}</td>
                     </tr>
                     <tr>
                         <td>Age:</td>
-                        <td>{patientInfo.age ? null : 'N/A'}</td>
+                        <td>{ patientInfo.age ? calculateAge(patientInfo.birthDate) : 'N/A'}</td>
                     </tr>
                     <tr>
                         <td>Strong Hand:</td>
@@ -123,12 +126,12 @@ const Results = () => {
                     </thead>
                     <tbody>
                     <tr>
-                        <td>Positive</td>
-                        <td>{averageReactionTimes.positive}</td>
+                        <td>correct</td>
+                        <td>{averageReactionTimes.correct}</td>
                     </tr>
                     <tr>
-                        <td>Negative</td>
-                        <td>{averageReactionTimes.negative}</td>
+                        <td>incorrect</td>
+                        <td>{averageReactionTimes.incorrect}</td>
                     </tr>
                     </tbody>
                 </table>

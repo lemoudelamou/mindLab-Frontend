@@ -8,6 +8,8 @@ import RedoExperimentModal from './DemoRedoExperimentModal'
 import {formatTime, saveToFile, calculateAverageReactionTime} from '../utils/ExperimentUtils';
 import Navbar from "../Componenets/Navbar";
 import '@fortawesome/fontawesome-free/css/all.css';
+import {Modal} from "react-bootstrap";
+import ntc from "ntc";
 
 
 
@@ -54,6 +56,15 @@ const DemoExperiment = () => {
         diseases: '',
     });
     const [showDemoInfoBox, setShowDemoInfoBox] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+
+    useEffect(() => {
+        if (location.state && location.state.showModal) {
+            setShowModal(true);
+        }
+    }, [location.state]);
+
+
 
 
     // Function to clear the text content of the target element
@@ -61,6 +72,18 @@ const DemoExperiment = () => {
         if (target.current) {
             target.current.textContent = "";
         }
+    };
+
+
+
+    const handleCloseModal = () => setShowModal(false)
+
+
+
+
+    const getColorName = () => {
+        const colorName = ntc.name(settingsData.color1);
+        return colorName[1]; // colorName is an array, and the name is at index 1
     };
 
     // Function to apply experiment settings
@@ -227,11 +250,11 @@ const DemoExperiment = () => {
     const handleSaveResults = () => {
         setShowSaveButton(false);
 
-        // Calculate average reaction time for "positive" and "negative" tries
-        const positiveTimes = reactionTimes.filter((entry) => entry.status.includes("positive"));
-        const negativeTimes = reactionTimes.filter((entry) => entry.status.includes("negative"));
-        const averagePositiveTime = calculateAverageReactionTime(positiveTimes);
-        const averageNegativeTime = calculateAverageReactionTime(negativeTimes);
+        // Calculate average reaction time for "correct" and "incorrect" tries
+        const correctTimes = reactionTimes.filter((entry) => entry.status.includes("correct"));
+        const incorrectTimes = reactionTimes.filter((entry) => entry.status.includes("incorrect"));
+        const averageCorrectTime = calculateAverageReactionTime(correctTimes);
+        const averageIncorrectTime = calculateAverageReactionTime(incorrectTimes);
         const age = patientData?.age;
 
 
@@ -251,16 +274,16 @@ const DemoExperiment = () => {
             },
             reactionTimes,
             averageReactionTimes: {
-                positive: averagePositiveTime,
-                negative: averageNegativeTime,
+                correct: averageCorrectTime,
+                incorrect: averageIncorrectTime,
             },
         };
 
         const payload = {
             reactionTimes,
             averageReactionTimes: {
-                positive: averagePositiveTime,
-                negative: averageNegativeTime,
+                correct: averageCorrectTime,
+                incorrect: averageIncorrectTime,
             },
         };
 
@@ -273,7 +296,7 @@ const DemoExperiment = () => {
 
 
         // Save the resultData to a file
-        saveToFile(resultData);
+       // saveToFile(resultData);
 
         // Pass resultData to the Results page using react-router-dom
         navigate('/demo-results', {state: {resultData}});
@@ -295,12 +318,12 @@ const DemoExperiment = () => {
 
             let status;
             if (isResponseCorrect) {
-                status = `positive`;
+                status = `correct`;
             } else if (backgroundColor === (isColorBlind ? "yellow" : selectedColors.falschColor)) {
-                status = `negative`;
+                status = `incorrect`;
             } else if (backgroundColor === selectedColors.color2) {
                 // Add condition for the third color in the medium difficulty level
-                status = `negative`;
+                status = `incorrect`;
             } else {
                 status = `No Reaction`;
             }
@@ -384,6 +407,7 @@ const DemoExperiment = () => {
     return (
         <div className="container-fluid">
             <Navbar/>
+            { settingsData !== null ? (
             <div className="container">
                 {/* Experiment container */}
                 <div className="experiment-container">
@@ -396,7 +420,7 @@ const DemoExperiment = () => {
                     <div className="button-container">
                         {showSaveButton && (
                             <button className="btn btn-success" onClick={handleSaveResults}>
-                                Save Results
+                                To Results
                             </button>
                         )}
                     </div>
@@ -421,6 +445,25 @@ const DemoExperiment = () => {
                     </div>
 
 
+                    <Modal show={showModal}  onHide={handleCloseModal} centered>
+                        <Modal.Header closeButton>
+                            <Modal.Title>Instructions</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <p>
+                                {`When you see the color `}
+                                <strong>{`${getColorName()}`}</strong>
+                                {` (color 1) please click on the space bar`}
+                            </p>
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <button className="btn btn-primary" onClick={handleCloseModal}>
+                                Confirm
+                            </button>
+                        </Modal.Footer>
+                    </Modal>
+
+
                     {/* Toggle Info Box button with icon */}
                     <div className="button-container">
                         <button className="btn btn-info" onClick={() => setShowDemoInfoBox(!showDemoInfoBox)}>
@@ -436,7 +479,10 @@ const DemoExperiment = () => {
                     <RedoExperimentModal show={showRedoModal} onHide={() => setShowRedoModal(false)}
                                          onRedo={handleRedoExperiment}/>
                 </div>
+            </div>) : <div className="container-fluid">
+                <h1> Please set the experiment settings first </h1>
             </div>
+            }
         </div>
     );
 };

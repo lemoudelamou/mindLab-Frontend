@@ -4,7 +4,7 @@
     padding: 20px;
     border-radius: 10px;
     background-color: #f8f9fa; /* Light gray background color */
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.7), 0 4px 8px rgba(0, 0, 0, 0.4);
     margin: 15% auto; /* Center vertically with 15% from the top */
     max-width: 400px;
 }

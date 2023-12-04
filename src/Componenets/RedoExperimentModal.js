@@ -9,7 +9,7 @@ const RedoExperimentModal = ({show, onHide, onRedo}) => {
 
 
     return (
-        <Modal show={show} onHide={onHide}>
+        <Modal show={show} onHide={onHide} centered>
             <Modal.Header closeButton>
                 <Modal.Title>Redo Experiment?</Modal.Title>
             </Modal.Header>

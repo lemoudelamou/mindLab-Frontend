@@ -19,6 +19,7 @@ function PatientInfoPage() {
         strongHand: 'Right',
         hasDiseases: false,
         diseases: '',
+        expDate: '',
     });
 
     const navigate = useNavigate();

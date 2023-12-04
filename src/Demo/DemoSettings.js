@@ -1,5 +1,5 @@
 // src/SettingsPage.js
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useNavigate, useLocation} from 'react-router-dom';
 import {saveSettingsData} from '../Api/Api';
 import '../style/SettingsPage.css';
@@ -30,14 +30,18 @@ const DemoSettings = ({selectedShape}) => {
     const navigate = useNavigate();
     const location = useLocation();
     const patientData = location.state && location.state.patientData;
-    const [showModal, setShowModal] = useState(false);
+    const [showModal, setShowModal] = useState(false); // State to control modal visibility
+    const [modalContent, setModalContent] = useState("");
 
 
 
-    const getColorName = () => {
-        const colorName = ntc.name(settingsData.color1);
-        return colorName[1]; // colorName is an array, and the name is at index 1
+
+    const handleShowModal = () => {
+        setShowModal(true);
     };
+
+
+
 
 
 
@@ -61,7 +65,7 @@ const DemoSettings = ({selectedShape}) => {
             isColorBlind: settingsData.isColorBlind,
             blinkDelay: settingsData.blinkDelay,
             difficultyLevel: settingsData.difficultyLevel,
-            color1: settingsData.color1,
+            color1: settingsData.color1 || '#ff0000',
             color2: settingsData.color2,
             color3: settingsData.color3,
         };
@@ -80,28 +84,32 @@ const DemoSettings = ({selectedShape}) => {
 
         // Check if patient data is available
         if (patientData) {
+
             console.log('Saving settings data...');
 
-            // Save settings data to the server
+
+
 
             // Redirect to the experiment page with patient and settings data
             navigate('/demo-experiment', {
                 state: {
                     patientData,
-                    settingsData: savedData
-                }
+                    settingsData: savedData,
+                    showModal: true, // Pass the state to show the modal on the next page
+                },
             });
 
         } else {
             // If patient data is null, allow the user to proceed with the experiment
-            navigate('/demo-experiment', {state: {settingsData: savedData}});
+            navigate('/demo-experiment', {
+                state: {
+                    settingsData: savedData,
+                    showModal: true, // Pass the state to show the modal on the next page
+                },
+            });
             console.log('Form submitted without patient data');
         }
-        setShowModal(false);
     }
-    const handleShowModal = () => setShowModal(true);
-    const handleCloseModal = () => setShowModal(false)
-
 
 
 
@@ -300,27 +308,11 @@ const DemoSettings = ({selectedShape}) => {
                     </>
                 )}
                 <div className="btn-settings">
-                    <button className="btn btn-primary" onClick={handleShowModal}>
+                    <button className="btn btn-primary" onClick={handleSaveSettings}>
                         Save Changes
                     </button>
                 </div>
-                <Modal show={showModal}  onHide={handleCloseModal} centered>
-                    <Modal.Header closeButton>
-                        <Modal.Title>Notice</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <p>
-                            {`When you see the color `}
-                            <strong>{`${getColorName()}`}</strong>
-                            {` (color 1) please click on the space bar`}
-                        </p>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <button className="btn btn-primary" onClick={handleSaveSettings}>
-                            OK, Saved
-                        </button>
-                    </Modal.Footer>
-                </Modal>
+
             </div>
         </div>
     );

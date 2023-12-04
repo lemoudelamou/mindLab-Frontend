@@ -1,7 +1,7 @@
 .results-container {
     max-width: 100%;
     margin: 0 auto;
-    padding: 120px;
+    padding: 70px;
     max-height: 150vh;
     overflow-y: auto;
     background: url("/src/assets/back.png") center/cover no-repeat fixed;
@@ -16,7 +16,7 @@
     max-width: 900px;
     min-height: 1000px;
     z-index: 1;
-    padding-top: 200px;
+    padding-top: 80px;
     align-items: center;
     text-align: center;
     overflow-y: auto;

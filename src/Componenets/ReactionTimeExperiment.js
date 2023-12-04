@@ -9,6 +9,8 @@ import RedoExperimentModal from './RedoExperimentModal'
 import {formatTime, saveToFile, calculateAverageReactionTime} from '../utils/ExperimentUtils';
 import Navbar from "./Navbar";
 import '@fortawesome/fontawesome-free/css/all.css';
+import ntc from "ntc";
+import {Modal} from "react-bootstrap";
 
 
 
@@ -53,8 +55,32 @@ const ReactionTimeExperiment = () => {
         strongHand: 'Right',
         hasDiseases: false,
         diseases: '',
+        expDate: '',
     });
     const [showInfoBox, setShowInfoBox] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+
+
+
+
+
+
+    useEffect(() => {
+        if (location.state && location.state.showModal) {
+            setShowModal(true);
+        }
+    }, [location.state]);
+
+
+
+
+    const handleCloseModal = () => setShowModal(false)
+
+
+    const getColorName = () => {
+        const colorName = ntc.name(settingsData.color1);
+        return colorName[1]; // colorName is an array, and the name is at index 1
+    };
 
 
     // Function to clear the text content of the target element
@@ -197,6 +223,7 @@ const ReactionTimeExperiment = () => {
                 strongHand: patientData.strongHand || 'Right',
                 hasDiseases: patientData.hasDiseases || '',
                 diseases: patientData.diseases || '',
+                expDate: patientData.expDate || '',
             });
         }
 
@@ -228,12 +255,13 @@ const ReactionTimeExperiment = () => {
     const handleSaveResults = async () => {
         setShowSaveButton(false);
 
-        // Calculate average reaction time for "positive" and "negative" tries
-        const positiveTimes = reactionTimes.filter((entry) => entry.status.includes("positive"));
-        const negativeTimes = reactionTimes.filter((entry) => entry.status.includes("negative"));
-        const averagePositiveTime = calculateAverageReactionTime(positiveTimes);
-        const averageNegativeTime = calculateAverageReactionTime(negativeTimes);
+        // Calculate average reaction time for "correct" and "incorrect" tries
+        const correctTimes = reactionTimes.filter((entry) => entry.status.includes("correct"));
+        const incorrectTimes = reactionTimes.filter((entry) => entry.status.includes("incorrect"));
+        const averageCorrectTime = calculateAverageReactionTime(correctTimes);
+        const averageIncorrectTime = calculateAverageReactionTime(incorrectTimes);
         const age = patientData?.age;
+        const expDate = patientData?.expDate
 
 
         // Combine experiment settings, patient info, and reaction times
@@ -249,19 +277,21 @@ const ReactionTimeExperiment = () => {
                 ...patientInfo,
                 birthDate: patientInfo.birthDate,
                 age,
+                expDate,
+
             },
             reactionTimes,
             averageReactionTimes: {
-                positive: averagePositiveTime,
-                negative: averageNegativeTime,
+                correct: averageCorrectTime,
+                incorrect: averageIncorrectTime,
             },
         };
 
         const payload = {
             reactionTimes,
             averageReactionTimes: {
-                positive: averagePositiveTime,
-                negative: averageNegativeTime,
+                correct: averageCorrectTime,
+                incorrect: averageIncorrectTime,
             },
         };
 
@@ -276,11 +306,19 @@ const ReactionTimeExperiment = () => {
                 console.log('Saving settings data...');
 
                 // Save settings data to the server
-                await saveExperimentResults(settingsId, payload);
+                const savedExperiment = await saveExperimentResults(settingsId, payload);
+
+                // Save experimentDataId to localStorage
+                localStorage.setItem('experimentDataId', savedExperiment.id);
+
+                navigate('/results', {state: {resultData}});
+
+                console.log('the experiment ', savedExperiment.id);
 
             } catch (error) {
                 console.error('Error saving settings data:', error);
                 // Handle error as needed
+                navigate('/results', {state: {resultData}});
             }
         }
 
@@ -288,10 +326,9 @@ const ReactionTimeExperiment = () => {
         console.log('Result Data:', resultData);
 
         // Save the resultData to a file
-        saveToFile(resultData);
+        //saveToFile(resultData);
 
-        // Pass resultData to the Results page using react-router-dom
-        navigate('/results', {state: {resultData}});
+
 
         // Reset experiment-related state variables
         resetExperiment();
@@ -310,14 +347,14 @@ const ReactionTimeExperiment = () => {
 
             let status;
             if (isResponseCorrect) {
-                status = `positive`;
+                status = `correct`;
             } else if (backgroundColor === (isColorBlind ? "yellow" : selectedColors.falschColor)) {
-                status = `negative`;
+                status = `incorrect`;
             } else if (backgroundColor === selectedColors.color2) {
                 // Add condition for the third color in the medium difficulty level
-                status = `negative`;
+                status = `incorrect`;
             } else {
-                status = `No Reaction`;
+                status = `incorrect`;
             }
 
             setBackgroundColor("white");
@@ -399,6 +436,7 @@ const ReactionTimeExperiment = () => {
     return (
         <div className="container-fluid">
             <Navbar/>
+            { settingsData !== null ? (
             <div className="container">
                 {/* Experiment container */}
                 <div className="experiment-container">
@@ -434,6 +472,26 @@ const ReactionTimeExperiment = () => {
                             </button>
                         )}
                     </div>
+
+                    <Modal show={showModal}  onHide={handleCloseModal} centered>
+                        <Modal.Header closeButton>
+                            <Modal.Title>Instructions</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <p>
+                                {`When you see the color `}
+                                <strong>{`${getColorName()}`}</strong>
+                                {` (color 1) please click on the space bar`}
+                            </p>
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <button className="btn btn-primary" onClick={handleCloseModal}>
+                                Confirm
+                            </button>
+                        </Modal.Footer>
+                    </Modal>
+
+
                     {/* Toggle Info Box button with icon */}
                     <div className="button-container">
                         <button className="btn btn-info" onClick={() => setShowInfoBox(!showInfoBox)}>
@@ -449,7 +507,10 @@ const ReactionTimeExperiment = () => {
                     <RedoExperimentModal show={showRedoModal} onHide={() => setShowRedoModal(false)}
                                          onRedo={handleRedoExperiment}/>
                 </div>
+            </div> ) :  <div className="container-fluid">
+                <h1> Please set the experiment settings first </h1>
             </div>
+            }
         </div>
     );
 };

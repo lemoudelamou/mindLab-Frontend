@@ -35,10 +35,7 @@ const SettingsPage = ({selectedShape}) => {
     const [showModal, setShowModal] = useState(false);
 
 
-    const getColorName = () => {
-        const colorName = ntc.name(settingsData.color1);
-        return colorName[1]; // colorName is an array, and the name is at index 1
-    };
+
 
     const handleSaveSettings = async () =>{
         console.log('Handling save changes...');
@@ -50,7 +47,7 @@ const SettingsPage = ({selectedShape}) => {
             isColorBlind: settingsData.isColorBlind,
             blinkDelay: settingsData.blinkDelay,
             difficultyLevel: settingsData.difficultyLevel,
-            color1: settingsData.color1,
+            color1: settingsData.color1 || '#ff0000',
             color2: settingsData.color2,
             color3: settingsData.color3,
         };
@@ -80,7 +77,9 @@ const SettingsPage = ({selectedShape}) => {
                     state: {
                         patientData,
                         settingsId: savedSettingsData.id,
-                        settingsData: savedSettingsData
+                        settingsData: savedSettingsData,
+                        showModal: true, // Pass the state to show the modal on the next page
+
                     }
                 });
                 console.log('PatientData inside Api response:', location.state.patientData);
@@ -90,7 +89,12 @@ const SettingsPage = ({selectedShape}) => {
             }
         } else {
             // If patient data is null, allow the user to proceed with the experiment
-            navigate('/ReactiontimeExperiment', {state: {settingsData: savedData}});
+            navigate('/ReactiontimeExperiment', {
+                state: {
+                    settingsData: savedData,
+                    showModal: true, // Pass the state to show the modal on the next page
+                },
+            });
             console.log('Form submitted without patient data');
         }
 
@@ -99,7 +103,6 @@ const SettingsPage = ({selectedShape}) => {
 
 
     const handleShowModal = () => setShowModal(true);
-    const handleCloseModal = () => setShowModal(false);
 
 
 
@@ -117,10 +120,7 @@ const SettingsPage = ({selectedShape}) => {
         }));
     };
 
-    const handleSaveChanges =  () => {
-        handleShowModal()
 
-    };
 
 
     return (
@@ -303,27 +303,11 @@ const SettingsPage = ({selectedShape}) => {
                     </>
                 )}
                 <div className="btn-settings">
-                    <button className="btn btn-primary" onClick={handleSaveChanges}>
+                    <button className="btn btn-primary" onClick={handleSaveSettings}>
                         Save Changes
                     </button>
                 </div>
-                <Modal show={showModal} onHide={handleCloseModal} centered>
-                    <Modal.Header closeButton>
-                        <Modal.Title>Notice</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <p>
-                            {`When you see the color `}
-                            <strong>{`${getColorName()}`}</strong>
-                            {` (color 1) please click on the space bar`}
-                        </p>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <button className="btn btn-primary" onClick={handleSaveSettings}>
-                            OK, Saved
-                        </button>
-                    </Modal.Footer>
-                </Modal>
+
             </div>
         </div>
     );

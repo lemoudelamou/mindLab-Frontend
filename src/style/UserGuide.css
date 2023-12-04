@@ -1,0 +1,8 @@
+
+
+.guide-container {
+    border-radius: 8px;
+    max-width: 1500px;
+    min-height: 600px;
+    margin: 250px auto; /* Set top and bottom margin to 20px, and left and right margin to auto */
+}
