@@ -3,11 +3,12 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import '../style/ReactionTimeExperiment.css';
 import { useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
-import InfoBox from "./DemoInfoBox";
+import DemoInfoBox from "./DemoInfoBox";
 import { saveExperimentResults } from '../Api/Api'; // Import the savePatientData function
 import RedoExperimentModal from './DemoRedoExperimentModal'
 import { formatTime, saveToFile, calculateAverageReactionTime} from '../utils/ExperimentUtils';
 import Navbar from "../Componenets/Navbar";
+import InfoBox from "../Componenets/InfoBox";
 
 
 const DemoExperiment = () => {
@@ -31,6 +32,7 @@ const DemoExperiment = () => {
     const shapes = ['circle', 'square', 'rectangle'];
     const [showRedoModal, setShowRedoModal] = useState(false);
     const [intervalId, setIntervalId] = useState(null); // New state variable to store the interval ID
+    const [showInfoBox, setShowInfoBox] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
     const { state } = location;
@@ -305,7 +307,7 @@ const DemoExperiment = () => {
         saveToFile(resultData);
 
         // Pass resultData to the Results page using react-router-dom
-        navigate('/results', { state: { resultData } });
+        navigate('/demo-results', { state: { resultData } });
 
         // Reset experiment-related state variables
         resetExperiment();
@@ -448,8 +450,17 @@ const DemoExperiment = () => {
                         )}
                     </div>
 
-                    {/* Display patient info and experiment settings */}
-                    <InfoBox patientInfo={patientData?.fullname ? patientInfo : {}} experimentSettings={experimentSettings} />
+                    {/* Toggle Info Box button with icon */}
+                    <div className="button-container">
+                        <button className="btn btn-info" onClick={() => setShowInfoBox(!showInfoBox)}>
+                            <i className={`fas ${showInfoBox ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                        </button>
+                    </div>
+
+                    {/* Display patient info and experiment settings based on visibility state */}
+                    {showInfoBox && (
+                        <DemoInfoBox patientInfo={patientData?.fullname ? patientInfo : {}} experimentSettings={experimentSettings} />
+                    )}
                     {/* Render the RedoExperimentModal */}
                     <RedoExperimentModal show={showRedoModal} onHide={() => setShowRedoModal(false)} onRedo={handleRedoExperiment} />
                 </div>
