@@ -102,7 +102,7 @@ export default function Navbar({activeTab}) {
                         >
                             <div className={`nav-item-content custom-dropdown-menu ${showDropdown ? 'show' : ''}`}>
                                 <img className="experiment-tab" src={Flask} alt="Experiment" />
-                                <a className={  activeTab === 'experiment' ? 'active' : ''} href="#dropdown" style={{paddingLeft:'0'}}>
+                                <a className={  activeTab === 'experiment' ? 'active' : ''}  style={{paddingLeft:'0'}}>
                                     Experiment
                                 </a>
                                 <div className={`dropdown-menu ${showDropdown ? 'show' : ''}`}>

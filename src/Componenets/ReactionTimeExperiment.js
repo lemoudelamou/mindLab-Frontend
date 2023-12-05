@@ -83,7 +83,7 @@ const ReactionTimeExperiment = () => {
         }
     };
 
-    // Function to apply experiment settings 
+    // Function to apply experiment settings
     const applyExperimentSettings = () => {
         setShape(settingsData.shape);
         setExperimentLength(settingsData.experimentLength);

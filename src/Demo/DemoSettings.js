@@ -27,6 +27,10 @@ const DemoSettings = ({selectedShape}) => {
         color3: '#0000ff', // Default color 3
     });
 
+
+    const [sessionLength, setSessionLength] = useState(1800); // Default session length in seconds (30 minutes)
+
+
     const navigate = useNavigate();
     const location = useLocation();
     const patientData = location.state && location.state.patientData;
@@ -44,7 +48,7 @@ const DemoSettings = ({selectedShape}) => {
 
     const handleSaveSettings = () =>{
 
-      
+        setSessionLength(sessionLength);
 
         console.log('Handling save changes...');
 
@@ -84,7 +88,7 @@ const DemoSettings = ({selectedShape}) => {
                 state: {
                     patientData,
                     settingsData: savedData,
-                    showModal: true, // Pass the state to show the modal on the next page
+                    sessionLength,
                 },
             });
 
@@ -93,7 +97,7 @@ const DemoSettings = ({selectedShape}) => {
             navigate('/demo-experiment', {
                 state: {
                     settingsData: savedData,
-                    showModal: true, // Pass the state to show the modal on the next page
+                    sessionLength,
                 },
             });
             console.log('Form submitted without patient data');
@@ -136,6 +140,17 @@ const DemoSettings = ({selectedShape}) => {
                             </option>
                         ))}
                     </select>
+                </div>
+                <div className="form-group">
+                    <label>Session Duration (seconds):</label>
+                    <input
+                        type="number"
+                        className="form-control"
+                        name="sessionLength"
+                        value={sessionLength}
+                        onChange={(e) => setSessionLength(e.target.value)}
+                        min="1"
+                    />
                 </div>
                 <div className="form-group">
                     <label>Select Shape:</label>

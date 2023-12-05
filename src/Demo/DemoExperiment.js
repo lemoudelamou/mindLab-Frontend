@@ -4,11 +4,9 @@ import '../style/ReactionTimeExperiment.css';
 import { useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import DemoInfoBox from "./DemoInfoBox";
-import { saveExperimentResults } from '../Api/Api'; // Import the savePatientData function
-import RedoExperimentModal from './DemoRedoExperimentModal'
+import DemoRedoExperimentModal from './DemoRedoExperimentModal'
 import { formatTime, saveToFile, calculateAverageReactionTime} from '../utils/ExperimentUtils';
 import Navbar from "../Componenets/Navbar";
-import InfoBox from "../Componenets/InfoBox";
 
 
 const DemoExperiment = () => {
@@ -31,14 +29,17 @@ const DemoExperiment = () => {
     const [selectedColors, setSelectedColors] = useState({ richtigColor: 'red', falschColor: 'green' });
     const shapes = ['circle', 'square', 'rectangle'];
     const [showRedoModal, setShowRedoModal] = useState(false);
+    const [countdown, setCountdown] = useState(3);
     const [intervalId, setIntervalId] = useState(null); // New state variable to store the interval ID
     const [showInfoBox, setShowInfoBox] = useState(false);
+    const [countdownRunning, setCountdownRunning] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
     const { state } = location;
     const patientData = state?.patientData || null;
     const settingsData = state?.settingsData || null;
     const settingsId = state?.settingsId || null;
+    const sessionLength = state.sessionLength;
     const [experimentSettings, setExperimentSettings] = useState({
         shape: "circle",
         experimentLength: 60,
@@ -54,6 +55,11 @@ const DemoExperiment = () => {
         hasDiseases: false,
         diseases: '',
     });
+    // New state variable for session countdown
+    const [sessionCountdown, setSessionCountdown] = useState(sessionLength);
+    const [allAttempts, setAllAttempts] = useState([]);
+
+
 
     // Function to clear the text content of the target element
     const clearTargetText = () => {
@@ -147,12 +153,13 @@ const DemoExperiment = () => {
         setExperimentStarted(false);
         setShowSaveButton(false);
         setBackgroundColor("white");
-        setTimeRemaining(experimentLength); // Set time remaining to experiment length
-
+        setTimeRemaining(experimentLength);
+        setAllAttempts([]); // Clear all attempts
     };
 
     // Function to start a new experiment
     const startNewExperiment = () => {
+
         setIsWaiting(true);
         clearTargetText();
         setSpacebarEnabled(true);
@@ -177,6 +184,11 @@ const DemoExperiment = () => {
             setShowSaveButton(true);
         }
     }, [lastReactionTime]);
+
+
+
+
+
 
     // Function to handle the start of the experiment
     const handleStartExperiment = () => {
@@ -204,6 +216,7 @@ const DemoExperiment = () => {
 
     // update infoBox Data (we can delete this if we decide to delete the info box from the experiment page)
     useEffect(() => {
+        console.log("SessionLength is: ", sessionLength);
         if (patientData) {
             setPatientInfo({
                 fullname: patientData.fullname || '',
@@ -217,6 +230,7 @@ const DemoExperiment = () => {
 
         console.log('use effect settingsData:', settingsData);
 
+
         if (settingsData) {
             setExperimentSettings({
                 shape: settingsData.shape || 'circle',
@@ -224,6 +238,7 @@ const DemoExperiment = () => {
                 isColorBlind: settingsData.isColorBlind || '',
                 blinkDelay: settingsData.blinkDelay || 1,
                 difficultyLevel: settingsData.difficultyLevel || 'Easy',
+
             });
         }
     }, [patientData, settingsData]);
@@ -240,17 +255,15 @@ const DemoExperiment = () => {
 
 
     // Function to handle saving results
-    const handleSaveResults = async () => {
+    const handleSaveResults = () => {
         setShowSaveButton(false);
 
-        // Calculate average reaction time for "positive" and "negative" tries
-        const positiveTimes = reactionTimes.filter((entry) => entry.status.includes("positive"));
-        const negativeTimes = reactionTimes.filter((entry) => entry.status.includes("negative"));
-        const averagePositiveTime = calculateAverageReactionTime(positiveTimes);
-        const averageNegativeTime = calculateAverageReactionTime(negativeTimes);
-        const age = patientData?.age ;
-
-
+        // Calculate average reaction time for "correct" and "incorrect" tries
+        const correctTimes = reactionTimes.filter((entry) => entry.status.includes("correct"));
+        const incorrectTimes = reactionTimes.filter((entry) => entry.status.includes("incorrect"));
+        const averageCorrectTime = calculateAverageReactionTime(correctTimes);
+        const averageIncorrectTime = calculateAverageReactionTime(incorrectTimes);
+        const age = patientData?.age;
 
         // Combine experiment settings, patient info, and reaction times
         const resultData = {
@@ -268,43 +281,28 @@ const DemoExperiment = () => {
             },
             reactionTimes,
             averageReactionTimes: {
-                positive: averagePositiveTime,
-                negative: averageNegativeTime,
+                correct: averageCorrectTime,
+                incorrect: averageIncorrectTime,
             },
         };
 
-        const payload = {
-            reactionTimes,
-            averageReactionTimes: {
-                positive: averagePositiveTime,
-                negative: averageNegativeTime,
-            },
-        };
+        // Save the resultData for this attempt
+        setAllAttempts((prevAttempts) => [...prevAttempts, resultData]);
 
-
-        console.log('Payload:', resultData.averageReactionTimes);
+        console.log('Payload:', resultData);
         console.log('settingsId:', settingsId);
-
 
         // Check if patient data is available
         if (settingsId) {
-            try {
-                console.log('Saving settings data...');
-
-                // Save settings data to the server
-                await saveExperimentResults(settingsId, payload);
-
-            } catch (error) {
-                console.error('Error saving settings data:', error);
-                // Handle error as needed
-            }
+            console.log('Saving settings data...');
+            navigate('/demo-results', { state: { resultData } });
         }
 
         // Log the result data to the console
         console.log('Result Data:', resultData);
 
         // Save the resultData to a file
-        saveToFile(resultData);
+        // saveToFile(resultData);
 
         // Pass resultData to the Results page using react-router-dom
         navigate('/demo-results', { state: { resultData } });
@@ -312,6 +310,7 @@ const DemoExperiment = () => {
         // Reset experiment-related state variables
         resetExperiment();
     };
+
 
 
     // Function to handle a click on the experiment bar
@@ -326,12 +325,12 @@ const DemoExperiment = () => {
 
             let status;
             if (isResponseCorrect) {
-                status = `positive`;
+                status = `correct`;
             } else if (backgroundColor === (isColorBlind ? "yellow" : selectedColors.falschColor)) {
-                status = `negative`;
+                status = `incorrect`;
             } else if (backgroundColor === selectedColors.color2) {
                 // Add condition for the third color in the medium difficulty level
-                status = `negative`;
+                status = `incorrect`;
             } else {
                 status = `No Reaction`;
             }
@@ -411,13 +410,66 @@ const DemoExperiment = () => {
     }, [isWaiting, backgroundColor, selectedColors.richtigColor]);
 
 
+
+
+    // Effect to update session countdown
+    useEffect(() => {
+        let intervalId;
+
+        // Start the countdown when the component is mounted
+        if (countdownRunning) {
+            intervalId = setInterval(() => {
+                setSessionCountdown((prevCountdown) => {
+                    if (prevCountdown > 0) {
+                        return prevCountdown - 1;
+                    } else {
+                        setCountdownRunning(false);  // Stop the countdown when it reaches 0
+                        return 0;
+                    }
+                });
+            }, 1000);
+        }
+
+        return () => clearInterval(intervalId);
+    }, [countdownRunning]);
+
+    const handleToggleCountdown = () => {
+        setCountdownRunning((prev) => !prev);
+    };
+
+
+
+
     // Render the component
     return (
         <div className="container-fluid">
             <Navbar/>
             <div className="container">
+
+
+                {/* Combined container with button and session countdown */}
+                <div >
+                    <div className="button-container">
+                        <button className="btn btn-warning" onClick={handleToggleCountdown}>
+                            <div className="countdown-container">
+                                <div className="experiment-status-box">
+                                    <p className="experiment-status">Session Time Remaining: {formatTime(sessionCountdown)}</p>
+                                </div>
+
+                                {/* Shutdown icon */}
+                                {countdownRunning && (
+                                    <i className="fas fa-power-off shutdown-icon" onClick={handleToggleCountdown}></i>
+                                )}
+                            </div>
+                            {countdownRunning ? 'Stop' : 'Start'}
+                        </button>
+                    </div>
+                </div>
                 {/* Experiment container */}
                 <div className="experiment-container">
+
+
+
                     {/* Shape container */}
                     <div className={`shape-container ${shape}`} style={{ backgroundColor }} onClick={handleBarClick}>
                         <div ref={target}></div>
@@ -462,12 +514,12 @@ const DemoExperiment = () => {
                         <DemoInfoBox patientInfo={patientData?.fullname ? patientInfo : {}} experimentSettings={experimentSettings} />
                     )}
                     {/* Render the RedoExperimentModal */}
-                    <RedoExperimentModal show={showRedoModal} onHide={() => setShowRedoModal(false)} onRedo={handleRedoExperiment} />
+                    <DemoRedoExperimentModal show={showRedoModal} onHide={() => setShowRedoModal(false)} onRedo={handleRedoExperiment} />
+
                 </div>
             </div>
         </div>
     );
 };
 export default DemoExperiment;
-
 

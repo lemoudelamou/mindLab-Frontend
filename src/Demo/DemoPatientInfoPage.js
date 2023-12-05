@@ -11,6 +11,8 @@ import Navbar from "../Componenets/Navbar";
 
 
 function DemoPatientInfoPage() {
+    const [sessionNumber, setSessionNumber] = useState(1);
+
     const [patientData, setPatientData] = useState({
         fullname: '',
         age: '',

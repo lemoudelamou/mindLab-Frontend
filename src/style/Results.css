@@ -14,9 +14,9 @@
 
 .pad-container {
     max-width: 900px;
-    min-height: 1000px;
+    max-height: 1200px;
     z-index: 1;
-    padding-top: 80px;
+    padding-top: 100px;
     align-items: center;
     text-align: center;
     overflow-y: auto;
