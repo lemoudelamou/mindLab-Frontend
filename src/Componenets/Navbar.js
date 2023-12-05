@@ -3,7 +3,7 @@ import {FaBars, FaTimes} from 'react-icons/fa';
 import {Link, useLocation} from 'react-router-dom';
 import QuitDemoButton from '../utils/QuitDemoButton';
 import '../style/Navbar.css';
-import 'bootstrap/dist/css/bootstrap.min.css'; // Import Bootstrap CSS
+import 'bootstrap/dist/css/bootstrap.min.css';
 import Logo from '../assets/mindlab.png';
 import Home from '../assets/home-w.png';
 import Data from '../assets/data-w.png';
@@ -63,7 +63,6 @@ export default function Navbar({activeTab}) {
             document.removeEventListener('click', handleClickOutsideDropdown);
         };
     }, []); // Empty dependency array means this effect runs once when the component mounts
-
 
 
 
@@ -137,13 +136,17 @@ export default function Navbar({activeTab}) {
                     </div>
 
 
+
                     <button className="nav-btn nav-close-btn" onClick={showNavbar}>
                         <FaTimes/>
                     </button>
                 </nav>
+
                 <button className="nav-btn" onClick={showNavbar}>
                     <FaBars/>
                 </button>
+
+
             </header>
         </div>
     );

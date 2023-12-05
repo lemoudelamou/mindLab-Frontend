@@ -1,0 +1,17 @@
+.form-check {
+    margin-top: 10px; /* Adjust as needed */
+}
+
+.form-check-label {
+    margin-left: 10px; /* Adjust as needed */
+}
+
+.form-check-input {
+    cursor: pointer;
+}
+
+/* Styling for the checked state */
+.form-check-input:checked {
+    background-color: #007bff; /* Bootstrap primary color */
+    border-color: #007bff;
+}

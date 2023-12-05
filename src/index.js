@@ -5,7 +5,7 @@ import './index.css';
 import reportWebVitals from './reportWebVitals';
 import Home from './Componenets/Home';
 import Data from './Componenets/Data';
-import Footer from './Componenets/Footer';
+import Footer from './Componenets/Footer/Footer';
 import PatientInfoPage from './Componenets/PatientInfoPage';
 import SettingsPage from './Componenets/SettingsPage';
 import ReactionTimeExperiment from './Componenets/ReactionTimeExperiment'
@@ -28,11 +28,12 @@ import 'bootstrap/dist/js/bootstrap.bundle.min';
 
 
 
+
 export default function App() {
 
 
   return (
-    <BrowserRouter>
+      <BrowserRouter>
       <AppRouter />
     </BrowserRouter>
   );
@@ -40,9 +41,6 @@ export default function App() {
 
 function AppRouter() {
   const location = useLocation();
-
-
-
 
 
   return (

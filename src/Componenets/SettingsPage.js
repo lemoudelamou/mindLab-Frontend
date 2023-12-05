@@ -27,6 +27,8 @@ const SettingsPage = ({selectedShape}) => {
         color2: '#00ff00', // Default color 2
         color3: '#0000ff', // Default color 3
     });
+    const [sessionLength, setSessionLength] = useState(1800); // Default session length in seconds (30 minutes)
+
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -35,9 +37,7 @@ const SettingsPage = ({selectedShape}) => {
     const [showModal, setShowModal] = useState(false);
 
 
-
-
-    const handleSaveSettings = async () =>{
+    const handleSaveSettings = async () => {
         console.log('Handling save changes...');
 
         let savedData = {
@@ -47,16 +47,16 @@ const SettingsPage = ({selectedShape}) => {
             isColorBlind: settingsData.isColorBlind,
             blinkDelay: settingsData.blinkDelay,
             difficultyLevel: settingsData.difficultyLevel,
-            color1: settingsData.color1 ,
-            color2: settingsData.color2 ,
-            color3: settingsData.color3 ,
+            color1: settingsData.color1,
+            color2: settingsData.color2,
+            color3: settingsData.color3,
         };
 
         if (
             (settingsData.difficultyLevel === 'Hard' && settingsData.isColorBlind !== 'colorBlind') ||
             (settingsData.difficultyLevel === 'Medium' && settingsData.isColorBlind === 'colorBlind') // Corrected typo
         ) {
-            savedData = { ...savedData, shape: '' };
+            savedData = {...savedData, shape: ''};
         }
 
 
@@ -78,8 +78,7 @@ const SettingsPage = ({selectedShape}) => {
                         patientData,
                         settingsId: savedSettingsData.id,
                         settingsData: savedSettingsData,
-                        showModal: true, // Pass the state to show the modal on the next page
-
+                        sessionLength,
                     }
                 });
                 console.log('PatientData inside Api response:', location.state.patientData);
@@ -92,7 +91,7 @@ const SettingsPage = ({selectedShape}) => {
             navigate('/ReactiontimeExperiment', {
                 state: {
                     settingsData: savedData,
-                    showModal: true, // Pass the state to show the modal on the next page
+                    sessionLength,
                 },
             });
             console.log('Form submitted without patient data');
@@ -101,14 +100,7 @@ const SettingsPage = ({selectedShape}) => {
     }
 
 
-
     const handleShowModal = () => setShowModal(true);
-
-
-
-
-
-
 
 
     const handleChange = (e) => {
@@ -119,8 +111,6 @@ const SettingsPage = ({selectedShape}) => {
             [name]: name === 'isColorBlind' ? value : type === 'checkbox' ? checked : value,
         }));
     };
-
-
 
 
     return (
@@ -143,6 +133,18 @@ const SettingsPage = ({selectedShape}) => {
                         ))}
                     </select>
                 </div>
+                <div className="form-group">
+                    <label>Session Duration (seconds):</label>
+                    <input
+                        type="number"
+                        className="form-control"
+                        name="sessionLength"
+                        value={sessionLength}
+                        onChange={(e) => setSessionLength(e.target.value)}
+                        min="1"
+                    />
+                </div>
+
                 <div className="form-group">
                     <label>Select Shape:</label>
                     <select
@@ -314,3 +316,4 @@ const SettingsPage = ({selectedShape}) => {
 };
 
 export default SettingsPage;
+
