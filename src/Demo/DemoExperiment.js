@@ -29,7 +29,7 @@ const DemoExperiment = () => {
     const [selectedColors, setSelectedColors] = useState({ richtigColor: 'red', falschColor: 'green' });
     const shapes = ['circle', 'square', 'rectangle'];
     const [showRedoModal, setShowRedoModal] = useState(false);
-    const [countdown, setCountdown] = useState(3);
+    const [experimentCountdown, setExperimentCountdown] = useState(3);
     const [intervalId, setIntervalId] = useState(null); // New state variable to store the interval ID
     const [showInfoBox, setShowInfoBox] = useState(false);
     const [countdownRunning, setCountdownRunning] = useState(false);
@@ -39,7 +39,7 @@ const DemoExperiment = () => {
     const patientData = state?.patientData || null;
     const settingsData = state?.settingsData || null;
     const settingsId = state?.settingsId || null;
-    const sessionLength = state.sessionLength;
+    const sessionLength = state?.sessionLength || null ;
     const [experimentSettings, setExperimentSettings] = useState({
         shape: "circle",
         experimentLength: 60,
@@ -56,7 +56,7 @@ const DemoExperiment = () => {
         diseases: '',
     });
     // New state variable for session countdown
-    const [sessionCountdown, setSessionCountdown] = useState(sessionLength);
+    const [sessionCountdown, setSessionCountdown] = useState(sessionLength ?? 180);
     const [allAttempts, setAllAttempts] = useState([]);
 
 
@@ -385,6 +385,25 @@ const DemoExperiment = () => {
     }, [isWaiting, backgroundColor, lastReactionTime, timeRemaining]);
 
 
+    // Function to start the experiment countdown
+    const startExperimentCountdown = () => {
+        setExperimentCountdown(3);
+
+        const countdownInterval = setInterval(() => {
+            setExperimentCountdown((prevCountdown) => {
+                if (prevCountdown > 1) {
+                    return prevCountdown - 1;
+                } else {
+                    clearInterval(countdownInterval);
+                    // Start the actual experiment when the countdown reaches 1
+                    handleStartExperiment();
+                    return 0;
+                }
+            });
+        }, 1000);
+    };
+
+
     // Effect to check conditions and show redo modal if needed
     useEffect(() => {
         let timeoutId;
@@ -493,11 +512,11 @@ const DemoExperiment = () => {
                         </div>
                     )}
 
-                    {/* Start experiment button */}
+                    {/* Start experiment button with countdown */}
                     <div className="button-container">
                         {!experimentStarted && (
-                            <button className="btn btn-primary" onClick={handleStartExperiment}>
-                                Start Experiment
+                            <button className="btn btn-primary" onClick={startExperimentCountdown}>
+                                {experimentCountdown > 0 ? `Experiment Starts in ${experimentCountdown}` : 'Start Experiment'}
                             </button>
                         )}
                     </div>
@@ -508,6 +527,9 @@ const DemoExperiment = () => {
                             <i className={`fas ${showInfoBox ? 'fa-eye-slash' : 'fa-eye'}`}></i>
                         </button>
                     </div>
+
+
+
 
                     {/* Display patient info and experiment settings based on visibility state */}
                     {showInfoBox && (
