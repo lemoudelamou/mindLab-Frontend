@@ -25,7 +25,6 @@ import DemoData from './Demo/DemoData';
 import DemoPatientList from './Demo/DemoPatientList';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
-import DemoExperimentSession from "./Demo/DemoExperimentSession";
 
 
 
@@ -64,7 +63,6 @@ function AppRouter() {
         <Route path="/demoHome" element={<DemoHome />}/>
         <Route path="/demo-patient-info" element={<DemoPatientInfoPage/>}/>
         <Route path="/demo-settings" element={<DemoSettings />}/>
-        <Route path="/demo-experiment-session" element={<DemoExperimentSession />}/>
         <Route path="/demo-experiment" element={<DemoExperiment/>}/>
         <Route path="/demo-results" element={<DemoResults />} />
         <Route path="/demo-patientList" element={<DemoPatientList />} />
