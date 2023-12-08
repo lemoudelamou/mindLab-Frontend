@@ -83,3 +83,18 @@ export const getSettingsById = async (settingsId) => {
         throw error;
     }
 };
+
+
+export const updatePatientById = async (id, updatedPatientData) => {
+    try {
+        // Make the PUT request to update the patient
+        const response = await axios.put(`${API_BASE_URL}/patients/${id}`, updatedPatientData);
+
+        // Return the updated patient data from the response
+        return response.data;
+    } catch (error) {
+        // Handle errors (e.g., show an error message)
+        console.error('Error updating patient:', error);
+        throw error; // Re-throw the error to handle it elsewhere if needed
+    }
+};

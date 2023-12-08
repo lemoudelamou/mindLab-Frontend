@@ -20,7 +20,7 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 50%; /* Adjust to your desired width */
+    width: 50%;
     margin: 0 auto; /* Center the navbar */
     z-index: 200;
 }
@@ -120,8 +120,8 @@ header {
     display: flex;
     align-items: center;
     padding: 8px;
-    background-color: #e74c3c; /* Change to your desired background color */
-    color: #fff; /* Change to your desired text color */
+    background-color: #e74c3c;
+    color: #fff;
     border: none;
     border-radius: 4px;
     cursor: pointer;

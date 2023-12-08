@@ -56,8 +56,8 @@ tbody tr:hover {
     font-family: 'Montserrat', sans-serif;
     height: 100vh; /* Ensures the container takes the full height of the viewport */
     text-align: center;
-    color: #fff; /* Set your desired text color */
-    font-size: 28pt; /* Set your desired font size */
+    color: #fff;
+    font-size: 28pt;
 }
 
 

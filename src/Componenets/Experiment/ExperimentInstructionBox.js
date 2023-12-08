@@ -12,7 +12,6 @@ const ExperimentInstructionsBox = () => {
                 <p>
                     Your experiment instructions go here. Provide clear guidance on how to proceed with the experiment.
                 </p>
-                {/* Add more instructions as needed */}
             </div>
         </div>
     );

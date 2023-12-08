@@ -73,7 +73,7 @@ body {
 .white-box {
     background-color: #fff;
     width: 100%;
-    min-height: 100vh; /* Adjust the height as needed */
+    min-height: 100vh;
     display: flex;
     margin: 0;
     padding-bottom: 0;
@@ -97,7 +97,7 @@ body {
 }
 
 .section {
-    width: 30%; /* Adjust as needed */
+    width: 30%;
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -110,7 +110,7 @@ body {
     height: 64px; /* Fixed height for the circular image */
     border: 1px solid #000;
     border-radius: 50%; /* Make the image round */
-    max-width: 64px; /* Adjust as needed */
+    max-width: 64px;
     margin: 5px auto; /* Center the image horizontally */
 }
 
@@ -135,7 +135,7 @@ body {
 
 
 .bottom-text {
-    font-size: 32pt; /* Adjust the font size as needed */
+    font-size: 32pt;
     font-family: 'Montserrat', sans-serif;
     color: #fff; /* Set the desired text color */
     text-align: center;
@@ -145,10 +145,10 @@ body {
 }
 
 .section-text {
-    font-size: 12pt; /* Adjust the font size as needed */
+    font-size: 12pt;
     font-family: 'Montserrat', sans-serif;
     color: #000;
-    max-width: 60%; /* Set a maximum width to control the line length */
+    max-width: 60%;
 
 }
 
@@ -219,7 +219,7 @@ body {
     width: 200px;
     height: 70px;
     padding: 10px 20px;
-    background-color: #007bff; /* Change this to your desired button color */
+    background-color: #007bff;
     color: #fff; /* Text color */
     border: none;
     border-radius: 5px;
@@ -249,13 +249,13 @@ body {
     /* Add hover styles */
 
     &:hover {
-        background-color: #811c1e; /* Change this to a darker shade for hover effect */
+        background-color: #811c1e;
     }
 }
 
 @media only screen and (max-width: 1024px) {
     .card {
-        min-height: 400px; /* Adjust as needed for small screens */
+        min-height: 400px;
     }
 
     .home-title {
@@ -270,7 +270,7 @@ body {
     }
 
     .section-text {
-        font-size: 9pt; /* Adjust the font size as needed */
+        font-size: 9pt;
         font-family: 'Montserrat', sans-serif;
 
     }
@@ -281,11 +281,11 @@ body {
     }
 
     .bottom-text {
-        font-size: 18pt; /* Adjust the font size as needed */
+        font-size: 18pt;
         font-family: 'Montserrat', sans-serif;
-        color: #fff; /* Set the desired text color */
+        color: #fff;
         text-align: center;
-        max-width: 60%; /* Set a maximum width to control the line length */
+        max-width: 60%;
 
     }
 }

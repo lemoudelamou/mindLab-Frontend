@@ -8,8 +8,8 @@ function QuitDemoButton() {
     const navigate = useNavigate();
 
     const handleQuitDemo = () => {
-        exitDemoMode(); // Assuming this function handles the logic to exit demo mode
-        navigate('/home'); // Navigate to the home page or another appropriate route
+        exitDemoMode();
+        navigate('/home');
     };
 
     return (

@@ -1,6 +1,6 @@
 .contact-title {
     text-align: center;
-    margin-top: 150px; /* Adjust as needed */
+    margin-top: 150px;
     padding: 20px;
 }
 
@@ -9,7 +9,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    margin-top: 50px; /* Add any additional margin if needed */
+    margin-top: 50px;
 }
 
 .contactForm {
