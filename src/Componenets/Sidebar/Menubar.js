@@ -1,7 +1,7 @@
 import React from 'react';
 import { Nav } from 'react-bootstrap';
 import { House, Heart, Speedometer2, Info, Window, Postcard } from 'react-bootstrap-icons';
-import '../style/Menubar.css';
+import '../../style/Menubar.css';
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import {Link} from "react-router-dom";
 

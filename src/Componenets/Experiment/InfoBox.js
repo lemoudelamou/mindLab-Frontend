@@ -1,19 +1,18 @@
 // src/InfoBox.js
 import React from 'react';
-import '../style/InfoBox.css';
-import { calculateAge} from "../utils/ExperimentUtils";
+import '../../style/InfoBox.css';
+import { calculateAge} from "../../utils/ExperimentUtils";
 
 
 
 
-
-const DemoInfoBox = ({patientInfo, experimentSettings}) => {
+const InfoBox = ({patientInfo, experimentSettings}) => {
     return (
         <div className="info-box">
             <h3>Patient Information</h3>
             <p>Name: {patientInfo.fullname}</p>
             <p>Birth Date: {patientInfo.birthDate ? new Date(patientInfo.birthDate).toLocaleDateString() : 'N/A'}</p>
-            <p>Age: {calculateAge(patientInfo.birthDate) ? null : 'N/A'}</p>
+            <p>Age: { patientInfo.age ? calculateAge(patientInfo.birthDate) : 'N/A'}</p>
             <strong>Has Diseases:</strong> {patientInfo.hasDiseases ? 'Yes' : 'No'}
             <p> Diseases: {patientInfo.diseases}</p>
 
@@ -28,4 +27,4 @@ const DemoInfoBox = ({patientInfo, experimentSettings}) => {
     );
 };
 
-export default DemoInfoBox;
+export default InfoBox;

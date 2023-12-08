@@ -3,16 +3,14 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import {Form, Button} from 'react-bootstrap';
 import {useNavigate} from 'react-router-dom';
 import {DatePicker} from 'rsuite';
-import {savePatientData} from '../Api/Api'; // Import the savePatientData function
+import {savePatientData} from '../../Api/Api'; // Import the savePatientData function
 import 'rsuite/dist/rsuite.min.css';
-import '../style/PatientInfoPage.css';
-import {calculateAge} from '../utils/ExperimentUtils'
-import Navbar from "../Componenets/Navbar";
+import '../../style/PatientInfoPage.css';
+import {calculateAge} from '../../utils/ExperimentUtils'
+import Navbar from "../Navbar/Navbar";
 
 
-function DemoPatientInfoPage() {
-    const [sessionNumber, setSessionNumber] = useState(1);
-
+function PatientInfoPage() {
     const [patientData, setPatientData] = useState({
         fullname: '',
         age: '',
@@ -21,6 +19,7 @@ function DemoPatientInfoPage() {
         strongHand: 'Right',
         hasDiseases: false,
         diseases: '',
+        expDate: '',
     });
 
     const navigate = useNavigate();
@@ -48,16 +47,25 @@ function DemoPatientInfoPage() {
         });
     };
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
 
+        try {
 
 
-        console.log('Patient data are passed', patientData);
+            const savedPatientData = await savePatientData({
+                ...patientData,
+            });
 
-        // Redirect to settings page with patient data
-        navigate('/demo-settings', {state: {patientData}});
+            localStorage.setItem("patientId", savedPatientData.id);
 
+            // Redirect to settings page with patient ID
+            navigate('/settings', {state: {patientId: savedPatientData.id, patientData: savedPatientData}});
+            console.log('Form submitted with data:', savedPatientData.id);
+        } catch (error) {
+            console.error('Error saving patient data:', error);
+            // Handle error as needed
+        }
     };
 
     return (
@@ -169,6 +177,6 @@ function DemoPatientInfoPage() {
     );
 }
 
-export default DemoPatientInfoPage;
+export default PatientInfoPage;
 
 

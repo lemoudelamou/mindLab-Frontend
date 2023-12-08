@@ -1,8 +1,8 @@
 // InformationPage.js
 import React, {useState} from 'react';
 import {Tabs, Tab} from 'react-bootstrap';
-import '../style/LevelsDescription.css'
-import Navbar from "./Navbar";
+import '../../style/LevelsDescription.css'
+import Navbar from "../Navbar/Navbar";
 
 const LevelsDescription = () => {
     const [activeTab, setActiveTab] = useState('tab1');

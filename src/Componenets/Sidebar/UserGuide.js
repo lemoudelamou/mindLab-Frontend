@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
 import {Card} from 'react-bootstrap';
-import '../style/UserGuide.css'
-import Navbar from "./Navbar";
-import Logo from '../assets/mindlab.png';
+import '../../style/UserGuide.css'
+import Navbar from "../Navbar/Navbar";
+import Logo from '../../assets/mindlab.png';
 
 
 const UserGuide = () => {

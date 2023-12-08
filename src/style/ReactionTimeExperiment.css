@@ -19,6 +19,7 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    width: 100%;
 }
 
 .experiment-container {
@@ -38,6 +39,28 @@
 
 
 
+.instructions-container {
+    flex: 0 0 auto; /* Do not grow or shrink */
+    width: 400px; /* Adjust the width as needed */
+    margin-right: 60%;
+}
+
+
+.centered-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Add a class to hide the instructions box */
+.hide {
+    display: none;
+}
+
+/* Add a class to show the instructions box */
+.show {
+    display: flow;
+}
 
 .btn.session-status.running {
     background-color: green; /* Set the background color when running */
@@ -104,6 +127,13 @@
     overflow-y: auto;
 }
 
+.button-container-instruction {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 1vw;
+}
+
 .button-container {
     display: flex;
     flex-direction: row;
@@ -118,6 +148,17 @@
     background-color: #333;
     color: #fff;
     border-radius: 0.5vw;
+}
+
+.countdown-container-123 {
+    text-align: center;
+    margin-top: 2vw;
+    padding: 1vw;
+    background-color: #333;
+    color: #fff;
+    border-radius: 0.5vw;
+    font-size: 24pt;
+    font-width: bold;
 }
 
 /* Media queries for responsiveness */

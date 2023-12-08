@@ -1,13 +1,14 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {FaBars, FaTimes} from 'react-icons/fa';
 import {Link, useLocation} from 'react-router-dom';
-import QuitDemoButton from '../utils/QuitDemoButton';
-import '../style/Navbar.css';
+import  secureLocalStorage  from  "react-secure-storage";
+import QuitDemoButton from './QuitDemoButton';
+import '../../style/Navbar.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Logo from '../assets/mindlab.png';
-import Home from '../assets/home-w.png';
-import Data from '../assets/data-w.png';
-import Flask from '../assets/exp-w.png';
+import Logo from '../../assets/mindlab.png';
+import Home from '../../assets/home-w.png';
+import Data from '../../assets/data-w.png';
+import Flask from '../../assets/exp-w.png';
 
 
 export default function Navbar({activeTab}) {
@@ -18,7 +19,7 @@ export default function Navbar({activeTab}) {
 
     const location = useLocation();
 
-    const isDemoMode = JSON.parse(localStorage.getItem('isDemoMode'));
+    const isDemoMode = JSON.parse(secureLocalStorage.getItem('isDemoMode'));
 
 // Check if the value exists
     if (isDemoMode !== null) {

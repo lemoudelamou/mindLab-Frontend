@@ -1,24 +1,21 @@
 import React, {useEffect, useState} from 'react';
 import '../style/Home.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {Card, Row, Col, Modal, Button, Nav} from 'react-bootstrap';
-import { House, Speedometer2, Table, Heart, Info, Window } from 'react-bootstrap-icons';
+import {Card, Row, Col, Modal, Button} from 'react-bootstrap';
+import  secureLocalStorage  from  "react-secure-storage";
 import mindLab from '../assets/mindlab.png';
 import Logo from '../assets/mindlab.png';
 import Person from '../assets/person.png';
 import Settings from '../assets/settings.png';
 import Experience from '../assets/experience.png';
-import Navbar from "../Componenets/Navbar";
-import MenuBar from "../Componenets/Menubar";
+import Navbar from "../Componenets/Navbar/Navbar";
+import MenuBar from "../Componenets/Sidebar/Menubar";
 
 
 function DemoHome() {
     const [showModal, setShowModal] = useState(false);
     const [selectedCard, setSelectedCard] = useState(null);
-    const currentMode = JSON.parse(localStorage.getItem('isDemoMode'));
-
-
-
+    const currentMode = JSON.parse(secureLocalStorage.getItem('isDemoMode'));
 
 
     const handleCardClick = (index) => {

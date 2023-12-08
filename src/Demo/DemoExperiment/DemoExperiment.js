@@ -1,17 +1,21 @@
 import React, {useState, useEffect, useRef} from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import '../style/ReactionTimeExperiment.css';
+import '../../style/ReactionTimeExperiment.css';
 import {useNavigate} from 'react-router-dom';
 import {useLocation} from 'react-router-dom';
-import InfoBox from "./InfoBox";
-import RedoExperimentModal from './RedoExperimentModal'
-import {formatTime, calculateAverageReactionTime} from '../utils/ExperimentUtils';
-import Navbar from "./Navbar";
-import {saveExperimentResults} from "../Api/Api";
+import DemoInfoBox from "./DemoInfoBox";
+import DemoRedoExperimentModal from './DemoRedoExperimentModal'
+import {formatTime, saveToFile, calculateAverageReactionTime} from '../../utils/ExperimentUtils';
+import Navbar from "../../Componenets/Navbar/Navbar";
 import '@fortawesome/fontawesome-free/css/all.css';
+import DemoExperimentInstructionsBox from "./DemoExperimentInstructionBox";
+import Spinner from "../../utils/Spinner";
+import InfoBox from "../../Componenets/Experiment/InfoBox";
+import RedoExperimentModal from "../../Componenets/Experiment/RedoExperimentModal";
+import ExperimentInstructionsBox from "../../Componenets/Experiment/ExperimentInstructionBox";
 
 
-const ReactionTimeExperiment = () => {
+const DemoExperiment = () => {
     // State variables for the experiment
     const [shape, setShape] = useState("circle");
     const [backgroundColor, setBackgroundColor] = useState("white");
@@ -35,6 +39,8 @@ const ReactionTimeExperiment = () => {
     const [intervalId, setIntervalId] = useState(null); // New state variable to store the interval ID
     const [showInfoBox, setShowInfoBox] = useState(false);
     const [countdownRunning, setCountdownRunning] = useState(false);
+    const [showInstructions, setShowInstructions] = useState(true);
+    const [sessionPaused, setSessionPaused] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
     const {state} = location;
@@ -42,6 +48,7 @@ const ReactionTimeExperiment = () => {
     const settingsData = state?.settingsData || null;
     const settingsId = state?.settingsId || null;
     const sessionLength = state?.sessionLength || null;
+    const showInstructionBoxButton = state?.showInstructionBoxButton || null;
     const [experimentSettings, setExperimentSettings] = useState({
         shape: "circle", experimentLength: 60, isColorBlind: '', blinkDelay: 1, difficultyLevel: 'Easy',
     }); // State variables for experiment settings and patient information
@@ -51,6 +58,8 @@ const ReactionTimeExperiment = () => {
     // New state variable for session countdown
     const [sessionCountdown, setSessionCountdown] = useState(sessionLength ?? 180);
     const [allAttempts, setAllAttempts] = useState([]);
+    // Function to check if the user can start a new experiment
+
 
 
     // Function to clear the text content of the target element
@@ -176,6 +185,8 @@ const ReactionTimeExperiment = () => {
 
     // Function to handle the start of the experiment
     const handleStartExperiment = () => {
+
+
         setExperimentStarted(true);
         setTimeRemaining(experimentLength);
 
@@ -239,7 +250,7 @@ const ReactionTimeExperiment = () => {
 
 
     // Function to handle saving results
-    const handleSaveResults = async () => {
+    const handleSaveResults = () => {
         setShowSaveButton(false);
 
         // Calculate average reaction time for "correct" and "incorrect" tries
@@ -266,44 +277,20 @@ const ReactionTimeExperiment = () => {
         console.log('Payload:', resultData);
         console.log('settingsId:', settingsId);
 
-        const payload = {
-            reactionTimes, averageReactionTimes: {
-                correct: averageCorrectTime, incorrect: averageIncorrectTime,
-            },
-        };
-
-
         // Check if patient data is available
         if (settingsId) {
-            try {
-                console.log('Saving settings data...');
-
-                // Save settings data to the server
-                const savedExperiment = await saveExperimentResults(settingsId, payload);
-
-                // Save experimentDataId to localStorage
-                localStorage.setItem('experimentDataId', savedExperiment.id);
-
-                navigate('/results', {state: {resultData}});
-
-                console.log('the experiment ', savedExperiment.id);
-
-            } catch (error) {
-                console.error('Error saving settings data:', error);
-                // Handle error as needed
-                navigate('/results', {state: {resultData}});
-            }
-        } else {
-
-            // Log the result data to the console
-            console.log('Result Data:', resultData);
-
-            // Save the resultData to a file
-            // saveToFile(resultData);
-
-            // Pass resultData to the Results page using react-router-dom
-            navigate('/results', {state: {resultData}});
+            console.log('Saving settings data...');
+            navigate('/demo-results', {state: {resultData}});
         }
+
+        // Log the result data to the console
+        console.log('Result Data:', resultData);
+
+        // Save the resultData to a file
+        // saveToFile(resultData);
+
+        // Pass resultData to the Results page using react-router-dom
+        navigate('/demo-results', {state: {resultData}});
 
         // Reset experiment-related state variables
         resetExperiment();
@@ -333,7 +320,9 @@ const ReactionTimeExperiment = () => {
             }
 
             setBackgroundColor("white");
+
             setUserResponse(status);
+
             setReactionTimes((prevReactionTimes) => [...prevReactionTimes, {time: reactionTime, status},]);
 
             setTimeout(() => {
@@ -395,6 +384,7 @@ const ReactionTimeExperiment = () => {
         }, 1000);
     };
 
+
     // Effect to check conditions and show redo modal if needed
     useEffect(() => {
         let timeoutId;
@@ -436,6 +426,10 @@ const ReactionTimeExperiment = () => {
                     }
                 });
             }, 1000);
+        } else if ( !countdownRunning && sessionCountdown > 0){
+            setSessionPaused(true);
+        } else {
+            console.log("session terminated")
         }
 
         return () => clearInterval(intervalId);
@@ -445,75 +439,123 @@ const ReactionTimeExperiment = () => {
         setCountdownRunning((prev) => !prev);
     };
 
+
+
+    const countdownDisplay = experimentCountdown > 0 && (
+        <div>
+            <p>{experimentCountdown}</p>
+        </div>
+    );
+
+
+    const startExperimentButton = (
+        <button
+            className="btn btn-primary"
+            onClick={startExperimentCountdown}
+            disabled={sessionCountdown <= 0 || experimentLength > sessionCountdown || !countdownRunning}
+        >
+            start experiment
+        </button>
+    );
+
+
+
+
+
     // Render the component
-    return (<div className="container-fluid">
+    return (
+        <div className="container-fluid">
             <Navbar/>
             <div className="container">
 
-                {/* Combined container with button and session countdown */}
-                <div>
-                    <div className="experiment-status-box">
-                        <button className={`btn session-status ${countdownRunning ? 'running' : 'stopped'}`}
+
+                    {/* Combined container with button and session countdown */}
+                    <div>
+                        <div className="experiment-status-box">
+                            <button
+                                className={`btn session-status ${countdownRunning ? 'running' : 'stopped'}`}
                                 onClick={handleToggleCountdown}
-                                disabled={sessionCountdown === 0}
-                        >
-                            <i className="fas fa-power-off shutdown-icon"
-                               style={{paddingLeft: '15px', paddingRight: `15px`}} onClick={handleToggleCountdown}> </i>
-                            | Session Time Remaining: {sessionCountdown > 0 ? formatTime(sessionCountdown) : 'Session Terminated'}
+                                disabled={sessionCountdown === 0}>
+                                <i className="fas fa-power-off shutdown-icon"></i>
+                                <span style={{
+                                    height: '50px',
+                                    borderRight: '1px solid white',
+                                    marginRight: '8px',
+                                    paddingLeft: '10px'
+                                }}></span>
+                                Session Time
+                                Remaining: {sessionCountdown > 0 ? formatTime(sessionCountdown) : 'Session Terminated'}
+                            </button>
+                        </div>
+                    </div>
+
+
+                    {/* Toggle Info Box button with icon */}
+                    <div className="button-container">
+                        <button className="btn btn-info" onClick={() => setShowInfoBox(!showInfoBox)}>
+                            <i className={`fas ${showInfoBox ? 'fa-eye-slash' : 'fa-eye'}`}></i>
                         </button>
                     </div>
-                </div>
 
-                {/* Toggle Info Box button with icon */}
-                <div className="button-container">
-                    <button className="btn btn-info" onClick={() => setShowInfoBox(!showInfoBox)}>
-                        <i className={`fas ${showInfoBox ? 'fa-eye-slash' : 'fa-eye'}`}></i>
-                    </button>
-                </div>
-
-                {/* Experiment container */}
-                <div className="experiment-container">
+                    {/* Experiment container */}
+                    <div className="experiment-container">
 
 
-                    {/* Shape container */}
-                    <div className={`shape-container ${shape}`} style={{backgroundColor}} onClick={handleBarClick}>
-                        <div ref={target}></div>
-                    </div>
+                        {/* Shape container */}
+                        <div className={`shape-container ${shape}`} style={{backgroundColor}} onClick={handleBarClick}>
+                            <div ref={target}></div>
+                        </div>
+                        <div className="countdown-container-123">
+                            {countdownDisplay}
+                        </div>
 
-                    {/* Save button */}
-                    <div className="button-container">
-                        {showSaveButton && (<button className="btn btn-success" onClick={handleSaveResults}>
+
+                        {/* Save button */}
+                        <div className="button-container">
+                            {showSaveButton && (<button className="btn btn-success" onClick={handleSaveResults}>
                                 Save Results
                             </button>)}
-                    </div>
+                        </div>
 
-                    {/* Countdown container */}
-                    {experimentStarted && (<div className="countdown-container">
+                        {/* Countdown container */}
+                        {experimentStarted && (<div className="countdown-container">
                             <div className="experiment-status-box">
-                                <p>Experiment in Progress - Time
+                                <p className="experiment-status">Experiment in Progress - Time
                                     Remaining: {formatTime(timeRemaining)}</p>
                             </div>
                         </div>)}
 
-                    {/* Start experiment button with countdown */}
-                    <div className="button-container">
-                        {!experimentStarted && (<button className="btn btn-primary" onClick={startExperimentCountdown}>
-                                {experimentCountdown > 0 ? `Experiment Starts in ${experimentCountdown}` : 'Start Experiment'}
 
-                            </button>)}
+                        {/* Start experiment button */}
+                        <div className="button-container">
+                            {!experimentStarted && startExperimentButton}
+                        </div>
+
+
+                        {/* Display patient info and experiment settings based on visibility state */}
+                        {showInfoBox && (<DemoInfoBox patientInfo={patientData?.fullname ? patientInfo : {}}
+                                                  experimentSettings={experimentSettings}/>)}
+                        {/* Render the RedoExperimentModal */}
+                        <DemoRedoExperimentModal show={showRedoModal} onHide={() => setShowRedoModal(false)}
+                                             onRedo={handleRedoExperiment}/>
+
                     </div>
-
-
-                    {/* Display patient info and experiment settings based on visibility state */}
-                    {showInfoBox && (<InfoBox patientInfo={patientData?.fullname ? patientInfo : {}}
-                                              experimentSettings={experimentSettings}/>)}
-                    {/* Render the RedoExperimentModal */}
-                    <RedoExperimentModal show={showRedoModal} onHide={() => setShowRedoModal(false)}
-                                         onRedo={handleRedoExperiment}/>
-
                 </div>
-            </div>
-        </div>);
+
+            {/* Toggle Instructions button */}
+            {showInstructionBoxButton && (
+                <div className="instructions-container">
+                    <div className="button-container-instruction">
+                        <button className="btn btn-info centered-button"
+                                onClick={() => setShowInstructions(!showInstructions)}>
+                            {showInstructions ? "Hide Instructions" : "Show Instructions"}
+                        </button>
+                    </div>
+                    {/* Display experiment instructions box based on visibility state */}
+                    {showInstructions && <DemoExperimentInstructionsBox/>}
+                </div>)}
+        </div>
+    );
 };
-export default ReactionTimeExperiment;
+export default DemoExperiment;
 

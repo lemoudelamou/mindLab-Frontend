@@ -16,7 +16,7 @@ export const savePatientData = async (patientData) => {
 
 export const saveSettingsData = async (patientId, settingsData) => {
     try {
-        const response = await axios.post(`${API_BASE_URL}/patient/settings/${patientId}`, settingsData);
+        const response = await axios.post(`${API_BASE_URL}/settings/save/${patientId}`, settingsData);
         console.log('Settings data saved:', response.data);
         return response.data;
     } catch (error) {
@@ -68,6 +68,18 @@ export const getExperimentsDataById = async (experimentDataId) => {
         return response.data;
     } catch (error) {
         console.error('Error getting experiment data:', error);
+        throw error;
+    }
+};
+
+
+export const getSettingsById = async (settingsId) => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/settings/patient/${settingsId}`);
+        console.log('Server response:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error getting settings data:', error);
         throw error;
     }
 };

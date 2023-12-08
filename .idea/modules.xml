@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/masterprojekt-v26-11.iml" filepath="$PROJECT_DIR$/.idea/masterprojekt-v26-11.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/mindlab-front.iml" filepath="$PROJECT_DIR$/.idea/mindlab-front.iml" />
     </modules>
   </component>
 </project>

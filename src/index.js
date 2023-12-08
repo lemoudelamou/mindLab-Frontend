@@ -1,28 +1,27 @@
-import React, {useState} from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter, Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation} from "react-router-dom";
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 import Home from './Componenets/Home';
-import Data from './Componenets/Data';
+import Data from './Componenets/Data/Data';
 import Footer from './Componenets/Footer/Footer';
-import PatientInfoPage from './Componenets/PatientInfoPage';
-import SettingsPage from './Componenets/SettingsPage';
-import ReactionTimeExperiment from './Componenets/ReactionTimeExperiment'
-import Results from './Componenets/Results';
-import LevelsDescription from './Componenets/LevelsDescription';
-import UserGuide from './Componenets/UserGuide';
-import Contact from './Componenets/Contact'
+import PatientInfoPage from './Componenets/Experiment/PatientInfoPage';
+import SettingsPage from './Componenets/Experiment/SettingsPage';
+import ReactionTimeExperiment from './Componenets/Experiment/ReactionTimeExperiment'
+import Results from './Componenets/Experiment/Results';
+import LevelsDescription from './Componenets/Sidebar/LevelsDescription';
+import UserGuide from './Componenets/Sidebar/UserGuide';
+import Contact from './Componenets/Sidebar/Contact'
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
-import PatientList from './Componenets/PatientList';
+import PatientList from './Componenets/Data/PatientList';
 import DemoHome from './Demo/DemoHome'
-import DemoPatientInfoPage from './Demo/DemoPatientInfoPage';
-import DemoSettings from './Demo/DemoSettings';
-import DemoExperiment from './Demo/DemoExperiment';
-import DemoResults from "./Demo/DemoResults";
-import DemoData from './Demo/DemoData';
-import DemoPatientList from './Demo/DemoPatientList';
+import DemoPatientInfoPage from './Demo/DemoExperiment/DemoPatientInfoPage';
+import DemoSettings from './Demo/DemoExperiment/DemoSettings';
+import DemoExperiment from './Demo/DemoExperiment/DemoExperiment';
+import DemoResults from "./Demo/DemoExperiment/DemoResults";
+import DemoData from './Demo/Data/DemoData';
+import DemoPatientList from './Demo/Data/DemoPatientList';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 

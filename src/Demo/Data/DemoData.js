@@ -4,10 +4,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import {Bar, Line, Doughnut} from 'react-chartjs-2';
 import Chart from 'chart.js/auto';
 import {useLocation} from 'react-router-dom';
-import Navbar from "../Componenets/Navbar";
+import Navbar from "../../Componenets/Navbar/Navbar";
 
 
-import '../style/Data.css';
+import '../../style/Data.css';
 
 const DemoData = () => {
     const [data, setData] = useState([]);

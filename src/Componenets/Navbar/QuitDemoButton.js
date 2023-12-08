@@ -1,8 +1,8 @@
 // QuitDemoButton.js
 import React from 'react';
 import {useNavigate} from 'react-router-dom';
-import {exitDemoMode} from './LocalStorageUtils';
-import OffButton from '../assets/offButton.png'
+import {exitDemoMode} from '../../utils/LocalStorageUtils';
+import OffButton from '../../assets/offButton.png'
 
 function QuitDemoButton() {
     const navigate = useNavigate();

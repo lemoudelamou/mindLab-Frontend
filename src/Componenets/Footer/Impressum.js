@@ -3,7 +3,7 @@ import { Modal, Button } from 'react-bootstrap';
 
 const Impressum = ({ show, handleClose }) => {
     return (
-        <Modal show={show} onHide={handleClose}>
+        <Modal show={show} onHide={handleClose} centered>
             <Modal.Header closeButton>
                 <Modal.Title>Impressum</Modal.Title>
             </Modal.Header>

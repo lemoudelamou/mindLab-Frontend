@@ -1,10 +1,10 @@
 // src/SettingsPage.js
 import React, {useState} from 'react';
 import {useNavigate, useLocation} from 'react-router-dom';
-import {saveSettingsData} from '../Api/Api';
-import '../style/SettingsPage.css';
-import Navbar from "./Navbar";
-import {Modal} from "react-bootstrap";
+import {saveSettingsData} from '../../Api/Api';
+import '../../style/SettingsPage.css';
+import Navbar from "../Navbar/Navbar";
+import {Form, Modal} from "react-bootstrap";
 import ntc from "ntc";
 
 
@@ -12,6 +12,7 @@ const SettingsPage = ({selectedShape}) => {
     const defaultShapes = ['circle', 'square', 'rectangle'];
     const defaultDifficultyLevels = ['Easy', 'Medium', 'Hard'];
     const defaultExperiments = ['Reaction Time'];
+    const [showInstructionBoxButton, setShowInstructionBoxButton] = useState(false);
 
 
     const [shapes, setShapes] = useState(defaultShapes);
@@ -33,10 +34,11 @@ const SettingsPage = ({selectedShape}) => {
     const navigate = useNavigate();
     const location = useLocation();
     const patientData = location.state && location.state.patientData;
-    const patientId = location.state && location.state.patientId;
+    const patientId = localStorage.getItem("patientId");
     const [showModal, setShowModal] = useState(false);
 
 
+    console.log("passed patient id: ", patientId);
     const handleSaveSettings = async () => {
         console.log('Handling save changes...');
 
@@ -72,15 +74,12 @@ const SettingsPage = ({selectedShape}) => {
                 // Save settings data to the server
                 const savedSettingsData = await saveSettingsData(patientId, savedData);
 
+                localStorage.setItem("settingsId", savedSettingsData.id);
+                localStorage.setItem("sessionLength", sessionLength);
+
+
                 // Redirect to the experiment page with patient and settings data
-                navigate('/ReactiontimeExperiment', {
-                    state: {
-                        patientData,
-                        settingsId: savedSettingsData.id,
-                        settingsData: savedSettingsData,
-                        sessionLength,
-                    }
-                });
+                navigate('/ReactiontimeExperiment');
                 console.log('PatientData inside Api response:', location.state.patientData);
             } catch (error) {
                 console.error('Error saving settings data:', error);
@@ -92,6 +91,7 @@ const SettingsPage = ({selectedShape}) => {
                 state: {
                     settingsData: savedData,
                     sessionLength,
+                    showInstructionBoxButton,
                 },
             });
             console.log('Form submitted without patient data');
@@ -304,6 +304,15 @@ const SettingsPage = ({selectedShape}) => {
                         </div>
                     </>
                 )}
+                <div className="form-group">
+                    <Form.Check
+                        type="switch"
+                        id="showInstructionBoxButtonSwitch"
+                        label="Show Instruction Box"
+                        checked={showInstructionBoxButton}
+                        onChange={() => setShowInstructionBoxButton(!showInstructionBoxButton)}
+                    />
+                </div>
                 <div className="btn-settings">
                     <button className="btn btn-primary" onClick={handleSaveSettings}>
                         Save Changes

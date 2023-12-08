@@ -1,17 +1,16 @@
 // src/SettingsPage.js
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {useNavigate, useLocation} from 'react-router-dom';
-import {saveSettingsData} from '../Api/Api';
-import '../style/SettingsPage.css';
-import Navbar from "../Componenets/Navbar";
-import {Modal} from "react-bootstrap";
-import ntc from "ntc";
+import '../../style/SettingsPage.css';
+import Navbar from "../../Componenets/Navbar/Navbar";
+import { Form } from 'react-bootstrap';
 
 
 const DemoSettings = ({selectedShape}) => {
     const defaultShapes = ['circle', 'square', 'rectangle'];
     const defaultDifficultyLevels = ['Easy', 'Medium', 'Hard'];
     const defaultExperiments = ['Reaction Time'];
+    const [showInstructionBoxButton, setShowInstructionBoxButton] = useState(false);
 
 
     const [shapes, setShapes] = useState(defaultShapes);
@@ -34,19 +33,9 @@ const DemoSettings = ({selectedShape}) => {
     const navigate = useNavigate();
     const location = useLocation();
     const patientData = location.state && location.state.patientData;
-    const [showModal, setShowModal] = useState(false); // State to control modal visibility
-    const [modalContent, setModalContent] = useState("");
 
 
-
-
-    const handleShowModal = () => {
-        setShowModal(true);
-    };
-
-
-
-    const handleSaveSettings = () =>{
+    const handleSaveSettings = () => {
 
         setSessionLength(sessionLength);
 
@@ -81,14 +70,13 @@ const DemoSettings = ({selectedShape}) => {
             console.log('Saving settings data...');
 
 
-
-
             // Redirect to the experiment page with patient and settings data
             navigate('/demo-experiment', {
                 state: {
                     patientData,
                     settingsData: savedData,
                     sessionLength,
+                    showInstructionBoxButton,
                 },
             });
 
@@ -98,15 +86,12 @@ const DemoSettings = ({selectedShape}) => {
                 state: {
                     settingsData: savedData,
                     sessionLength,
+                    showInstructionBoxButton
                 },
             });
             console.log('Form submitted without patient data');
         }
     }
-
-
-
-
 
 
     const handleChange = (e) => {
@@ -117,8 +102,6 @@ const DemoSettings = ({selectedShape}) => {
             [name]: name === 'isColorBlind' ? value : type === 'checkbox' ? checked : value,
         }));
     };
-
-
 
 
     return (
@@ -311,6 +294,15 @@ const DemoSettings = ({selectedShape}) => {
                         </div>
                     </>
                 )}
+                <div className="form-group">
+                    <Form.Check
+                        type="switch"
+                        id="showInstructionBoxButtonSwitch"
+                        label="Show Instruction Box"
+                        checked={showInstructionBoxButton}
+                        onChange={() => setShowInstructionBoxButton(!showInstructionBoxButton)}
+                    />
+                </div>
                 <div className="btn-settings">
                     <button className="btn btn-primary" onClick={handleSaveSettings}>
                         Save Changes

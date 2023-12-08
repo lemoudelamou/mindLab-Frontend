@@ -3,14 +3,15 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import {Form, Button} from 'react-bootstrap';
 import {useNavigate} from 'react-router-dom';
 import {DatePicker} from 'rsuite';
-import {savePatientData} from '../Api/Api'; // Import the savePatientData function
+import {savePatientData} from '../../Api/Api'; // Import the savePatientData function
 import 'rsuite/dist/rsuite.min.css';
-import '../style/PatientInfoPage.css';
-import {calculateAge} from '../utils/ExperimentUtils'
-import Navbar from "./Navbar";
+import '../../style/PatientInfoPage.css';
+import {calculateAge} from '../../utils/ExperimentUtils'
+import Navbar from "../../Componenets/Navbar/Navbar";
 
 
-function PatientInfoPage() {
+function DemoPatientInfoPage() {
+
     const [patientData, setPatientData] = useState({
         fullname: '',
         age: '',
@@ -19,7 +20,6 @@ function PatientInfoPage() {
         strongHand: 'Right',
         hasDiseases: false,
         diseases: '',
-        expDate: '',
     });
 
     const navigate = useNavigate();
@@ -47,24 +47,16 @@ function PatientInfoPage() {
         });
     };
 
-    const handleSubmit = async (event) => {
+    const handleSubmit = (event) => {
         event.preventDefault();
 
-        try {
 
 
-            const savedPatientData = await savePatientData({
-                ...patientData,
+        console.log('Patient data are passed', patientData);
 
-            });
+        // Redirect to settings page with patient data
+        navigate('/demo-settings', {state: {patientData}});
 
-            // Redirect to settings page with patient ID
-            navigate('/settings', {state: {patientId: savedPatientData.id, patientData: savedPatientData}});
-            console.log('Form submitted with data:', savedPatientData.id);
-        } catch (error) {
-            console.error('Error saving patient data:', error);
-            // Handle error as needed
-        }
     };
 
     return (
@@ -176,6 +168,6 @@ function PatientInfoPage() {
     );
 }
 
-export default PatientInfoPage;
+export default DemoPatientInfoPage;
 
 

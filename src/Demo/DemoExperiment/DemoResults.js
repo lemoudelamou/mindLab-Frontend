@@ -1,42 +1,18 @@
-import React, {useState, useEffect} from "react";
+import React from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
-import Navbar from "./Navbar";
-import '../style/Results.css'
-import {calculateAge} from "../utils/ExperimentUtils";
-import {getExperimentsDataById} from "../Api/Api";
+import Navbar from "../../Componenets/Navbar/Navbar";
+import '../../style/Results.css';
+import { calculateAge} from "../../utils/ExperimentUtils";
+
 
 const Results = () => {
 
     const navigate = useNavigate();
     const location = useLocation();
     const resultData = location.state && location.state.resultData;
-    const [experimentDetails, setExperimentDetails] = useState(null);
-    const storedExperimentDataId = localStorage.getItem('experimentDataId');
 
-
-    // Access data from experimentDetails with additional checks
-
-    console.log("the experiment data id is: ", storedExperimentDataId)
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                if (storedExperimentDataId) {
-                    // Call the API to get detailed experiment data
-                    const allData = await getExperimentsDataById(storedExperimentDataId);
-                    setExperimentDetails(allData);
-                }
-            } catch (error) {
-                console.error('Error getting experiment details:', error);
-            }
-        };
-
-        fetchData(); // Call the async function
-    }, []);
-
-
-    if (!experimentDetails) {
+    if (!resultData) {
         // Handle the case where resultData is not available
         return <div>
             <Navbar/>
@@ -44,14 +20,15 @@ const Results = () => {
         </div>
     }
 
-    const handleSubmit = (event) => {
-        navigate('/data', { state: { resultData } });
+    // Access data from resultData
+    const { experimentSettings, patientInfo, reactionTimes, averageReactionTimes } = resultData;
+
+    console.log("the results data are", resultData);
+
+    const handleSubmit =  (event) => {
+        navigate('/demo-data', { state: { resultData } });
         console.log('submitted resultData from results page:', resultData);
-    };
-
-
-    const { experimentSettings, patient, reactionTimes, averageReactionTimes } = experimentDetails || {};
-
+    }
     return (
         <div className="results-container">
             <Navbar/>
@@ -64,38 +41,32 @@ const Results = () => {
                     <tbody>
                     <tr>
                         <td>Fullname:</td>
-                        <td>{patient.fullname}</td>
+                        <td>{patientInfo.fullname}</td>
                     </tr>
                     <tr>
                         <td>Birth Date:</td>
-                        <td>{patient.birthDate ? new Date(patient?.birthDate).toLocaleDateString() : 'N/A'}</td>
+                        <td>{patientInfo.birthDate ? new Date(patientInfo.birthDate).toLocaleDateString() : 'N/A'}</td>
                     </tr>
                     <tr>
                         <td>Age:</td>
-                        <td>{ patient.age ? calculateAge(patient?.birthDate) : 'N/A'}</td>
+                        <td>{ patientInfo.age ? calculateAge(patientInfo.birthDate) : 'N/A'}</td>
                     </tr>
                     <tr>
                         <td>Strong Hand:</td>
-                        <td>{patient.strongHand}</td>
+                        <td>{patientInfo.strongHand}</td>
                     </tr>
                     <tr>
                         <td>Has Diseases:</td>
-                        <td>{patient?.hasDiseases  ? 'Yes' : 'No'}</td>
+                        <td>{patientInfo.hasDiseases  ? 'Yes' : 'No'}</td>
                     </tr>
-                    {patient?.hasDiseases && (
+                    {patientInfo.hasDiseases && (
                         <tr>
                             <td>Diseases:</td>
-                            <td>{patient?.diseases}</td>
+                            <td>{patientInfo.diseases}</td>
                         </tr>
                     )}
-                    <tr>
-                        <td>Experiment taken on:</td>
-                        <td>{patient.expDate}</td>
-                    </tr>
                     </tbody>
                 </table>
-
-
 
                 {/* Display experiment settings */}
                 <h3>Experiment Settings</h3>
@@ -103,7 +74,7 @@ const Results = () => {
                     <tbody>
                     <tr>
                         <td>Shape:</td>
-                        <td>{experimentDetails.experimentSettings.shape}</td>
+                        <td>{experimentSettings.shape}</td>
                     </tr>
                     <tr>
                         <td>Experiment Length:</td>
@@ -119,13 +90,14 @@ const Results = () => {
                     </tr>
                     <tr>
                         <td>Difficulty Level:</td>
-                        <td>{experimentSettings.difficultyLevel} </td>
+                        <td>{resultData.experimentSettings.difficultyLevel} </td>
                     </tr>
+                    {/* Add more experiment settings fields as needed */}
                     </tbody>
                 </table>
 
                 {/* Display relevant information from resultData */}
-                <h3>Reaction Times (in ms)</h3>
+                <h3>Reaction Times</h3>
                 <table>
                     <thead>
                     <tr>
@@ -144,7 +116,7 @@ const Results = () => {
                 </table>
 
                 {/* Display average reaction times */}
-                <h3>Average Reaction Times (in ms)</h3>
+                <h3>Average Reaction Times</h3>
                 <table>
                     <thead>
                     <tr>
@@ -155,7 +127,7 @@ const Results = () => {
                     <tbody>
                     <tr>
                         <td>correct</td>
-                        <td>{averageReactionTimes.correct} </td>
+                        <td>{averageReactionTimes.correct}</td>
                     </tr>
                     <tr>
                         <td>incorrect</td>
@@ -168,6 +140,8 @@ const Results = () => {
 
                     <Button className="transfer-button" type="submit" onClick={handleSubmit}>Transfer to Data</Button>
                 </div>
+
+
 
             </div>
         </div>

@@ -11,8 +11,9 @@ import Logo from '../assets/mindlab.png';
 import Person from '../assets/person.png';
 import Settings from '../assets/settings.png';
 import Experience from '../assets/experience.png';
-import Navbar from "./Navbar";
-import MenuBar from "./Menubar";
+import Navbar from "./Navbar/Navbar";
+import MenuBar from "./Sidebar/Menubar";
+import secureLocalStorage from "react-secure-storage";
 
 
 function Home() {
@@ -20,7 +21,7 @@ function Home() {
     const [isDemoMode, setIsDemoMode] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [selectedCard, setSelectedCard] = useState(null);
-    const currentMode = JSON.parse(localStorage.getItem('isDemoMode'));
+    const currentMode = JSON.parse(secureLocalStorage.getItem('isDemoMode'));
 
 
 

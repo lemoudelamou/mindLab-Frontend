@@ -4,10 +4,11 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import {Bar, Line, Doughnut} from 'react-chartjs-2';
 import Chart from 'chart.js/auto';
 import {useLocation} from 'react-router-dom';
-import {getExperimentsData} from "../Api/Api";
-import Navbar from "./Navbar";
+import {getExperimentsData} from "../../Api/Api";
+import Navbar from "../Navbar/Navbar";
 
-import '../style/Data.css';
+import '../../style/Data.css';
+import Spinner from "../../utils/Spinner";
 
 const Data = () => {
     const [data, setData] = useState([]);
@@ -19,6 +20,7 @@ const Data = () => {
     const [yAxisMin, setYAxisMin] = useState('');
     const [yAxisMax, setYAxisMax] = useState('');
     const [isFullscreen, setIsFullscreen] = useState(false);
+    const [loading, setLoading] = useState(true);
 
 
     // Inside Data component
@@ -53,7 +55,9 @@ const Data = () => {
                 }
             } catch (error) {
                 console.error('Error fetching data:', error);
-            }
+            }  finally {
+            setLoading(false);
+        }
         };
 
         // Call the fetchData function when the component mounts
@@ -235,11 +239,16 @@ const Data = () => {
 
         <div className='data-container'>
             <Navbar/>
-
             <h1 className='title-data'>Crossfilter</h1>
             <div className='sec'>
-                {Array.isArray(data) && data.length > 0 ? (
+                {loading ? (  // Check if data is still loading
+                    <div className="text-center mt-5">
+                        <Spinner/>
+
+                    </div>
+                ) : Array.isArray(data) && data.length > 0 ? (
                     <>
+
                         <div>
                             <button className='btn btn-primary m-1' onClick={() => filterData('correct')}>
                                 correct
