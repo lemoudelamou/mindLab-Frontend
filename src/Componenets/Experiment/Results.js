@@ -31,6 +31,8 @@ const Results = () => {
                     // Call the API to get detailed experiment data
                     const allData = await getExperimentsDataById(storedExperimentDataId);
                     setExperimentDetails(allData);
+                    setLoading(false);
+
                 }
             } catch (error) {
                 console.error('Error getting experiment details:', error);
