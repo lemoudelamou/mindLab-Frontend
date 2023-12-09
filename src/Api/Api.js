@@ -98,3 +98,16 @@ export const updatePatientById = async (id, updatedPatientData) => {
         throw error; // Re-throw the error to handle it elsewhere if needed
     }
 };
+
+
+export const fetchDataForGroup = async (groupe) => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/data/group/${groupe}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        throw error; // Rethrow the error to handle it at the calling site
+    }
+};
+
+export default fetchDataForGroup;

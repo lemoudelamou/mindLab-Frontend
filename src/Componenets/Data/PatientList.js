@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { getAllPatients, updatePatientById } from '../../Api/Api';
+import React, {useState, useEffect} from 'react';
+import {getAllPatients, updatePatientById} from '../../Api/Api';
 import Navbar from '../Navbar/Navbar';
 
 import '../../style/PatientList.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Pagination from "../../utils/Pagination";
+import {useNavigate} from "react-router-dom";
 
 const PatientList = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -12,18 +14,41 @@ const PatientList = () => {
     const [collapsedItems, setCollapsedItems] = useState([]);
     const [filterDate, setFilterDate] = useState(null);
     const [searchClicked, setSearchClicked] = useState(false);
-    const [filtersConfirmed, setFiltersConfirmed] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editedIndex, setEditedIndex] = useState(null);
     const [editedData, setEditedData] = useState({});
+    const [editedGroupe, setEditedGroupe] = useState('');
     const [originalIndices, setOriginalIndices] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [groupsPerPage] = useState(5);
+    const navigate = useNavigate();
 
+
+    // Function to group patients by 'groupe' field
+    const groupPatientsByGroupe = () => {
+        const groupedPatients = {};
+        searchResults.forEach((patient) => {
+            const group = patient.groupe || 'Other';
+            if (!groupedPatients[group]) {
+                groupedPatients[group] = [];
+            }
+            groupedPatients[group].push(patient);
+        });
+        return groupedPatients;
+    };
+
+    // Calculate the total number of pages based on the number of groups
+    const totalPages = Math.ceil(Object.keys(groupPatientsByGroupe()).length / groupsPerPage);
 
     // Initialize collapsedItems and fetch data on component mount
     useEffect(() => {
         setCollapsedItems([]);
         fetchData();
     }, []);
+
+    useEffect(() => {
+        handleSearch();
+    }, [filterDate, currentPage, groupsPerPage]);
 
     const fetchData = async () => {
         try {
@@ -49,7 +74,7 @@ const PatientList = () => {
         const filteredItems = originalData.filter(
             (item) =>
                 item.fullname.toLowerCase().includes(searchTerm.toLowerCase()) &&
-                (filterDate ? item.expDate === filterDate : true)
+                (!filterDate || item.expDate === filterDate)
         );
 
         setSearchResults(filteredItems);
@@ -84,15 +109,16 @@ const PatientList = () => {
 
     const handleEditPatient = (index) => {
         setEditedIndex(index);
-        setEditedData({ ...searchResults[index] });
+        setEditedData({...searchResults[index]});
+        setEditedGroupe(searchResults[index].groupe || ''); // Set the initial edited value for groupe
     };
 
     const handleSaveEdit = async () => {
         try {
-            const updatedPatient = await updatePatientById(
-                editedData.id,
-                editedData
-            );
+            const updatedPatient = await updatePatientById(editedData.id, {
+                ...editedData,
+                groupe: editedGroupe,
+            });
 
             const updatedData = searchResults.map((patient, index) =>
                 index === editedIndex ? updatedPatient : patient
@@ -101,24 +127,41 @@ const PatientList = () => {
             setOriginalData(updatedData);
             setSearchResults(updatedData);
 
+            // Reset edited state
             setEditedIndex(null);
             setEditedData({});
+            setEditedGroupe('');
         } catch (error) {
             console.error('Error updating patient:', error);
             // Handle errors (e.g., show an error message)
         }
     };
 
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
+
     const handleCancelEdit = () => {
         setEditedIndex(null);
         setEditedData({});
+        setEditedGroupe('');
     };
 
     const handleInputChange = (field, value) => {
-        setEditedData((prevData) => ({
-            ...prevData,
-            [field]: value,
-        }));
+        if (field === 'groupe') {
+            setEditedGroupe(value);
+        } else {
+            setEditedData((prevData) => ({
+                ...prevData,
+                [field]: value,
+            }));
+        }
+    };
+
+    const handleGroupDataButtonClick = (groupName) => {
+        console.log(`Clicked on Group Data for group:`, groupName);
+        localStorage.setItem("groupName", groupName);
+        navigate("/group-results")
     };
 
     const renderDetails = (result, index) => (
@@ -128,6 +171,7 @@ const PatientList = () => {
             </p>
             <p className='mb-0'>Date of Birth: {result.birthDate}</p>
             <p className='mb-0'>Strong hand: {result.strongHand}</p>
+            <p className='mb-0'>Groupe: {editedIndex === index ? editedGroupe : result.groupe}</p>
             <p className='mb-0'>Has diseases: {result.hasDiseases ? 'Yes' : 'No'}</p>
             {result.hasDiseases && <p className='mb-0'>Diseases: {result.diseases}</p>}
             <div className='d-flex justify-content-between mt-3'>
@@ -177,13 +221,114 @@ const PatientList = () => {
                     placeholder='Diseases'
                 />
             )}
+            {/* New input for editing "groupe" */}
+            <input
+                type='text'
+                value={editedGroupe || ''}
+                onChange={(e) => handleInputChange('groupe', e.target.value)}
+                className='form-control mb-2'
+                placeholder='Groupe'
+            />
         </>
     );
 
+    // Logic to display page numbers and handle pagination
+    const pageNumbers = [];
+    for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i);
+    }
+
+    const renderPageNumbers = pageNumbers.map((number) => (
+        <li key={number} className='page-item'>
+            <a
+                href='javascript:void(0);'
+                className={`page-link ${number === currentPage ? 'active' : ''}`}
+                onClick={() => setCurrentPage(number)}
+            >
+                {number}
+            </a>
+        </li>
+    ));
+
+    // Rendering function for grouped patients
+    const renderGroupedPatients = () => {
+        const groupedPatients = groupPatientsByGroupe();
+
+        // Calculate the range of groups to display based on the current page and groupsPerPage
+        const startIndex = (currentPage - 1) * groupsPerPage;
+        const endIndex = startIndex + groupsPerPage;
+
+        // Slice the groupedPatients object into an array of groups to display
+        const groupsToDisplay = Object.keys(groupedPatients).slice(startIndex, endIndex);
+
+        return groupsToDisplay.map((group, groupIndex) => (
+            <div key={groupIndex} className='custom-group'>
+                <div className="group-title" style={{ display: 'flex', alignItems: 'center' }}>
+                    <h3>{group}</h3>
+                    <div style={{paddingTop: '30px', marginLeft: '80%'}}>
+                    <button className='btn btn-dark'
+                            onClick={() => handleGroupDataButtonClick(group)}
+                                >
+                        Group Data
+                    </button>
+
+                    </div>
+
+                </div>
+                <ul className='list-group m-5'>
+                    {groupedPatients[group].map((result, index) => (
+                        <li key={index} className='list-group-item custom-list-item pb-3 mb-2'>
+                            <div className='d-flex w-100 justify-content-between align-items-center'>
+                                <h5 className='mb-1'>
+                                    {editedIndex === index ? renderEditFields() : result.fullname}
+                                </h5>
+                                <div className='d-flex'>
+                                    {editedIndex === index ? (
+                                        <>
+                                            <button className='btn btn-success mr-2' onClick={handleSaveEdit}>
+                                                Save
+                                            </button>
+                                            <button className='btn btn-secondary' onClick={handleCancelEdit}>
+                                                Cancel
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <button
+                                            className={`btn ${
+                                                collapsedItems[index] ? 'btn-secondary' : 'btn-info'
+                                            }`}
+                                            onClick={() => toggleCollapse(index)}
+                                            style={{cursor: 'pointer'}}
+                                            data-toggle={`#detailsCollapse${index}`}
+                                            aria-expanded={!collapsedItems[index]}
+                                        >
+                                            Details
+                                        </button>
+                                    )}
+                                    <button
+                                        className='btn btn-warning ml-2'
+                                        onClick={() => handleEditPatient(index, result.id)}
+                                    >
+                                        Edit
+                                    </button>
+                                </div>
+                            </div>
+                            <div
+                                id={`detailsCollapse${index}`}
+                                className={`collapse ${collapsedItems[index] ? '' : 'show'} collapsed-box`}
+                            >
+                                {editedIndex === index ? renderEditFields() : renderDetails(result, index)}
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        ));
+    };
 
     return (
-        <div>
-            <Navbar />
+        <div className="container-bg">
+            <Navbar/>
             <div className='search-container'>
                 <h1 className='title-search'>Patients List</h1>
                 <div className='input-group mb-3'>
@@ -215,64 +360,18 @@ const PatientList = () => {
                 </div>
             </div>
             <div className='custom-list'>
-                <ul className='list-group m-5'>
-                    {searchClicked && searchResults.length === 0 ? (
-                        <p className='no-result-text'>No results found.</p>
-                    ) : (
-                        searchResults.map((result, index) => (
-                            <li key={index} className='list-group-item custom-list-item pb-3 mb-2'>
-                                <div className='d-flex w-100 justify-content-between align-items-center'>
-                                    <h5 className='mb-1'>
-                                        {editedIndex === index ? (
-                                            renderEditFields()
-                                        ) : (
-                                            result.fullname
-                                        )}
-                                    </h5>
-                                    <div className='d-flex'>
-                                        {editedIndex === index ? (
-                                            <>
-                                                <button className='btn btn-success mr-2' onClick={handleSaveEdit}>
-                                                    Save
-                                                </button>
-                                                <button className='btn btn-secondary' onClick={handleCancelEdit}>
-                                                    Cancel
-                                                </button>
-                                            </>
-                                        ) : (
-                                            <button
-                                                className={`btn ${
-                                                    collapsedItems[index] ? 'btn-secondary' : 'btn-info'
-                                                }`}
-                                                onClick={() => toggleCollapse(index)}
-                                                style={{ cursor: 'pointer' }}
-                                                data-toggle={`#detailsCollapse${index}`}
-                                                aria-expanded={!collapsedItems[index]}
-                                            >
-                                                Details
-                                            </button>
-                                        )}
-                                        <button
-                                            className='btn btn-warning ml-2'
-                                            onClick={() => {
-                                                console.log('Result Object:', result);
-                                                handleEditPatient(index, result.id);
-                                            }}
-                                        >
-                                            Edit
-                                        </button>
-                                    </div>
-                                </div>
-                                <div
-                                    id={`detailsCollapse${index}`}
-                                    className={`collapse ${collapsedItems[index] ? '' : 'show'} collapsed-box`}
-                                >
-                                    {editedIndex === index ? renderEditFields() : renderDetails(result, index)}
-                                </div>
-                            </li>
-                        ))
-                    )}
-                </ul>
+                {searchClicked && searchResults.length === 0 ? (
+                    <p className='no-result-text'>No results found.</p>
+                ) : (
+                    renderGroupedPatients()
+                )}
+                <div className="bottom-absolute">
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={handlePageChange}
+                    />
+                </div>
             </div>
         </div>
     );
