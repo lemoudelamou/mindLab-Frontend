@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { deletePatientById, getAllPatients, updatePatientById } from '../../Api/Api';
 import Navbar from '../Navbar/Navbar';
@@ -23,8 +24,11 @@ const PatientList = () => {
     const [groupsPerPage] = useState(5);
     const [expandedIndex, setExpandedIndex] = useState(null);
     const navigate = useNavigate();
+    const [expandedMap, setExpandedMap] = useState(new Map());
+    const [isEditingMap, setIsEditingMap] = useState(new Map());
 
-    // Function to group patients by 'groupe' field
+
+
     const groupPatientsByGroupe = () => {
         const groupedPatients = {};
         searchResults.forEach((patient) => {
@@ -37,10 +41,8 @@ const PatientList = () => {
         return groupedPatients;
     };
 
-    // Calculate the total number of pages based on the number of groups
     const totalPages = Math.ceil(Object.keys(groupPatientsByGroupe()).length / groupsPerPage);
 
-    // Initialize collapsedItems and fetch data on component mount
     useEffect(() => {
         setCollapsedItems([]);
         fetchData();
@@ -56,7 +58,7 @@ const PatientList = () => {
             const initialCollapsedState = Array(patientsData.length).fill(true);
 
             setCollapsedItems(initialCollapsedState);
-            setOriginalData(patientsData); // Save the original data
+            setOriginalData(patientsData);
             setSearchResults(patientsData);
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -70,6 +72,8 @@ const PatientList = () => {
         return indexMapping;
     };
 
+
+
     const handleSearch = () => {
         const filteredItems = originalData.filter(
             (item) =>
@@ -80,34 +84,49 @@ const PatientList = () => {
         setSearchResults(filteredItems);
         setSearchClicked(true);
 
-        // Store the original indices of search results
         const originalIndices = filteredItems.map((result) => originalData.indexOf(result));
         setOriginalIndices(originalIndices);
     };
 
     useEffect(() => {
-        // Create a mapping between searchResults indices and originalData indices
         const indexMapping = mapSearchResultsToOriginalIndices(searchResults, originalData);
-        setCollapsedItems(indexMapping.map(() => true)); // Initialize collapsed state
+        setCollapsedItems(indexMapping.map(() => true));
     }, [searchResults, originalData]);
 
-    const toggleCollapse = (index) => {
-        setExpandedIndex((prevIndex) => (prevIndex === index ? null : index));
+    const toggleCollapse = (patientId) => {
+        setExpandedMap((prevMap) => {
+            const newMap = new Map(prevMap);
+            newMap.set(patientId, !newMap.get(patientId));
+            return newMap;
+        });
     };
+
+    const handleEditPatient = (patientId) => {
+        console.log('Edit button clicked for patientId:', patientId);
+
+        setIsEditingMap((prevMap) => {
+            const newMap = new Map(prevMap);
+            newMap.set(patientId, !prevMap.get(patientId));
+            return newMap;
+        });
+
+        setEditedIndex(patientId);
+        setEditedData(searchResults.find((result) => result.id === patientId) || {});
+        setEditedGroupe(searchResults.find((result) => result.id === patientId)?.groupe || '');
+    };
+
+
+
 
     const clearFilters = () => {
         setCollapsedItems([]);
-        setSearchResults(originalData); // Reset to the original data
+        setSearchResults(originalData);
         setSearchTerm('');
         setFilterDate(null);
         setSearchClicked(false);
     };
 
-    const handleEditPatient = (index) => {
-        setEditedIndex(index);
-        setEditedData({ ...searchResults[index] });
-        setEditedGroupe(searchResults[index].groupe || ''); // Set the initial edited value for groupe
-    };
+
 
     const handleSaveEdit = async () => {
         try {
@@ -116,22 +135,40 @@ const PatientList = () => {
                 groupe: editedGroupe,
             });
 
-            const updatedData = searchResults.map((patient, index) =>
-                index === editedIndex ? updatedPatient : patient
+            // Update search results and original data with the updated patient
+            setSearchResults((prevSearchResults) =>
+                prevSearchResults.map((patient) =>
+                    patient.id === updatedPatient.id ? updatedPatient : patient
+                )
             );
 
-            setOriginalData(updatedData);
-            setSearchResults(updatedData);
+            setOriginalData((prevOriginalData) =>
+                prevOriginalData.map((patient) =>
+                    patient.id === updatedPatient.id ? updatedPatient : patient
+                )
+            );
 
-            // Reset edited state
-            setEditedIndex(null);
-            setEditedData({});
-            setEditedGroupe('');
+            // Collapse details after save
+            setExpandedMap((prevMap) => {
+                const newMap = new Map(prevMap);
+                newMap.set(updatedPatient.id, false);
+                return newMap;
+            });
+
+            // Exit editing mode
+            setIsEditingMap((prevMap) => {
+                const newMap = new Map(prevMap);
+                newMap.set(updatedPatient.id, false);
+                return newMap;
+            });
+            setIsEditing(false);
+
         } catch (error) {
             console.error('Error updating patient:', error);
-            // Handle errors (e.g., show an error message)
         }
     };
+
+
 
     const handleDeletePatient = async (patientId) => {
         const confirmDelete = window.confirm('Are you sure you want to delete this patient?');
@@ -140,13 +177,11 @@ const PatientList = () => {
             try {
                 await deletePatientById(patientId);
 
-                // After successful deletion, update the state and re-fetch data
                 const updatedData = searchResults.filter((patient) => patient.id !== patientId);
                 setOriginalData(updatedData);
                 setSearchResults(updatedData);
             } catch (error) {
                 console.error('Error deleting patient:', error);
-                // Handle errors (e.g., show an error message)
             }
         }
     };
@@ -155,7 +190,13 @@ const PatientList = () => {
         setCurrentPage(pageNumber);
     };
 
-    const handleCancelEdit = () => {
+    const handleCancelEdit = (patientId) => {
+        setIsEditingMap((prevMap) => {
+            const newMap = new Map(prevMap);
+            newMap.set(patientId, false);
+            return newMap;
+        });
+
         setEditedIndex(null);
         setEditedData({});
         setEditedGroupe('');
@@ -190,6 +231,11 @@ const PatientList = () => {
             {result.hasDiseases && <p className='mb-0'>Diseases: {result.diseases}</p>}
             <div className='d-flex justify-content-between mt-3'>
                 <span className='badge badge-info'>Experiment taken on: {result.expDate}</span>
+            </div>
+            <div className='mt-3'>
+                <a href={`/patient-details/${result.fullname}`} className='btn btn-primary'>
+                    View Details
+                </a>
             </div>
         </>
     );
@@ -235,7 +281,6 @@ const PatientList = () => {
                     placeholder='Diseases'
                 />
             )}
-            {/* New input for editing "groupe" */}
             <input
                 type='text'
                 value={editedGroupe || ''}
@@ -246,23 +291,17 @@ const PatientList = () => {
         </>
     );
 
-    // Logic to display page numbers and handle pagination
     const pageNumbers = [];
     for (let i = 1; i <= totalPages; i++) {
         pageNumbers.push(i);
     }
 
-
-
-    // Rendering function for grouped patients
     const renderGroupedPatients = () => {
         const groupedPatients = groupPatientsByGroupe();
 
-        // Calculate the range of groups to display based on the current page and groupsPerPage
         const startIndex = (currentPage - 1) * groupsPerPage;
         const endIndex = startIndex + groupsPerPage;
 
-        // Slice the groupedPatients object into an array of groups to display
         const groupsToDisplay = Object.keys(groupedPatients).slice(startIndex, endIndex);
 
         return groupsToDisplay.map((group, groupIndex) => (
@@ -270,60 +309,61 @@ const PatientList = () => {
                 <div className="group-title" style={{ display: 'flex', alignItems: 'center' }}>
                     <h3>{group}</h3>
                     <div style={{ paddingTop: '30px', marginLeft: '80%' }}>
-                        <button className='btn btn-dark'
-                                onClick={() => handleGroupDataButtonClick(group)}
-                        >
+                        <button className='btn btn-dark' onClick={() => handleGroupDataButtonClick(group)}>
                             Group Data
                         </button>
                     </div>
                 </div>
                 <ul className='list-group m-5'>
-                    {groupedPatients[group].map((result, index) => (
-                        <li key={index} className='list-group-item custom-list-item pb-3 mb-2'>
+                    {groupedPatients[group].map((result) => (
+                        <li key={result.id} className='list-group-item custom-list-item pb-3 mb-2'>
                             <div className='d-flex w-100 justify-content-between align-items-center'>
                                 <h5 className='mb-1'>
-                                    {editedIndex === index ? renderEditFields() : result.fullname}
+                                    {isEditingMap.get(result.id) ? renderEditFields() : result.fullname}
                                 </h5>
                                 <div className='d-flex'>
-                                    {editedIndex === index ? (
+                                    {isEditingMap.get(result.id) ? (
                                         <>
                                             <button className='btn btn-success mr-2' onClick={handleSaveEdit}>
                                                 Save
                                             </button>
-                                            <button className='btn btn-secondary' onClick={handleCancelEdit}>
+                                            <button
+                                                className='btn btn-secondary'
+                                                onClick={() => handleCancelEdit(result.id)}
+                                            >
                                                 Cancel
                                             </button>
                                         </>
                                     ) : (
                                         <button
-                                            className={`btn ${expandedIndex === index ? 'btn-info' : 'btn-secondary'}`}
-                                            onClick={() => toggleCollapse(index)}
-                                            style={{ cursor: 'pointer' }}
-                                            data-toggle={`#detailsCollapse${index}`}
-                                            aria-expanded={expandedIndex === index}
+                                            className={`btn ${expandedMap.get(result.id) ? 'btn-info' : 'btn-secondary'}`}
+                                            aria-expanded={expandedMap.get(result.id)}
+                                            onClick={() => toggleCollapse(result.id)}
                                         >
                                             Details
                                         </button>
                                     )}
                                     <button
                                         className='btn btn-warning ml-2'
-                                        onClick={() => handleEditPatient(index, result.id)}
+                                        onClick={() => handleEditPatient(result.id)}
+                                        disabled={isEditingMap.get(result.id)}
                                     >
                                         Edit
                                     </button>
                                     <button
                                         className='btn btn-danger ml-2'
                                         onClick={() => handleDeletePatient(result.id)}
+                                        disabled={isEditingMap.get(result.id)}
                                     >
                                         Delete
                                     </button>
                                 </div>
                             </div>
                             <div
-                                id={`detailsCollapse${index}`}
-                                className={`collapse ${expandedIndex === index ? 'show' : ''} collapsed-box`}
+                                id={`detailsCollapse${result.id}`}
+                                className={`collapse ${expandedMap.get(result.id) ? 'show' : ''} collapsed-box`}
                             >
-                                {editedIndex === index ? renderEditFields() : renderDetails(result, index)}
+                                {isEditingMap.get(result.id) ? renderEditFields() : renderDetails(result)}
                             </div>
                         </li>
                     ))}
@@ -364,7 +404,8 @@ const PatientList = () => {
                         </button>
                     </div>
                 </div>
-            </div>
+
+        </div>
             <div className='custom-list'>
                 {searchClicked && searchResults.length === 0 ? (
                     <p className='no-result-text'>No results found.</p>

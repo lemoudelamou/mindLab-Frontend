@@ -169,3 +169,15 @@ export const deleteExperimentDataById = async (experimentId) => {
 };
 
 
+export const getPatientByFullname = async (fullname) => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/data/by-patient-fullname/${fullname}`);
+        console.log('Server response:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error getting settings data:', error);
+        throw error;
+    }
+};
+
+
