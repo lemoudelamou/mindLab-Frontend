@@ -169,14 +169,3 @@ export const deleteExperimentDataById = async (experimentId) => {
 };
 
 
-export const updateExperimentSettings = async (settingsId ,settings) => {
-    try {
-        const response = await axios.put(`http://localhost:8081/api/settings/update/${settingsId}`, settings);
-
-        // Handle the response, update UI, show success message, etc.
-        console.log('Settings updated successfully', response.data);
-    } catch (error) {
-        // Handle errors, show error message, etc.
-        console.error('Error updating settings', error);
-    }
-};

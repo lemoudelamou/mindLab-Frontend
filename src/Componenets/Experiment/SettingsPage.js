@@ -1,7 +1,7 @@
 // src/SettingsPage.js
 import React, {useState} from 'react';
 import {useNavigate, useLocation} from 'react-router-dom';
-import {saveSettingsData, updateExperimentSettings} from '../../Api/Api';
+import {saveSettingsData} from '../../Api/Api';
 import '../../style/SettingsPage.css';
 import Navbar from "../Navbar/Navbar";
 import {Form, Modal} from "react-bootstrap";
@@ -35,8 +35,6 @@ const SettingsPage = ({selectedShape}) => {
     const navigate = useNavigate();
     const patientId = localStorage.getItem("patientId");
     const [showModal, setShowModal] = useState(false);
-    const experimentDataId = localStorage.getItem("experimentDataIdId");
-    const settingsIdToUpdate = localStorage.getItem("settingsId");
 
 
 
@@ -60,31 +58,17 @@ const SettingsPage = ({selectedShape}) => {
 
         if (
             (settingsData.difficultyLevel === 'Hard' && settingsData.isColorBlind !== 'colorBlind') ||
-            (settingsData.difficultyLevel === 'Medium' && settingsData.isColorBlind === 'colorBlind')
+            (settingsData.difficultyLevel === 'Medium' && settingsData.isColorBlind === 'colorBlind') // Corrected typo
         ) {
-            savedData = { ...savedData, shape: '' };
+            savedData = {...savedData, shape: ''};
         }
+
 
         console.log('Saved data:', savedData);
 
-        // Check if experimentData.id is null and settingsData.id is not null
-        if (!experimentDataId && settingsIdToUpdate && patientId) {
-            try {
-                console.log('Updating settings data...');
 
-                // Update settings data on the server
-                const updatedSettingsData = await updateExperimentSettings(settingsIdToUpdate,savedData);
-
-                localStorage.setItem("sessionLength", sessionLength);
-                localStorage.setItem("showInstructionsBox", showInstructionBoxButton);
-
-                // Redirect to the experiment page with patient and settings data
-                navigate('/ReactiontimeExperiment');
-            } catch (error) {
-                console.error('Error updating settings data:', error);
-                // Handle error as needed
-            }
-        } else if (patientId) {
+        // Check if patient data is available
+        if (patientId) {
             try {
                 console.log('Saving settings data...');
 
@@ -94,6 +78,7 @@ const SettingsPage = ({selectedShape}) => {
                 localStorage.setItem("settingsId", savedSettingsData.id);
                 localStorage.setItem("sessionLength", sessionLength);
                 localStorage.setItem("showInstructionsBox", showInstructionBoxButton);
+
 
                 // Redirect to the experiment page with patient and settings data
                 navigate('/ReactiontimeExperiment');
@@ -106,8 +91,8 @@ const SettingsPage = ({selectedShape}) => {
             navigate('/ReactiontimeExperiment');
             console.log('Form submitted without patient data');
         }
-    };
 
+    }
     const handleChangeSelect = (e) => {
         const { name, value } = e.target;
 
