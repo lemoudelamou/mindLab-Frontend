@@ -65,3 +65,13 @@ tbody tr:hover {
     margin-top: 15px;
     margin-bottom: 10px;
 }
+
+
+.centered-text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh; /* 100% of the viewport height */
+    color: #FFFFFF;
+    font-size: 30pt;
+}

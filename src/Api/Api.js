@@ -25,17 +25,20 @@ export const saveSettingsData = async (patientId, settingsData) => {
     }
 };
 
-export const saveExperimentResults = async (settingsId, payload) => {
+export const saveExperimentResults = async (patientId, settingsId, experimentId, payload) => {
     try {
-        const response = await axios.post(`${API_BASE_URL}/data/${settingsId}/results`, payload);
+
+        const response = await axios.post(`${API_BASE_URL}/data/patient/${patientId}/${settingsId}/results/${experimentId}`, payload);
         console.log('Server response:', response.data);
+        console.log('experiment data id:', response.data.id);
+        localStorage.setItem("experimentDataId", response.data.id);
+
         return response.data;
     } catch (error) {
         console.error('Error saving experiment results:', error);
         throw error;
     }
 };
-
 
 export const getExperimentsData = async () => {
     try {
@@ -61,9 +64,9 @@ export const getAllPatients = async () => {
 };
 
 
-export const getExperimentsDataById = async (experimentDataId) => {
+export const getExperimentsDataById = async (patientId) => {
     try {
-        const response = await axios.get(`${API_BASE_URL}/data/experiment-details/${experimentDataId}`);
+        const response = await axios.get(`${API_BASE_URL}/data/data/patient/${patientId}`);
         console.log('Server response:', response.data);
         return response.data;
     } catch (error) {
@@ -110,4 +113,70 @@ export const fetchDataForGroup = async (groupe) => {
     }
 };
 
-export default fetchDataForGroup;
+
+export const fetchDataByGender = async (gender) => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/data/gender/${gender}`);
+
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        throw error; // Rethrow the error to handle it at the calling site
+    }
+};
+
+
+export const deletePatientById = async (patientId) => {
+
+    try {
+        // Send a DELETE request to the specified endpoint
+        const response = await axios.delete(`${API_BASE_URL}/patients/delete/${patientId}`);
+
+        // Handle the response (optional)
+        console.log('Delete success:', response.data);
+
+        // Return any data you want, or simply return true to indicate success
+        return true;
+    } catch (error) {
+        // Handle errors
+        console.error('Error deleting patient:', error);
+
+        // Return false or handle the error as needed
+        return false;
+    }
+};
+
+
+export const deleteExperimentDataById = async (experimentId) => {
+    try {
+        // Send a DELETE request to the specified endpoint
+        const response = await axios.delete(`${API_BASE_URL}/data/delete-reaction-times/${experimentId}`);
+
+
+        // Handle the response (optional)
+        console.log('Delete success:', response.data);
+
+        // Return any data you want, or simply return true to indicate success
+        return true;
+    } catch (error) {
+        // Handle errors
+        console.error('Error deleting experiment data:', error);
+
+        // Return false or handle the error as needed
+        return false;
+    }
+
+};
+
+
+export const updateExperimentSettings = async (settingsId ,settings) => {
+    try {
+        const response = await axios.put(`http://localhost:8081/api/settings/update/${settingsId}`, settings);
+
+        // Handle the response, update UI, show success message, etc.
+        console.log('Settings updated successfully', response.data);
+    } catch (error) {
+        // Handle errors, show error message, etc.
+        console.error('Error updating settings', error);
+    }
+};

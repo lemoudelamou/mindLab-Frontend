@@ -1,0 +1,24 @@
+.results-container-group{
+        max-width: 100%;
+        margin: 0 auto;
+        min-height: 100vh;
+        overflow-y: auto;
+        background: url("/src/assets/back.png") center/cover no-repeat fixed;
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1;
+
+}
+
+.pad-container-group {
+    max-width: 900px;
+    min-height: 1000px;
+    padding: 100px;
+    z-index: 1;
+    align-items: center;
+    text-align: center;
+    overflow-y: auto;
+
+}

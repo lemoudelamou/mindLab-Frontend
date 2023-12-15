@@ -2,16 +2,15 @@ import React, {useState, useEffect, useRef} from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../../style/ReactionTimeExperiment.css';
 import {useNavigate} from 'react-router-dom';
-import {useLocation} from 'react-router-dom';
-import InfoBox from "./InfoBox";
 import RedoExperimentModal from './RedoExperimentModal'
 import {formatTime, calculateAverageReactionTime} from '../../utils/ExperimentUtils';
 import Navbar from "../Navbar/Navbar";
 import {getSettingsById, saveExperimentResults} from "../../Api/Api";
 import '@fortawesome/fontawesome-free/css/all.css';
 import ExperimentInstructionsBox from "./ExperimentInstructionBox";
-import secureLocalStorage from "react-secure-storage";
 import Spinner from "../../utils/Spinner";
+import {v4 as uuidv4} from "uuid"; // Import the uuid library
+import Modal from 'react-modal';
 
 
 const ReactionTimeExperiment = () => {
@@ -36,17 +35,12 @@ const ReactionTimeExperiment = () => {
     const [showRedoModal, setShowRedoModal] = useState(false);
     const [experimentCountdown, setExperimentCountdown] = useState(3);
     const [intervalId, setIntervalId] = useState(null); // New state variable to store the interval ID
-    const [showInfoBox, setShowInfoBox] = useState(false);
     const [countdownRunning, setCountdownRunning] = useState(false);
-    const [showInstructions, setShowInstructions] = useState(true);
     const navigate = useNavigate();
-    const location = useLocation();
-    const {state} = location;
-    const patientData = state?.patientData || null;
-    //const settingsData = state?.settingsData || null;
     const settingsId = localStorage.getItem("settingsId") || null;
+    const patientId = localStorage.getItem("patientId") || null;
     const sessionLength = localStorage.getItem("sessionLength") || null;
-    const showInstructionBoxButton = state?.showInstructionBoxButton || null;
+    const showInstructionBoxButton = localStorage.getItem("showInstructionsBox") === 'true';
     const [experimentSettings, setExperimentSettings] = useState({
         shape: "circle", experimentLength: 60, isColorBlind: '', blinkDelay: 1, difficultyLevel: 'Easy',
     }); // State variables for experiment settings and patient information
@@ -59,8 +53,11 @@ const ReactionTimeExperiment = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [settingsData, setSettingsData] = useState(null);
-
-    console.log("passed settings id: ", settingsId);
+    const [experimentData, setExperimentData] = useState({});
+    const [experimentId, setExperimentId] = useState(""); // State variable to store the experiment ID
+    const currentExperimentDataRef = useRef([]);
+    const [tablesVisible, setTablesVisible] = useState(false);
+    const [showContentBox, setShowContentBox] = useState(false);
 
 
     // Function to clear the text content of the target element
@@ -70,16 +67,22 @@ const ReactionTimeExperiment = () => {
         }
     };
 
+    const toggleContentBox = () => {
+        setShowContentBox(!showContentBox);
+    };
+
+    const handleToggleClick = () => {
+        console.log('Button clicked!');
+        setTablesVisible(!tablesVisible);
+    };
+
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchSettingsData = async () => {
             try {
                 const data = await getSettingsById(settingsId);
                 setSettingsData(data);
-
                 applyExperimentSettings(data);
-
-                // Log data after it has been successfully fetched
                 console.log("fetched settings data:", data);
             } catch (error) {
                 setError(error);
@@ -88,10 +91,8 @@ const ReactionTimeExperiment = () => {
             }
         };
 
-        // Log before fetching (optional)
         console.log("About to fetch settings data");
-
-        fetchData();
+        fetchSettingsData().then(r => settingsId);
     }, [settingsId]);
 
 
@@ -158,10 +159,8 @@ const ReactionTimeExperiment = () => {
     const handleRedoExperiment = () => {
         // Reset experiment-related state variables
         resetExperiment()
-
         // Close the modal
         setShowRedoModal(false);
-
         // Clear the interval when redoing the experiment
         if (intervalId) {
             clearInterval(intervalId);
@@ -196,25 +195,45 @@ const ReactionTimeExperiment = () => {
         setTimeout(() => {
             setBackgroundColor(() => {
                 const newColor = generateRandomColor();
-                setStartTime(performance.now());
+                setStartTime(performance.now().toFixed(2));
                 setIsWaiting(false);
                 return newColor;
             });
         }, fadeDuration);
     };
 
-    // Effect to show save button when a reaction time is recorded
+
+    /* is responsible for applying experiment settings when the settingsData changes,
+       ensuring that the component responds to updates in the settingsData prop and applies
+       the corresponding side effect.*/
     useEffect(() => {
-        if (lastReactionTime !== 0) {
-            setShowSaveButton(true);
+        if (settingsData) {
+            applyExperimentSettings(settingsData);
         }
-    }, [lastReactionTime]);
+    }, [settingsData]);
 
 
-    // Function to handle the start of the experiment
+    // Effect to update main experimentData when the current experiment is completed
+    useEffect(() => {
+        if (experimentId && currentExperimentDataRef.current.length > 0) {
+            setExperimentData((prevData) => {
+                const updatedData = {
+                    ...prevData,
+                    [experimentId]: currentExperimentDataRef.current,
+                };
+                console.log("Experiment Data: ", updatedData);
+                return updatedData;
+            });
+        }
+    }, [experimentId]);
+
     const handleStartExperiment = () => {
         setExperimentStarted(true);
         setTimeRemaining(experimentLength);
+
+        const newExperimentId = uuidv4();
+        setExperimentId(newExperimentId);
+        currentExperimentDataRef.current = []; // Reset data for the new experiment
 
         const id = setInterval(() => {
             setTimeRemaining((prevTime) => {
@@ -225,6 +244,17 @@ const ReactionTimeExperiment = () => {
                     setSpacebarEnabled(false);
                     setBackgroundColor("white");
                     clearInterval(id); // Clear the interval when the time is up
+
+                    // Save the data for the current experiment
+                    setExperimentData((prevData) => {
+                        const updatedData = {
+                            ...prevData,
+                            [newExperimentId]: currentExperimentDataRef.current,
+                        };
+                        console.log("Experiment Data: ", updatedData);
+                        return updatedData;
+                    });
+
                     return 0;
                 }
             });
@@ -235,122 +265,11 @@ const ReactionTimeExperiment = () => {
         startNewExperiment();
     };
 
-    // update infoBox Data (we can delete this if we decide to delete the info box from the experiment page)
-    useEffect(() => {
-        console.log("SessionLength is: ", sessionLength);
-        if (patientData) {
-            setPatientInfo({
-                fullname: patientData.fullname || '',
-                birthDate: patientData.birthDate || '',
-                age: patientData.age || '',
-                strongHand: patientData.strongHand || 'Right',
-                hasDiseases: patientData.hasDiseases || '',
-                diseases: patientData.diseases || '',
-            });
-        }
-
-        console.log('use effect settingsData:', settingsData);
-
-
-        if (settingsData) {
-            setExperimentSettings({
-                shape: settingsData.shape || 'circle',
-                experimentLength: settingsData.experimentLength || 60,
-                isColorBlind: settingsData.isColorBlind || '',
-                blinkDelay: settingsData.blinkDelay || 1,
-                difficultyLevel: settingsData.difficultyLevel || 'Easy',
-
-            });
-        }
-    }, [patientData, settingsData]);
-
-
-    /* is responsible for applying experiment settings when the settingsData changes,
-    ensuring that the component responds to updates in the settingsData prop and applies
-    the corresponding side effect.*/
-    useEffect(() => {
-        if (settingsData) {
-            applyExperimentSettings(settingsData);
-        }
-    }, [settingsData]);
-
-
-    // Function to handle saving results
-    const handleSaveResults = async () => {
-        setShowSaveButton(false);
-
-        // Calculate average reaction time for "correct" and "incorrect" tries
-        const correctTimes = reactionTimes.filter((entry) => entry.status.includes("correct"));
-        const incorrectTimes = reactionTimes.filter((entry) => entry.status.includes("incorrect"));
-        const averageCorrectTime = calculateAverageReactionTime(correctTimes);
-        const averageIncorrectTime = calculateAverageReactionTime(incorrectTimes);
-        const age = patientData?.age;
-
-        // Combine experiment settings, patient info, and reaction times
-        const resultData = {
-            experimentSettings: {
-                shape, experimentLength, isColorBlind, blinkDelay, difficultyLevel: experimentSettings.difficultyLevel,
-            }, patientInfo: {
-                ...patientInfo, birthDate: patientInfo.birthDate, age,
-            }, reactionTimes, averageReactionTimes: {
-                correct: averageCorrectTime, incorrect: averageIncorrectTime,
-            },
-        };
-
-        // Save the resultData for this attempt
-        setAllAttempts((prevAttempts) => [...prevAttempts, resultData]);
-
-        console.log('Payload:', resultData);
-        console.log('settingsId:', settingsId);
-
-        const payload = {
-            reactionTimes, averageReactionTimes: {
-                correct: averageCorrectTime, incorrect: averageIncorrectTime,
-            },
-        };
-
-
-        // Check if patient data is available
-        if (settingsId) {
-            try {
-                console.log('Saving settings data...');
-
-                // Save settings data to the server
-                const savedExperiment = await saveExperimentResults(settingsId, payload);
-
-                // Save experimentDataId to secureLocalStorage
-                secureLocalStorage.setItem('experimentDataId', savedExperiment.id);
-
-                navigate('/results', {state: {resultData}});
-
-                console.log('the experiment ', savedExperiment.id);
-
-            } catch (error) {
-                console.error('Error saving settings data:', error);
-                // Handle error as needed
-                navigate('/results', {state: {resultData}});
-            }
-        } else {
-
-            // Log the result data to the console
-            console.log('Result Data:', resultData);
-
-            // Save the resultData to a file
-            // saveToFile(resultData);
-
-            // Pass resultData to the Results page using react-router-dom
-            navigate('/results', {state: {resultData}});
-        }
-
-        // Reset experiment-related state variables
-        resetExperiment();
-    };
-
 
     // Function to handle a click on the experiment bar
     const handleBarClick = () => {
         if (!isWaiting && timeRemaining > 0) {
-            const endTime = performance.now();
+            const endTime = performance.now().toFixed(2);
             const reactionTime = endTime - startTime;
 
             setLastReactionTime(reactionTime);
@@ -373,12 +292,90 @@ const ReactionTimeExperiment = () => {
             setUserResponse(status);
             setReactionTimes((prevReactionTimes) => [...prevReactionTimes, {time: reactionTime, status},]);
 
+            currentExperimentDataRef.current.push({time: reactionTime, status});
+
+
             setTimeout(() => {
                 setUserResponse("");
                 startNewExperiment();
+
+
             }, 1000);
         }
     };
+
+
+    const handleResultsPage = () => {
+        navigate("/results")
+        ;
+    }
+
+    const handleSaveResults = async () => {
+        setShowSaveButton(false);
+
+        // Iterate through each experiment data
+        for (const [experimentId, data] of Object.entries(experimentData)) {
+            // Calculate average reaction time for "correct" and "incorrect" tries
+            const correctTimes = data.filter((entry) => entry.status.includes("correct"));
+            const incorrectTimes = data.filter((entry) => entry.status.includes("incorrect"));
+            const averageCorrectTime = calculateAverageReactionTime(correctTimes);
+            const averageIncorrectTime = calculateAverageReactionTime(incorrectTimes);
+
+            // Combine experiment settings, patient info, and reaction times
+            const resultData = {
+                experimentSettings: {
+                    shape,
+                    experimentLength,
+                    isColorBlind,
+                    blinkDelay,
+                    difficultyLevel: experimentSettings.difficultyLevel,
+                },
+                patientInfo: {
+                    ...patientInfo, birthDate: patientInfo.birthDate, age: patientInfo.age,
+                },
+                reactionTimes: experimentData,
+                averageReactionTimes: {
+                    correct: averageCorrectTime,
+                    incorrect: averageIncorrectTime,
+                },
+            };
+
+            console.log('Payload:', resultData);
+
+            //saveToFile(resultData);
+
+            // Check if experimentId is available
+            if (settingsId) {
+                try {
+                    console.log('Saving settings data...');
+
+                    // Save settings data to the server using the currentExperimentId
+                    await saveExperimentResults(patientId, settingsId, experimentId,{
+                        reactionTimes: experimentData,
+                        averageReactionTimes: {
+                            correct: averageCorrectTime, incorrect: averageIncorrectTime,
+                        },
+                    });
+
+                    console.log("Experiment Data id: ", resultData)
+
+
+                } catch (error) {
+                    // Handle error as needed
+                    console.log('Error:', error);
+
+                }
+            } else {
+                // Log the result data to the console
+            }
+
+        }
+
+        // Reset experiment-related state variables
+        resetExperiment();
+    };
+
+
     // Effect to handle keydown events for spacebar
     useEffect(() => {
         const handleKeyDown = (event) => {
@@ -400,10 +397,7 @@ const ReactionTimeExperiment = () => {
         const timeoutId = setTimeout(() => {
             if (!isWaiting && backgroundColor === (isColorBlind ? "yellow" : selectedColors.falschColor)) {
                 startNewExperiment();
-            } else if (!isWaiting && backgroundColor === (isColorBlind ? "blue" : selectedColors.richtigColor) && lastReactionTime === 0 && timeRemaining > 0) {
-                setShowSaveButton(true);
-            } else if (!isWaiting && timeRemaining === 0) {
-                // If time is up, reset experiment-related state variables and ensure the background color is white
+            } else if (timeRemaining === 0 && !isWaiting) {
                 setBackgroundColor("white");
             }
         }, 1000);
@@ -411,7 +405,7 @@ const ReactionTimeExperiment = () => {
         return () => {
             clearTimeout(timeoutId);
         };
-    }, [isWaiting, backgroundColor, lastReactionTime, timeRemaining]);
+    }, [isWaiting, backgroundColor, lastReactionTime, timeRemaining, startNewExperiment, setShowSaveButton]);
 
 
     // Function to start the experiment countdown
@@ -478,44 +472,243 @@ const ReactionTimeExperiment = () => {
         return () => clearInterval(intervalId);
     }, [countdownRunning]);
 
+
+    const calculateAverages = () => {
+        const averages = {};
+
+        Object.entries(experimentData).forEach(([experimentId, data]) => {
+            const correctTimes = data.filter((entry) => entry.status === "correct");
+            const incorrectTimes = data.filter((entry) => entry.status === "incorrect");
+
+            const averageCorrectTime = calculateAverageReactionTime(correctTimes);
+            const averageIncorrectTime = calculateAverageReactionTime(incorrectTimes);
+
+            averages[experimentId] = {
+                correct: averageCorrectTime,
+                incorrect: averageIncorrectTime,
+            };
+        });
+
+        return averages;
+    };
+
+
     const handleToggleCountdown = () => {
         setCountdownRunning((prev) => !prev);
     };
 
 
-    // Calculate the content for experiment countdown
-    const experimentCountdownContent =
-        experimentCountdown > 0 ? `Experiment Starts in ${experimentCountdown}` : 'Start Experiment';
+    let sessionCountdownContent;
+    if (sessionCountdown <= 0 && !countdownRunning) {
+        sessionCountdownContent = 'Terminated';
+    } else if (sessionCountdown === sessionLength) {
+        sessionCountdownContent = 'Start session';
+    } else if (sessionCountdown > 0 && countdownRunning) {
+        sessionCountdownContent = formatTime(sessionCountdown);
+    } else if (sessionCountdown < sessionLength && !countdownRunning) {
+        sessionCountdownContent = `Resume ${formatTime(sessionCountdown)}`;
+    }
 
 
-    const countdownDisplay = experimentCountdown > 0 && (
-        <div>
-            <p>{experimentCountdown}</p>
-        </div>
-    );
+    // Function to render the experiment countdown content
+    const renderExperimentCountdown = () => {
+        if (experimentCountdown > 0) {
+            return `Experiment Starts in ${experimentCountdown}`;
+        } else if (timeRemaining === 0) {
+            return 'Terminated';
+        }
+        return null;
+    };
 
+    // Function to render the session countdown content
+    const renderSessionCountdown = () => {
+        if (sessionCountdown <= 0 && !countdownRunning) {
+            return 'Terminated';
+        } else if (sessionCountdown === sessionLength) {
+            return 'Start session';
+        } else if (sessionCountdown > 0 && countdownRunning) {
+            return formatTime(sessionCountdown);
+        } else if (sessionCountdown < sessionLength && !countdownRunning) {
+            return `Resume ${formatTime(sessionCountdown)}`;
+        }
+        return null;
+    };
 
-    const startExperimentButton = (
+    // Function to render the start experiment button
+    const renderStartExperimentButton = () => (
         <button
             className="btn btn-primary"
             onClick={startExperimentCountdown}
             disabled={sessionCountdown <= 0 || experimentLength > sessionCountdown || !countdownRunning}
         >
-            start experiment
+            Start Experiment
         </button>
     );
 
+    // Function to render the save button
+    const renderSaveButton = () => (
+        timeRemaining === 0 && (
+            <button className="btn btn-success" onClick={handleSaveResults}>
+                Save Results
+            </button>
+        )
+    );
+
+    // Function to render the experiment status box
+    const renderExperimentStatusBox = () => (
+        experimentStarted && (
+            <div className="experiment-status-box">
+                <p className="experiment-status">
+                    Experiment in Progress - Time Remaining: {formatTime(timeRemaining)}
+                </p>
+            </div>
+        )
+    );
+
+    // Function to render the instruction box button
+    const renderInstructionBoxButton = () => (
+        showInstructionBoxButton && (
+            <div style={{paddingTop: '10px'}}>
+                {/* Button to toggle the modal */}
+                <div>
+                    <button onClick={toggleContentBox} className="btn btn-dark" style={{justifySelf: 'center'}}>
+                        {showContentBox ? 'Hide Instructions' : 'Show Instructions'}
+                    </button>
+                </div>
+
+                <Modal
+                    isOpen={showContentBox}
+                    ariaHideApp={false}
+                    onRequestClose={toggleContentBox}
+                    contentLabel="Instructions"
+                    style={{
+                        content: {
+                            top: '50%',
+                            left: '50%',
+                            right: 'auto',
+                            bottom: 'auto',
+                            marginRight: '-50%',
+                            transform: 'translate(-50%, -50%)',
+                        },
+                    }}
+                >
+                    <ExperimentInstructionsBox/>
+                </Modal>
+            </div>
+        )
+    );
+
+    // Function to render the results modal
+    const renderResultsModal = () => (
+        <Modal
+            isOpen={tablesVisible}
+            ariaHideApp={false}
+            onRequestClose={handleToggleClick}
+            contentLabel="Experiment Results"
+            style={{
+                content: {
+                    top: '50%',
+                    left: '50%',
+                    right: 'auto',
+                    bottom: 'auto',
+                    marginRight: '-50%',
+                    transform: 'translate(-50%, -50%)',
+                    maxHeight: '80%', // Set the maximum height of the modal content
+                    overflowY: 'auto', // Enable vertical scrolling
+                    display: 'flex', // Use Flexbox
+                    flexDirection: 'column', // Stack items vertically
+                    alignItems: 'center', // Center items horizontally
+                },
+            }}>
+            <div>
+                <div className="results-section experiment-results">
+                    <h2>Experiment Results</h2>
+                    {renderExperimentData()}
+                </div>
+
+                <div className="results-section average-reaction-times">
+                    <h2>Average Reaction Times</h2>
+                    {renderAverages()}
+                </div>
+            </div>
+            <button onClick={handleResultsPage} className="btn btn-dark"
+                    style={{marginTop: '10px', flexDirection: 'column', alignItems: 'center'}}>
+                To Results
+            </button>
+        </Modal>
+    );
+
+
+    const renderExperimentData = () => {
+        return tablesVisible && Object.entries(experimentData).map(([experimentId, data], index) => (
+            <div key={experimentId} className={tablesVisible ? 'visible' : 'hidden'} >
+                <h3 style={{ textAlign: 'center' }}>{`Experiment ${index + 1}`}</h3>
+                <table style={{ minWidth: '700px'}}>
+                    <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {data.map((entry, entryIndex) => (
+                        <tr key={entryIndex}>
+                            <td>{entry.time}</td>
+                            <td>{entry.status}</td>
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+            </div>
+        ));
+    };
+
+    const renderAverages = () => {
+        const averages = calculateAverages();
+
+        return tablesVisible && Object.entries(averages).map(([experimentId, values], index) => (
+            <div key={experimentId} className={tablesVisible ? 'visible' : 'hidden'}>
+                <h3 style={{ textAlign: 'center' }}>{`Experiment ${index + 1}`}</h3>
+                <table style={{ minWidth: '700px'}}>
+                    <thead>
+                    <tr>
+                        <th>Statistic</th>
+                        <th>Value</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>Average Correct Time</td>
+                        <td>{values.correct} ms</td>
+                    </tr>
+                    <tr>
+                        <td>Average Incorrect Time</td>
+                        <td>{values.incorrect} ms</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        ));
+    };
 
     // Render the component
     return (
         <div className="container-fluid">
             <Navbar/>
             {loading ?
-                (<div>
+                (
                     <Spinner/>
-                </div>) :
+                ) :
 
-                (<div className="container">
+                (<div className="container" style={{overflowY: 'auto', maxHeight: '100vh'}}>
+
+
+                    <button onClick={handleToggleClick} className="btn btn-dark">
+                        {tablesVisible ? 'Hide results Tables' : 'Show results Tables'}
+                    </button>
+
+                    {/* Instruction box button */}
+                    {renderInstructionBoxButton()}
 
 
                     {/* Combined container with button and session countdown */}
@@ -524,7 +717,8 @@ const ReactionTimeExperiment = () => {
                             <button
                                 className={`btn session-status ${countdownRunning ? 'running' : 'stopped'}`}
                                 onClick={handleToggleCountdown}
-                                disabled={sessionCountdown === 0}>
+                                disabled={sessionCountdown === 0}
+                            >
                                 <i className="fas fa-power-off shutdown-icon"></i>
                                 <span style={{
                                     height: '50px',
@@ -532,19 +726,11 @@ const ReactionTimeExperiment = () => {
                                     marginRight: '8px',
                                     paddingLeft: '10px'
                                 }}></span>
-                                Session Time
-                                Remaining: {sessionCountdown > 0 ? formatTime(sessionCountdown) : 'Session Terminated'}
+                                {renderSessionCountdown()}
                             </button>
                         </div>
                     </div>
 
-
-                    {/* Toggle Info Box button with icon */}
-                    <div className="button-container">
-                        <button className="btn btn-info" onClick={() => setShowInfoBox(!showInfoBox)}>
-                            <i className={`fas ${showInfoBox ? 'fa-eye-slash' : 'fa-eye'}`}></i>
-                        </button>
-                    </div>
 
                     {/* Experiment container */}
                     <div className="experiment-container">
@@ -554,36 +740,33 @@ const ReactionTimeExperiment = () => {
                         <div className={`shape-container ${shape}`} style={{backgroundColor}} onClick={handleBarClick}>
                             <div ref={target}></div>
                         </div>
-                        <div className="countdown-container-123">
-                            {countdownDisplay}
-                        </div>
 
+                        {/* Countdown container */}
+                        <div className="countdown-container-123">
+                            {renderExperimentCountdown()}
+                        </div>
 
                         {/* Save button */}
                         <div className="button-container">
-                            {showSaveButton && (<button className="btn btn-success" onClick={handleSaveResults}>
-                                Save Results
-                            </button>)}
+                            {renderSaveButton()}
                         </div>
 
-                        {/* Countdown container */}
-                        {experimentStarted && (<div className="countdown-container">
-                            <div className="experiment-status-box">
-                                <p className="experiment-status">Experiment in Progress - Time
-                                    Remaining: {formatTime(timeRemaining)}</p>
-                            </div>
+                        {/* Experiment status box */}
+                        {experimentStarted &&   (<div className="countdown-container">
+                            {renderExperimentStatusBox()}
                         </div>)}
 
 
                         {/* Start experiment button */}
                         <div className="button-container">
-                            {!experimentStarted && startExperimentButton}
+                            {!experimentStarted && renderStartExperimentButton()}
                         </div>
 
 
-                        {/* Display patient info and experiment settings based on visibility state */}
-                        {showInfoBox && (<InfoBox patientInfo={patientData?.fullname ? patientInfo : {}}
-                                                  experimentSettings={experimentSettings}/>)}
+
+                        {/* Results modal */}
+                        {renderResultsModal()}
+
                         {/* Render the RedoExperimentModal */}
                         <RedoExperimentModal show={showRedoModal} onHide={() => setShowRedoModal(false)}
                                              onRedo={handleRedoExperiment}/>
@@ -591,20 +774,10 @@ const ReactionTimeExperiment = () => {
                     </div>
                 </div>)}
 
-            {/* Toggle Instructions button */}
-            {showInstructionBoxButton && (
-                <div className="instructions-container">
-                    <div className="button-container-instruction">
-                        <button className="btn btn-info centered-button"
-                                onClick={() => setShowInstructions(!showInstructions)}>
-                            {showInstructions ? "Hide Instructions" : "Show Instructions"}
-                        </button>
-                    </div>
-                    {/* Display experiment instructions box based on visibility state */}
-                    {showInstructions && <ExperimentInstructionsBox/>}
-                </div>)}
+
         </div>
     );
 };
 export default ReactionTimeExperiment;
+
 

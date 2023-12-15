@@ -1,11 +1,11 @@
-import React, {useState, useEffect} from 'react';
-import {getAllPatients, updatePatientById} from '../../Api/Api';
+import React, { useState, useEffect } from 'react';
+import { deletePatientById, getAllPatients, updatePatientById } from '../../Api/Api';
 import Navbar from '../Navbar/Navbar';
 
 import '../../style/PatientList.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Pagination from "../../utils/Pagination";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const PatientList = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -21,8 +21,8 @@ const PatientList = () => {
     const [originalIndices, setOriginalIndices] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [groupsPerPage] = useState(5);
+    const [expandedIndex, setExpandedIndex] = useState(null);
     const navigate = useNavigate();
-
 
     // Function to group patients by 'groupe' field
     const groupPatientsByGroupe = () => {
@@ -92,11 +92,7 @@ const PatientList = () => {
     }, [searchResults, originalData]);
 
     const toggleCollapse = (index) => {
-        setCollapsedItems((prevCollapsedItems) => {
-            const newCollapsedItems = [...prevCollapsedItems];
-            newCollapsedItems[index] = !newCollapsedItems[index];
-            return newCollapsedItems;
-        });
+        setExpandedIndex((prevIndex) => (prevIndex === index ? null : index));
     };
 
     const clearFilters = () => {
@@ -109,7 +105,7 @@ const PatientList = () => {
 
     const handleEditPatient = (index) => {
         setEditedIndex(index);
-        setEditedData({...searchResults[index]});
+        setEditedData({ ...searchResults[index] });
         setEditedGroupe(searchResults[index].groupe || ''); // Set the initial edited value for groupe
     };
 
@@ -137,6 +133,24 @@ const PatientList = () => {
         }
     };
 
+    const handleDeletePatient = async (patientId) => {
+        const confirmDelete = window.confirm('Are you sure you want to delete this patient?');
+
+        if (confirmDelete) {
+            try {
+                await deletePatientById(patientId);
+
+                // After successful deletion, update the state and re-fetch data
+                const updatedData = searchResults.filter((patient) => patient.id !== patientId);
+                setOriginalData(updatedData);
+                setSearchResults(updatedData);
+            } catch (error) {
+                console.error('Error deleting patient:', error);
+                // Handle errors (e.g., show an error message)
+            }
+        }
+    };
+
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
     };
@@ -161,7 +175,7 @@ const PatientList = () => {
     const handleGroupDataButtonClick = (groupName) => {
         console.log(`Clicked on Group Data for group:`, groupName);
         localStorage.setItem("groupName", groupName);
-        navigate("/group-results")
+        navigate("/group-results");
     };
 
     const renderDetails = (result, index) => (
@@ -238,17 +252,7 @@ const PatientList = () => {
         pageNumbers.push(i);
     }
 
-    const renderPageNumbers = pageNumbers.map((number) => (
-        <li key={number} className='page-item'>
-            <a
-                href='javascript:void(0);'
-                className={`page-link ${number === currentPage ? 'active' : ''}`}
-                onClick={() => setCurrentPage(number)}
-            >
-                {number}
-            </a>
-        </li>
-    ));
+
 
     // Rendering function for grouped patients
     const renderGroupedPatients = () => {
@@ -265,15 +269,13 @@ const PatientList = () => {
             <div key={groupIndex} className='custom-group'>
                 <div className="group-title" style={{ display: 'flex', alignItems: 'center' }}>
                     <h3>{group}</h3>
-                    <div style={{paddingTop: '30px', marginLeft: '80%'}}>
-                    <button className='btn btn-dark'
-                            onClick={() => handleGroupDataButtonClick(group)}
-                                >
-                        Group Data
-                    </button>
-
+                    <div style={{ paddingTop: '30px', marginLeft: '80%' }}>
+                        <button className='btn btn-dark'
+                                onClick={() => handleGroupDataButtonClick(group)}
+                        >
+                            Group Data
+                        </button>
                     </div>
-
                 </div>
                 <ul className='list-group m-5'>
                     {groupedPatients[group].map((result, index) => (
@@ -294,13 +296,11 @@ const PatientList = () => {
                                         </>
                                     ) : (
                                         <button
-                                            className={`btn ${
-                                                collapsedItems[index] ? 'btn-secondary' : 'btn-info'
-                                            }`}
+                                            className={`btn ${expandedIndex === index ? 'btn-info' : 'btn-secondary'}`}
                                             onClick={() => toggleCollapse(index)}
-                                            style={{cursor: 'pointer'}}
+                                            style={{ cursor: 'pointer' }}
                                             data-toggle={`#detailsCollapse${index}`}
-                                            aria-expanded={!collapsedItems[index]}
+                                            aria-expanded={expandedIndex === index}
                                         >
                                             Details
                                         </button>
@@ -311,11 +311,17 @@ const PatientList = () => {
                                     >
                                         Edit
                                     </button>
+                                    <button
+                                        className='btn btn-danger ml-2'
+                                        onClick={() => handleDeletePatient(result.id)}
+                                    >
+                                        Delete
+                                    </button>
                                 </div>
                             </div>
                             <div
                                 id={`detailsCollapse${index}`}
-                                className={`collapse ${collapsedItems[index] ? '' : 'show'} collapsed-box`}
+                                className={`collapse ${expandedIndex === index ? 'show' : ''} collapsed-box`}
                             >
                                 {editedIndex === index ? renderEditFields() : renderDetails(result, index)}
                             </div>
@@ -328,7 +334,7 @@ const PatientList = () => {
 
     return (
         <div className="container-bg">
-            <Navbar/>
+            <Navbar />
             <div className='search-container'>
                 <h1 className='title-search'>Patients List</h1>
                 <div className='input-group mb-3'>

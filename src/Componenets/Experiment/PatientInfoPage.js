@@ -61,8 +61,7 @@ function PatientInfoPage() {
             localStorage.setItem("patientId", savedPatientData.id);
 
             // Redirect to settings page with patient ID
-            navigate('/settings', {state: {patientId: savedPatientData.id, patientData: savedPatientData}});
-            console.log('Form submitted with data:', savedPatientData.id);
+            navigate('/settings');
         } catch (error) {
             console.error('Error saving patient data:', error);
             // Handle error as needed

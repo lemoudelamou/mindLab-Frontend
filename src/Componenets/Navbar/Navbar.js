@@ -21,14 +21,7 @@ export default function Navbar({activeTab}) {
 
     const isDemoMode = JSON.parse(secureLocalStorage.getItem('isDemoMode'));
 
-// Check if the value exists
-    if (isDemoMode !== null) {
-        // The value exists in local storage, you can use it
-        console.log('Retrieved value:', isDemoMode);
-    } else {
-        // The value doesn't exist in local storage
-        console.log('Value not found in local storage');
-    }
+
 
 
     const showNavbar = () => {
@@ -65,9 +58,6 @@ export default function Navbar({activeTab}) {
         };
     }, []); // Empty dependency array means this effect runs once when the component mounts
 
-
-
-    console.log('isDemoMode:', isDemoMode);
 
 
     return (

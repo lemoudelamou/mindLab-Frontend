@@ -1,189 +1,215 @@
-import React, {useState, useEffect} from "react";
-import { useLocation, useNavigate } from 'react-router-dom';
-import { Button } from 'react-bootstrap';
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../Navbar/Navbar";
-import '../../style/Results.css'
-import {calculateAge} from "../../utils/ExperimentUtils";
-import {getExperimentsDataById} from "../../Api/Api";
-import  secureLocalStorage  from  "react-secure-storage";
+import "../../style/Results.css";
+import { calculateAge } from "../../utils/ExperimentUtils";
+import {deleteExperimentDataById, deletePatientById, getExperimentsDataById} from "../../Api/Api";
+import secureLocalStorage from "react-secure-storage";
 import Spinner from "../../utils/Spinner";
 
-
 const Results = () => {
-
-    const navigate = useNavigate();
-    const location = useLocation();
-    const resultData = location.state && location.state.resultData;
-    const [experimentDetails, setExperimentDetails] = useState(null);
-    const storedExperimentDataId = secureLocalStorage.getItem('experimentDataId');
+    const [experimentDetails, setExperimentDetails] = useState("");
     const [loading, setLoading] = useState(true);
-
-
-
-    // Access data from experimentDetails with additional checks
-
-    console.log("the experiment data id is: ", storedExperimentDataId)
+    const [fetchDataTrigger, setFetchDataTrigger] = useState(true); // Added state variable
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                if (storedExperimentDataId) {
-                    // Call the API to get detailed experiment data
-                    const allData = await getExperimentsDataById(storedExperimentDataId);
+                const patientId = localStorage.getItem("patientId");
+                if (patientId && fetchDataTrigger) {
+                    const allData = await getExperimentsDataById(patientId);
+                    console.log("allData: ", allData);
+
                     setExperimentDetails(allData);
                     setLoading(false);
-
+                    setFetchDataTrigger(false); // Set the trigger to false after fetching data
                 }
             } catch (error) {
-                console.error('Error getting experiment details:', error);
+                console.error("Error getting experiment details:", error);
             }
         };
 
-        fetchData(); // Call the async function
-    }, []);
+        fetchData();
+    }, [fetchDataTrigger]); // Fetch data when fetchDataTrigger changes
 
 
-    if (!experimentDetails) {
-        // Handle the case where resultData is not available
-        return <div>
-            <Navbar/>
-            <p className="no-results-message">No results available.</p>;
-        </div>
-    }
 
-    const handleSubmit = (event) => {
-        navigate('/data', { state: { resultData } });
-        console.log('submitted resultData from results page:', resultData);
+    const handleDeleteExperimentData = async (experimentDataId) => {
+        const confirmDelete = window.confirm('Are you sure you want to delete all reaction times for this experiment?');
+
+        if (confirmDelete) {
+            try {
+                await deleteExperimentDataById(experimentDataId);
+
+                // Update state to remove the deleted experiment
+                setExperimentDetails((prevExperimentDetails) =>
+                    prevExperimentDetails.filter((experiment) => experiment.experimentDataId !== experimentDataId)
+                );
+            } catch (error) {
+                console.error('Error deleting experiment data:', error);
+                // Handle errors (e.g., show an error message)
+            }
+        }
     };
 
 
-    const { experimentSettings, patient, reactionTimes, averageReactionTimes } = experimentDetails || {};
+    if (loading) {
+        return <Spinner />;
+    }
+
+    if (!experimentDetails || experimentDetails.length === 0) {
+        return (
+            <div>
+                <Navbar />
+                <p className="no-results-message">No results available.</p>
+            </div>
+        );
+    }
+
+
+
 
     return (
         <div className="results-container">
-            <Navbar/>
+            <Navbar />
 
-            {loading ?
-                (<div>
-                    <Spinner/>
-                </div>) : (
-            <div className="pad-container">
-                <h2>Experiment Results</h2>
-
-                {/* Display patient information */}
-                <h3>Patient Information</h3>
-                <table>
-                    <tbody>
-                    <tr>
-                        <td>Fullname:</td>
-                        <td>{patient.fullname}</td>
-                    </tr>
-                    <tr>
-                        <td>Birth Date:</td>
-                        <td>{patient.birthDate ? new Date(patient?.birthDate).toLocaleDateString() : 'N/A'}</td>
-                    </tr>
-                    <tr>
-                        <td>Age:</td>
-                        <td>{ patient.age ? calculateAge(patient?.birthDate) : 'N/A'}</td>
-                    </tr>
-                    <tr>
-                        <td>Strong Hand:</td>
-                        <td>{patient.strongHand}</td>
-                    </tr>
-                    <tr>
-                        <td>Has Diseases:</td>
-                        <td>{patient?.hasDiseases  ? 'Yes' : 'No'}</td>
-                    </tr>
-                    {patient?.hasDiseases && (
-                        <tr>
-                            <td>Diseases:</td>
-                            <td>{patient?.diseases}</td>
-                        </tr>
-                    )}
-                    <tr>
-                        <td>Experiment taken on:</td>
-                        <td>{patient.expDate}</td>
-                    </tr>
-                    </tbody>
-                </table>
-
-
-
-                {/* Display experiment settings */}
-                <h3>Experiment Settings</h3>
-                <table>
-                    <tbody>
-                    <tr>
-                        <td>Shape:</td>
-                        <td>{experimentDetails.experimentSettings.shape}</td>
-                    </tr>
-                    <tr>
-                        <td>Experiment Length:</td>
-                        <td>{experimentSettings.experimentLength} seconds</td>
-                    </tr>
-                    <tr>
-                        <td>Is Color Blind:</td>
-                        <td>{experimentSettings.isColorBlind ? "Yes" : "No"}</td>
-                    </tr>
-                    <tr>
-                        <td>Blink Delay:</td>
-                        <td>{experimentSettings.blinkDelay} seconds</td>
-                    </tr>
-                    <tr>
-                        <td>Difficulty Level:</td>
-                        <td>{experimentSettings.difficultyLevel} </td>
-                    </tr>
-                    </tbody>
-                </table>
-
-                {/* Display relevant information from resultData */}
-                <h3>Reaction Times (in ms)</h3>
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Time</th>
-                        <th>Status</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {reactionTimes.map((entry, index) => (
-                        <tr key={index}>
-                            <td>{entry.time}</td>
-                            <td>{entry.status}</td>
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>
-
-                {/* Display average reaction times */}
-                <h3>Average Reaction Times (in ms)</h3>
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Condition</th>
-                        <th>Average Reaction Time</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>correct</td>
-                        <td>{averageReactionTimes.correct} </td>
-                    </tr>
-                    <tr>
-                        <td>incorrect</td>
-                        <td>{averageReactionTimes.incorrect}</td>
-                    </tr>
-                    </tbody>
-                </table>
-                <div className='transfer'>
-                    {/* Button to transfer resultData to /Data */}
-
-                    <Button className="transfer-button" type="submit" onClick={handleSubmit}>Transfer to Data</Button>
+            {loading ? (
+                <div>
+                    <Spinner />
                 </div>
+            ) : (
+                <div className="pad-container">
+                    <h2>Experiment Results</h2>
 
-            </div> )}
+                    {/* Display patient information */}
+                    <h3>Patient Information</h3>
+                    <table>
+                        <tbody>
+                        <tr>
+                            <td>Fullname:</td>
+                            <td>{experimentDetails[0].patientInfo.fullname}</td>
+                        </tr>
+                        <tr>
+                            <td>Birth Date:</td>
+                            <td>{experimentDetails[0].patientInfo.birthDate ? new Date(experimentDetails[0].patientInfo.birthDate).toLocaleDateString() : 'N/A'}</td>
+                        </tr>
+                        <tr>
+                            <td>Age:</td>
+                            <td>{ experimentDetails[0].patientInfo.age ? calculateAge(experimentDetails[0].patientInfo.birthDate) : 'N/A'}</td>
+                        </tr>
+                        <tr>
+                            <td>Strong Hand:</td>
+                            <td>{experimentDetails[0].patientInfo.strongHand}</td>
+                        </tr>
+                        <tr>
+                            <td>Has Diseases:</td>
+                            <td>{experimentDetails[0].patientInfo.hasDiseases  ? 'Yes' : 'No'}</td>
+                        </tr>
+                        {experimentDetails[0].patientInfo.hasDiseases && (
+                            <tr>
+                                <td>Diseases:</td>
+                                <td>{experimentDetails[0].patientInfo.diseases}</td>
+                            </tr>
+                        )}
+                        </tbody>
+                    </table>
+
+                    {/* Display experiment settings */}
+                    <h3>Experiment Settings</h3>
+                    <table>
+                        <tbody>
+                        <tr>
+                            <td>Shape:</td>
+                            <td>{experimentDetails[0].experimentSettings.shape}</td>
+                        </tr>
+                        <tr>
+                            <td>Experiment Length:</td>
+                            <td>{experimentDetails[0].experimentSettings.experimentLength} seconds</td>
+                        </tr>
+                        <tr>
+                            <td>Is Color Blind:</td>
+                            <td>{experimentDetails[0].experimentSettings.isColorBlind ? "Yes" : "No"}</td>
+                        </tr>
+                        <tr>
+                            <td>Blink Delay:</td>
+                            <td>{experimentDetails[0].experimentSettings.blinkDelay} seconds</td>
+                        </tr>
+                        <tr>
+                            <td>Difficulty Level:</td>
+                            <td>{experimentDetails[0].experimentSettings.difficultyLevel} </td>
+                        </tr>
+                        {/* Add more experiment settings fields as needed */}
+                        </tbody>
+                    </table>
+
+
+
+
+                    {/* Display relevant information from resultData */}
+                    <h3>Reaction Times (in ms)</h3>
+                    {Array.isArray(experimentDetails) ? (
+                        experimentDetails.map((groupData) => (
+                            groupData.reactionTimes && groupData.reactionTimes.length > 0 ? (
+                                <div key={groupData.experimentDataId}>
+                                    <div style={{ color: '#FFFFFF' }}>{`Experiment Data ID ${groupData.experimentDataId}`}</div>
+
+                                    <table style={{ marginBottom: '20px' }}>
+                                        <thead>
+                                        <tr>
+                                            <th>Time</th>
+                                            <th>Status</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {groupData.reactionTimes.map((entry, index) => (
+                                            <tr key={index}>
+                                                <td>{entry.time}</td>
+                                                <td>{entry.status}</td>
+                                            </tr>
+                                        ))}
+                                        </tbody>
+                                    </table>
+                                    <button
+                                        onClick={() => handleDeleteExperimentData(groupData.experimentDataId)}
+                                        style={{ marginTop: '10px', marginBottom: '10px' }}
+                                        className="btn btn-dark"
+                                    >
+                                        Delete {groupData.experimentDataId}
+                                    </button>
+                                </div>
+                            ) : null
+                        ))
+                    ) : null}
+
+                    <h3>Average Reaction Times (in ms)</h3>
+                    {experimentDetails
+                        .filter(experiment => experiment.averageReactionTimes && experiment.averageReactionTimes.id)
+                        .map((experiment) => (
+                            <div key={experiment.averageReactionTimes.id}>
+                                <div style={{color: '#FFFFFF', paddingTop: '10px'}}>{`Experiment Data ID ${experiment.averageReactionTimes.id}`}</div>
+                                <table>
+                                    <thead>
+                                    <tr>
+                                        <th>Condition</th>
+                                        <th>Average Reaction Time</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {Object.entries(experiment.averageReactionTimes || {}).map(([condition, time], index) => (
+                                        <tr key={index}>
+                                            <td>{condition}</td>
+                                            <td>{time}</td>
+                                        </tr>
+                                    ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        ))}
+                </div>
+            )}
         </div>
     );
 };
+
 
 export default Results;

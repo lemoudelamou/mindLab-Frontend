@@ -1,19 +1,20 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import crossfilter from 'crossfilter';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {Bar, Line, Doughnut} from 'react-chartjs-2';
-import Chart from 'chart.js/auto';
-import {useLocation} from 'react-router-dom';
-import {getExperimentsData} from "../../Api/Api";
-import Navbar from "../Navbar/Navbar";
+import { Bar, Line } from 'react-chartjs-2';
+import { fetchDataByGender } from '../../Api/Api';
+import Navbar from '../Navbar/Navbar';
+import { Row, Col } from 'react-bootstrap'; // Add this import for layout
 
 import '../../style/Data.css';
-import Spinner from "../../utils/Spinner";
+import Spinner from '../../utils/Spinner';
 
 const Data = () => {
     const [data, setData] = useState([]);
     const [cf, setCrossfilter] = useState(null);
     const [categoryDimension, setCategoryDimension] = useState(null);
+    const [correctDimension, setCorrectDimension] = useState(null);
+    const [incorrectDimension, setIncorrectDimension] = useState(null);
     const [chartType, setChartType] = useState('bar');
     const [xAxisMin, setXAxisMin] = useState('');
     const [xAxisMax, setXAxisMax] = useState('');
@@ -21,18 +22,18 @@ const Data = () => {
     const [yAxisMax, setYAxisMax] = useState('');
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [selectedGender, setSelectedGender] = useState('all');
 
-
-    // Inside Data component
     useEffect(() => {
         const fetchData = async () => {
-            console.log('Starting fetch data');
+            console.log('Starting fetch data with gender:', selectedGender);
             try {
-                const experimentsData = await getExperimentsData(); // Call the function
-                console.log('Fetch data done', experimentsData);
+                const experimentsData = await fetchDataByGender(selectedGender);
+                console.log('fetched data: ', experimentsData);
+
+
 
                 if (Array.isArray(experimentsData)) {
-                    // Assuming each experimentData has a property named 'reactionTimes'
                     const rawData = experimentsData.flatMap((item) =>
                         item.reactionTimes.map((reactionTime) => ({
                             category: reactionTime.status,
@@ -40,30 +41,28 @@ const Data = () => {
                         }))
                     );
 
-                    // Initialize Crossfilter
                     const crossfilterInstance = crossfilter(rawData);
-
-                    // Create dimensions and groups
                     const dimension = crossfilterInstance.dimension((d) => d.category);
+                    const correctDimension = crossfilterInstance.dimension((d) => d.category === 'correct');
+                    const incorrectDimension = crossfilterInstance.dimension((d) => d.category === 'incorrect');
 
                     setData(rawData);
                     setCrossfilter(crossfilterInstance);
                     setCategoryDimension(dimension);
+                    setCorrectDimension(correctDimension);
+                    setIncorrectDimension(incorrectDimension);
 
-                    // Clean up on unmount
                     return () => crossfilterInstance.remove();
                 }
             } catch (error) {
                 console.error('Error fetching data:', error);
-            }  finally {
-            setLoading(false);
-        }
+            } finally {
+                setLoading(false);
+            }
         };
 
-        // Call the fetchData function when the component mounts
         fetchData();
-    }, []);
-
+    }, [selectedGender]);
 
     useEffect(() => {
         const handleFullscreenChange = () => {
@@ -105,34 +104,28 @@ const Data = () => {
         }
     };
 
-
     const filterData = (category) => {
         cf && categoryDimension && categoryDimension.filter(category);
-        // Update state with the filtered data
         setData(categoryDimension.top(Infinity));
     };
 
     const clearFilters = () => {
-        // Clear all filters
         cf && categoryDimension && categoryDimension.filterAll();
-        // Update state with the unfiltered data
         setData(categoryDimension.top(Infinity));
     };
 
-    // Function to calculate average reaction times
     const calculateAverage = () => {
         if (!Array.isArray(data) || data.length === 0) {
-            return 0; // Return 0 if there is no data
+            return 0;
         }
 
         const sum = data.reduce((accumulator, item) => accumulator + item.value, 0);
         return sum / data.length;
     };
 
-    // Function to prepare data for the chart
     const prepareChartData = () => {
         if (!Array.isArray(data)) {
-            return {labels: [], datasets: []}; // Return empty data
+            return { labels: [], datasets: [] };
         }
 
         const labels = data.map((item) => item.category);
@@ -152,8 +145,6 @@ const Data = () => {
         };
     };
 
-
-    // Chart options
     const chartOptions = {
         scales: {
             x: {
@@ -174,7 +165,7 @@ const Data = () => {
                     color: 'rgba(0, 0, 0, 0.1)',
                 },
                 ticks: {
-                    stepSize: 5, // Customize the step size on the y-axis
+                    stepSize: 10,
                 },
             },
         },
@@ -190,11 +181,10 @@ const Data = () => {
             },
         },
         animation: {
-            duration: 1500, // Customize the animation duration
+            duration: 1500,
         },
     };
 
-    // Render the selected chart type
     const renderChart = () => {
         if (!Array.isArray(data)) {
             return null;
@@ -202,21 +192,19 @@ const Data = () => {
 
         switch (chartType) {
             case 'bar':
-                return <Bar data={prepareChartData()} options={chartOptions}/>;
+                return <Bar data={prepareChartData()} options={chartOptions} />;
             case 'line':
-                return <Line data={prepareChartData()} options={chartOptions}/>;
+                return <Line data={prepareChartData()} options={chartOptions} />;
             default:
                 return null;
         }
     };
 
-    // Function to render the table rows
     const renderTableRows = () => {
         if (!Array.isArray(data)) {
             return null;
         }
 
-        // Calculate average reaction times
         const averageReactionTime = calculateAverage();
 
         return (
@@ -228,7 +216,9 @@ const Data = () => {
                     </tr>
                 ))}
                 <tr>
-                    <td><strong>Average Reaction Time</strong></td>
+                    <td>
+                        <strong>Average Reaction Time</strong>
+                    </td>
                     <td>{averageReactionTime.toFixed(2)}</td>
                 </tr>
             </>
@@ -236,102 +226,123 @@ const Data = () => {
     };
 
     return (
-
         <div className='data-container'>
-            <Navbar/>
+            <Navbar />
             <h1 className='title-data'>Crossfilter</h1>
             <div className='sec'>
-                {loading ? (  // Check if data is still loading
-                    <div className="text-center mt-5">
-                        <Spinner/>
-
+                {loading ? (
+                    <div className='text-center mt-5'>
+                        <Spinner />
                     </div>
                 ) : Array.isArray(data) && data.length > 0 ? (
                     <>
+                        <Row>
+                            <Col>
+                                <div>
+                                    <label htmlFor='genderSelect' className='form-label'>
+                                        Select Gender:
+                                    </label>
+                                    <select
+                                        id='genderSelect'
+                                        className='form-select narrow-select'
+                                        value={selectedGender}
+                                        onChange={(e) => setSelectedGender(e.target.value)}
+                                    >
+                                        <option value='all'>All</option>
+                                        <option value='Male'>Male</option>
+                                        <option value='Female'>Female</option>
+                                    </select>
+                                </div>
 
-                        <div>
-                            <button className='btn btn-primary m-1' onClick={() => filterData('correct')}>
-                                correct
-                            </button>
-                            <button className='btn btn-primary m-1' onClick={() => filterData('incorrect')}>
-                                incorrect
-                            </button>
-                            <button className='btn btn-secondary m-1' onClick={clearFilters}>
-                                Clear Filters
-                            </button>
-                        </div>
-                        <div>
-                            <h2>Data Table</h2>
-                            <table className='table table-bordered table-container'>
-                                <thead>
-                                <tr>
-                                    <th>Category</th>
-                                    <th>Value</th>
-                                </tr>
-                                </thead>
-                                <tbody>{renderTableRows()}</tbody>
-                            </table>
-                        </div>
-                        <div>
-                            <h2>Chart Type</h2>
-                            <select
-                                className='form-select'
-                                value={chartType}
-                                onChange={(e) => setChartType(e.target.value)}
-                            >
-                                <option value='bar'>Bar Chart</option>
-                                <option value='line'>Line Chart</option>
-                            </select>
-                        </div>
-                        <div>
-                            <h2>{chartType === 'bar' ? 'Bar Chart' : chartType === 'line' ? 'Line Chart' : 'Doughnut Chart'}</h2>
-                            <div id='chart-container' className={`diag-box ${isFullscreen ? 'fullscreen' : ''}`}
-                                 onClick={toggleFullscreen}>
-                                {renderChart()}
-                            </div>
-                            <div>
-                                <h2>Manual Scaling</h2>
-                                <div className="form-group">
-                                    <label>X-Axis Min:</label>
-                                    <input
-                                        type="number"
-                                        className="form-control"
-                                        value={xAxisMin}
-                                        onChange={(e) => setXAxisMin(e.target.value)}
-                                    />
+                                <div>
+                                    <button className='btn btn-primary m-1' onClick={() => filterData('correct')}>
+                                        correct
+                                    </button>
+                                    <button className='btn btn-primary m-1' onClick={() => filterData('incorrect')}>
+                                        incorrect
+                                    </button>
+                                    <button className='btn btn-secondary m-1' onClick={clearFilters}>
+                                        Clear Filters
+                                    </button>
                                 </div>
-                                <div className="form-group">
-                                    <label>X-Axis Max:</label>
-                                    <input
-                                        type="number"
-                                        className="form-control"
-                                        value={xAxisMax}
-                                        onChange={(e) => setXAxisMax(e.target.value)}
-                                    />
+                                <div>
+                                    <h2>Data Table</h2>
+                                    <table className='table table-bordered table-container'>
+                                        <thead>
+                                        <tr>
+                                            <th>Category</th>
+                                            <th>Value</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>{renderTableRows()}</tbody>
+                                    </table>
                                 </div>
-                                <div className="form-group">
-                                    <label>Y-Axis Min:</label>
-                                    <input
-                                        type="number"
-                                        className="form-control"
-                                        value={yAxisMin}
-                                        onChange={(e) => setYAxisMin(e.target.value)}
-                                    />
+
+                                <div>
+                                    <h2>Chart Type</h2>
+                                    <select
+                                        className='form-select'
+                                        value={chartType}
+                                        onChange={(e) => setChartType(e.target.value)}
+                                    >
+                                        <option value='bar'>Bar Chart</option>
+                                        <option value='line'>Line Chart</option>
+                                    </select>
                                 </div>
-                                <div className="form-group">
-                                    <label>Y-Axis Max:</label>
-                                    <input
-                                        type="number"
-                                        className="form-control"
-                                        value={yAxisMax}
-                                        onChange={(e) => setYAxisMax(e.target.value)}
-                                    />
+                                <div>
+                                    <h2>{chartType === 'bar' ? 'Bar Chart' : 'Line Chart'}</h2>
+                                    <div
+                                        id='chart-container'
+                                        className={`diag-box ${isFullscreen ? 'fullscreen' : ''}`}
+                                        onClick={toggleFullscreen}
+                                    >
+                                        {renderChart()}
+                                    </div>
+                                    <div>
+                                        <h2>Manual Scaling</h2>
+                                        <div className='form-group'>
+                                            <label>X-Axis Min:</label>
+                                            <input
+                                                type='number'
+                                                className='form-control'
+                                                value={xAxisMin}
+                                                onChange={(e) => setXAxisMin(e.target.value)}
+                                            />
+                                        </div>
+                                        <div className='form-group'>
+                                            <label>X-Axis Max:</label>
+                                            <input
+                                                type='number'
+                                                className='form-control'
+                                                value={xAxisMax}
+                                                onChange={(e) => setXAxisMax(e.target.value)}
+                                            />
+                                        </div>
+                                        <div className='form-group'>
+                                            <label>Y-Axis Min:</label>
+                                            <input
+                                                type='number'
+                                                className='form-control'
+                                                value={yAxisMin}
+                                                onChange={(e) => setYAxisMin(e.target.value)}
+                                            />
+                                        </div>
+                                        <div className='form-group'>
+                                            <label>Y-Axis Max:</label>
+                                            <input
+                                                type='number'
+                                                className='form-control'
+                                                value={yAxisMax}
+                                                onChange={(e) => setYAxisMax(e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
+                            </Col>
+                        </Row>
                     </>
                 ) : (
-                    <p className="no-data-message">No data available</p>
+                    <p className='no-data-message'>No data available</p>
                 )}
             </div>
         </div>

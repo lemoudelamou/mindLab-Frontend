@@ -25,11 +25,14 @@ import DemoData from './Demo/Data/DemoData';
 import DemoPatientList from './Demo/Data/DemoPatientList';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
+import Modal from 'react-modal';
+
 
 
 
 
 export default function App() {
+
 
 
   return (

@@ -66,3 +66,17 @@
     text-align: center;
     margin-top: 20px;
 }
+
+
+.correct-row {
+    background-color: #c8e6c9; /* Light green background for correct rows */
+}
+
+.incorrect-row {
+    background-color: #ffcdd2; /* Light red background for incorrect rows */
+}
+
+.narrow-select {
+    width: 150px;
+}
+

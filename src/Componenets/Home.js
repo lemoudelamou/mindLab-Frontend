@@ -1,8 +1,7 @@
 import React, {useState} from 'react';
 import '../style/Home.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {Carousel, Card, Row, Col, Modal, Button, Nav} from 'react-bootstrap';
-import { House, Speedometer2, Table, Heart, Info, Window } from 'react-bootstrap-icons';
+import { Card, Row, Col, Modal, Button } from 'react-bootstrap';
 import {useEffect} from "react";
 import {useNavigate} from 'react-router-dom';
 import {toggleDemoMode} from '../utils/LocalStorageUtils';
@@ -55,15 +54,16 @@ function Home() {
             imageSrc: Logo
         },
         {
-            title: 'Benefits of the Application', content: (
-                <div>
-                    <p><b>Modularity:</b> Customize tests to specific research goals or clinical needs.</p>
-                    <p><b>Data Integrity:</b> Ensure accurate and reliable data collection for qualitative analyses.</p>
-                    <p><b>User-Friendliness:</b> Enjoy an intuitive user interface that requires no technical expertise.
-                    </p>
-                    <p><b>Privacy:</b> Ensure the protection and confidentiality of sensitive information with our
-                        robust security protocols.</p>
-                </div>), imageSrc: Logo
+            title: 'Benefits of the Application', content:
+            <ul>
+                    <li><b>Modularity:</b> Customize tests to specific research goals or clinical needs.</li>
+                    <li><b>Data Integrity:</b> Ensure accurate and reliable data collection for qualitative analyses.</li>
+                    <li><b>User-Friendliness:</b> Enjoy an intuitive user interface that requires no technical expertise.
+                    </li>
+                    <li><b>Privacy:</b> Ensure the protection and confidentiality of sensitive information with our
+                        robust security protocols.</li>
+            </ul>,
+                 imageSrc: Logo
         },
         {
             title: 'Experiment Settings',
@@ -180,7 +180,7 @@ function Home() {
                                         <Card.Body>
                                             <Card.Title><b>{card.title}</b></Card.Title>
                                             <Card.Text>
-                                                {card.content}
+                                                <div>{card.content}</div>
                                             </Card.Text>
                                         </Card.Body>
                                     </Card>
@@ -222,7 +222,12 @@ function Home() {
                     </div>
 
                     {/* Modal for Fullscreen Card */}
-                    <Modal show={showModal} onHide={handleCloseModal} size="lg" centered>
+                    <Modal show={showModal}
+                           onHide={handleCloseModal}
+                           ariaHideApp={false}
+                           size="lg"
+                           centered
+                    >
                         <Modal.Header closeButton>
                             <Modal.Title>{selectedCard && selectedCard.title}</Modal.Title>
                         </Modal.Header>
@@ -271,3 +276,5 @@ function Home() {
 }
 
 export default Home;
+
+

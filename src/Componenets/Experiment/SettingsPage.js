@@ -1,11 +1,12 @@
 // src/SettingsPage.js
 import React, {useState} from 'react';
 import {useNavigate, useLocation} from 'react-router-dom';
-import {saveSettingsData} from '../../Api/Api';
+import {saveSettingsData, updateExperimentSettings} from '../../Api/Api';
 import '../../style/SettingsPage.css';
 import Navbar from "../Navbar/Navbar";
 import {Form, Modal} from "react-bootstrap";
 import ntc from "ntc";
+
 
 
 const SettingsPage = ({selectedShape}) => {
@@ -32,10 +33,13 @@ const SettingsPage = ({selectedShape}) => {
 
 
     const navigate = useNavigate();
-    const location = useLocation();
-    const patientData = location.state && location.state.patientData;
     const patientId = localStorage.getItem("patientId");
     const [showModal, setShowModal] = useState(false);
+    const experimentDataId = localStorage.getItem("experimentDataIdId");
+    const settingsIdToUpdate = localStorage.getItem("settingsId");
+
+
+
 
 
     console.log("passed patient id: ", patientId);
@@ -56,18 +60,31 @@ const SettingsPage = ({selectedShape}) => {
 
         if (
             (settingsData.difficultyLevel === 'Hard' && settingsData.isColorBlind !== 'colorBlind') ||
-            (settingsData.difficultyLevel === 'Medium' && settingsData.isColorBlind === 'colorBlind') // Corrected typo
+            (settingsData.difficultyLevel === 'Medium' && settingsData.isColorBlind === 'colorBlind')
         ) {
-            savedData = {...savedData, shape: ''};
+            savedData = { ...savedData, shape: '' };
         }
 
-
         console.log('Saved data:', savedData);
-        console.log('patient data:', patientData);
 
+        // Check if experimentData.id is null and settingsData.id is not null
+        if (!experimentDataId && settingsIdToUpdate && patientId) {
+            try {
+                console.log('Updating settings data...');
 
-        // Check if patient data is available
-        if (patientId) {
+                // Update settings data on the server
+                const updatedSettingsData = await updateExperimentSettings(settingsIdToUpdate,savedData);
+
+                localStorage.setItem("sessionLength", sessionLength);
+                localStorage.setItem("showInstructionsBox", showInstructionBoxButton);
+
+                // Redirect to the experiment page with patient and settings data
+                navigate('/ReactiontimeExperiment');
+            } catch (error) {
+                console.error('Error updating settings data:', error);
+                // Handle error as needed
+            }
+        } else if (patientId) {
             try {
                 console.log('Saving settings data...');
 
@@ -76,29 +93,29 @@ const SettingsPage = ({selectedShape}) => {
 
                 localStorage.setItem("settingsId", savedSettingsData.id);
                 localStorage.setItem("sessionLength", sessionLength);
-
+                localStorage.setItem("showInstructionsBox", showInstructionBoxButton);
 
                 // Redirect to the experiment page with patient and settings data
                 navigate('/ReactiontimeExperiment');
-                console.log('PatientData inside Api response:', location.state.patientData);
             } catch (error) {
                 console.error('Error saving settings data:', error);
                 // Handle error as needed
             }
         } else {
             // If patient data is null, allow the user to proceed with the experiment
-            navigate('/ReactiontimeExperiment', {
-                state: {
-                    settingsData: savedData,
-                    sessionLength,
-                    showInstructionBoxButton,
-                },
-            });
+            navigate('/ReactiontimeExperiment');
             console.log('Form submitted without patient data');
         }
+    };
 
-    }
+    const handleChangeSelect = (e) => {
+        const { name, value } = e.target;
 
+        setSettingsData((prevSettingsData) => ({
+            ...prevSettingsData,
+            [name]: value,
+        }));
+    };
 
     const handleShowModal = () => setShowModal(true);
 
@@ -113,6 +130,8 @@ const SettingsPage = ({selectedShape}) => {
     };
 
 
+
+
     return (
         <div className="experiment-settings-container">
             <Navbar/>
@@ -124,6 +143,7 @@ const SettingsPage = ({selectedShape}) => {
                         className="form-control"
                         name="selectedExperiment"
                         value={settingsData.selectedExperiment}
+                        onChange={handleChangeSelect} // Add this line
                     >
                         <option value="" disabled>Select Experiment</option>
                         {experiments.map((experimentOption) => (

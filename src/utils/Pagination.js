@@ -8,9 +8,13 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
             <ul className='pagination' >
                 {pageNumbers.map((number) => (
                     <li key={number} className={`page-item ${number === currentPage ? 'active' : ''}`}>
-                        <a href='javascript:void(0);' className='page-link' onClick={() => onPageChange(number)}>
+                        <button
+                            type="button"
+                            className={`page-link ${number === currentPage ? 'active' : ''}`}
+                            onClick={() => onPageChange(number)}
+                        >
                             {number}
-                        </a>
+                        </button>
                     </li>
                 ))}
             </ul>
