@@ -75,3 +75,11 @@ tbody tr:hover {
     color: #FFFFFF;
     font-size: 30pt;
 }
+
+
+.spinner-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh; /* Adjust as needed based on your layout */
+}

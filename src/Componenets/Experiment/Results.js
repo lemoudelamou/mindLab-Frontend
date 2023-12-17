@@ -26,6 +26,9 @@ const Results = () => {
                 }
             } catch (error) {
                 console.error("Error getting experiment details:", error);
+                setLoading(false);
+
+
             }
         };
 
@@ -54,10 +57,13 @@ const Results = () => {
 
 
     if (loading) {
-        return <Spinner />;
+        return <div className="spinner-container">
+        <Spinner />
+        </div>;
     }
 
     if (!experimentDetails || experimentDetails.length === 0) {
+
         return (
             <div>
                 <Navbar />
@@ -148,10 +154,10 @@ const Results = () => {
                     {/* Display relevant information from resultData */}
                     <h3>Reaction Times (in ms)</h3>
                     {Array.isArray(experimentDetails) ? (
-                        experimentDetails.map((groupData) => (
-                            groupData.reactionTimes && groupData.reactionTimes.length > 0 ? (
-                                <div key={groupData.experimentDataId}>
-                                    <div style={{ color: '#FFFFFF' }}>{`Experiment Data ID ${groupData.experimentDataId}`}</div>
+                        experimentDetails.map((data) => (
+                            data.reactionTimes && data.reactionTimes.length > 0 ? (
+                                <div key={data.experimentDataId}>
+                                    <div style={{ color: '#FFFFFF' }}>{`Experiment Data ID ${data.experimentDataId}`}</div>
 
                                     <table style={{ marginBottom: '20px' }}>
                                         <thead>
@@ -161,7 +167,7 @@ const Results = () => {
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        {groupData.reactionTimes.map((entry, index) => (
+                                        {data.reactionTimes.map((entry, index) => (
                                             <tr key={index}>
                                                 <td>{entry.time}</td>
                                                 <td>{entry.status}</td>
@@ -170,11 +176,11 @@ const Results = () => {
                                         </tbody>
                                     </table>
                                     <button
-                                        onClick={() => handleDeleteExperimentData(groupData.experimentDataId)}
+                                        onClick={() => handleDeleteExperimentData(data.experimentDataId)}
                                         style={{ marginTop: '10px', marginBottom: '10px' }}
                                         className="btn btn-dark"
                                     >
-                                        Delete {groupData.experimentDataId}
+                                        Delete {data.experimentDataId}
                                     </button>
                                 </div>
                             ) : null

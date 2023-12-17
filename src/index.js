@@ -10,6 +10,7 @@ import SettingsPage from './Componenets/Experiment/SettingsPage';
 import ReactionTimeExperiment from './Componenets/Experiment/ReactionTimeExperiment'
 import Results from './Componenets/Experiment/Results';
 import GroupResults from "./Componenets/Data/GroupResults";
+import PatientResults from "./Componenets/Data/PatientResults";
 import LevelsDescription from './Componenets/Sidebar/LevelsDescription';
 import UserGuide from './Componenets/Sidebar/UserGuide';
 import Contact from './Componenets/Sidebar/Contact'
@@ -57,6 +58,7 @@ function AppRouter() {
         <Route path="/reactionTimeExperiment" element={<ReactionTimeExperiment/>}/>
         <Route path="/results" element={<Results />} />
         <Route path="/group-results" element={<GroupResults />} />
+        <Route path="/patient-results" element={<PatientResults />} />
         <Route path="/home" element={<Home/>}/>
         <Route path="/data" element={<Data />}/>
         <Route path="/levelsDescription" element={<LevelsDescription />}/>

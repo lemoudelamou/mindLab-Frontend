@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { deletePatientById, getAllPatients, updatePatientById } from '../../Api/Api';
 import Navbar from '../Navbar/Navbar';
@@ -7,6 +6,7 @@ import '../../style/PatientList.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Pagination from "../../utils/Pagination";
 import { useNavigate } from "react-router-dom";
+import Spinner from "../../utils/Spinner";
 
 const PatientList = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -22,12 +22,10 @@ const PatientList = () => {
     const [originalIndices, setOriginalIndices] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [groupsPerPage] = useState(5);
-    const [expandedIndex, setExpandedIndex] = useState(null);
     const navigate = useNavigate();
     const [expandedMap, setExpandedMap] = useState(new Map());
     const [isEditingMap, setIsEditingMap] = useState(new Map());
-
-
+    const [loading, setLoading] = useState(true);
 
     const groupPatientsByGroupe = () => {
         const groupedPatients = {};
@@ -44,9 +42,8 @@ const PatientList = () => {
     const totalPages = Math.ceil(Object.keys(groupPatientsByGroupe()).length / groupsPerPage);
 
     useEffect(() => {
-        setCollapsedItems([]);
         fetchData();
-    }, []);
+    }, []); // Moved fetchData outside of setCollapsedItems to fetch data as soon as the component is mounted
 
     useEffect(() => {
         handleSearch();
@@ -60,9 +57,21 @@ const PatientList = () => {
             setCollapsedItems(initialCollapsedState);
             setOriginalData(patientsData);
             setSearchResults(patientsData);
+            setLoading(false);
         } catch (error) {
             console.error('Error fetching data:', error);
+            setLoading(false);
         }
+    };
+
+
+
+    const handleViewDetails = (fullname , patientById) => {
+
+        localStorage.setItem("fullname", fullname);
+        localStorage.setItem("patientById", patientById)
+
+        navigate(`/patient-results`);
     };
 
     const mapSearchResultsToOriginalIndices = (searchResults, originalData) => {
@@ -71,8 +80,6 @@ const PatientList = () => {
         );
         return indexMapping;
     };
-
-
 
     const handleSearch = () => {
         const filteredItems = originalData.filter(
@@ -102,8 +109,6 @@ const PatientList = () => {
     };
 
     const handleEditPatient = (patientId) => {
-        console.log('Edit button clicked for patientId:', patientId);
-
         setIsEditingMap((prevMap) => {
             const newMap = new Map(prevMap);
             newMap.set(patientId, !prevMap.get(patientId));
@@ -115,9 +120,6 @@ const PatientList = () => {
         setEditedGroupe(searchResults.find((result) => result.id === patientId)?.groupe || '');
     };
 
-
-
-
     const clearFilters = () => {
         setCollapsedItems([]);
         setSearchResults(originalData);
@@ -126,8 +128,6 @@ const PatientList = () => {
         setSearchClicked(false);
     };
 
-
-
     const handleSaveEdit = async () => {
         try {
             const updatedPatient = await updatePatientById(editedData.id, {
@@ -135,7 +135,6 @@ const PatientList = () => {
                 groupe: editedGroupe,
             });
 
-            // Update search results and original data with the updated patient
             setSearchResults((prevSearchResults) =>
                 prevSearchResults.map((patient) =>
                     patient.id === updatedPatient.id ? updatedPatient : patient
@@ -148,27 +147,22 @@ const PatientList = () => {
                 )
             );
 
-            // Collapse details after save
             setExpandedMap((prevMap) => {
                 const newMap = new Map(prevMap);
                 newMap.set(updatedPatient.id, false);
                 return newMap;
             });
 
-            // Exit editing mode
             setIsEditingMap((prevMap) => {
                 const newMap = new Map(prevMap);
                 newMap.set(updatedPatient.id, false);
                 return newMap;
             });
             setIsEditing(false);
-
         } catch (error) {
             console.error('Error updating patient:', error);
         }
     };
-
-
 
     const handleDeletePatient = async (patientId) => {
         const confirmDelete = window.confirm('Are you sure you want to delete this patient?');
@@ -214,7 +208,6 @@ const PatientList = () => {
     };
 
     const handleGroupDataButtonClick = (groupName) => {
-        console.log(`Clicked on Group Data for group:`, groupName);
         localStorage.setItem("groupName", groupName);
         navigate("/group-results");
     };
@@ -233,9 +226,12 @@ const PatientList = () => {
                 <span className='badge badge-info'>Experiment taken on: {result.expDate}</span>
             </div>
             <div className='mt-3'>
-                <a href={`/patient-details/${result.fullname}`} className='btn btn-primary'>
+                <button
+                    className='btn btn-primary'
+                    onClick={() => handleViewDetails(result.fullname, result.id)}
+                >
                     View Details
-                </a>
+                </button>
             </div>
         </>
     );
@@ -315,8 +311,8 @@ const PatientList = () => {
                     </div>
                 </div>
                 <ul className='list-group m-5'>
-                    {groupedPatients[group].map((result) => (
-                        <li key={result.id} className='list-group-item custom-list-item pb-3 mb-2'>
+                    {groupedPatients[group].map((result, resultIndex) => (
+                        <li key={resultIndex} className='list-group-item custom-list-item pb-3 mb-2'>
                             <div className='d-flex w-100 justify-content-between align-items-center'>
                                 <h5 className='mb-1'>
                                     {isEditingMap.get(result.id) ? renderEditFields() : result.fullname}
@@ -363,7 +359,7 @@ const PatientList = () => {
                                 id={`detailsCollapse${result.id}`}
                                 className={`collapse ${expandedMap.get(result.id) ? 'show' : ''} collapsed-box`}
                             >
-                                {isEditingMap.get(result.id) ? renderEditFields() : renderDetails(result)}
+                                {isEditingMap.get(result.id) ? renderEditFields() : renderDetails(result, resultIndex)}
                             </div>
                         </li>
                     ))}
@@ -375,43 +371,51 @@ const PatientList = () => {
     return (
         <div className="container-bg">
             <Navbar />
-            <div className='search-container'>
-                <h1 className='title-search'>Patients List</h1>
-                <div className='input-group mb-3'>
-                    <input
-                        type='text'
-                        className='form-control custom-search-input'
-                        placeholder='Search...'
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                    <div className='input-group-append'>
-                        <button
-                            className='btn btn-primary custom-search-button btn-cd'
-                            type='button'
-                            onClick={handleSearch}
-                        >
-                            Search
-                        </button>
+            {loading ? (
+                <Spinner />
+            ) : (
+                <div className='search-container'>
+                    <h1 className='title-search'>Patients List</h1>
+                    <div className='input-group mb-3'>
                         <input
-                            type='date'
-                            className='form-control ml-2'
-                            value={filterDate || ''}
-                            onChange={(e) => setFilterDate(e.target.value)}
+                            type='text'
+                            className='form-control custom-search-input'
+                            placeholder='Search...'
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
                         />
-                        <button className='btn btn-secondary btn-cd' onClick={clearFilters}>
-                            Clear
-                        </button>
+                        <div className='input-group-append'>
+                            <button
+                                className='btn btn-primary custom-search-button btn-cd'
+                                type='button'
+                                onClick={handleSearch}
+                            >
+                                Search
+                            </button>
+                            <input
+                                type='date'
+                                className='form-control ml-2'
+                                value={filterDate || ''}
+                                onChange={(e) => setFilterDate(e.target.value)}
+                            />
+                            <button className='btn btn-secondary btn-cd' onClick={clearFilters}>
+                                Clear
+                            </button>
+                        </div>
                     </div>
                 </div>
+            )}
 
-        </div>
             <div className='custom-list'>
-                {searchClicked && searchResults.length === 0 ? (
+                {loading ? (
+                    // Show nothing or loading indicator while fetching data
+                    null
+                ) : searchClicked && searchResults.length === 0 ? (
                     <p className='no-result-text'>No results found.</p>
                 ) : (
                     renderGroupedPatients()
                 )}
+
                 <div className="bottom-absolute">
                     <Pagination
                         currentPage={currentPage}
