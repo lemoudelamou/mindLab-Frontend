@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import crossfilter from 'crossfilter';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Bar, Line } from 'react-chartjs-2';
-import { fetchDataByGender } from '../../Api/Api';
+import { fetchDataByGender, getExperimentsData } from '../../Api/Api';
 import Navbar from '../Navbar/Navbar';
 import { Row, Col } from 'react-bootstrap'; // Add this import for layout
 
@@ -28,10 +28,15 @@ const Data = () => {
         const fetchData = async () => {
             console.log('Starting fetch data with gender:', selectedGender);
             try {
-                const experimentsData = await fetchDataByGender(selectedGender);
+                let experimentsData;
+
+                if (selectedGender === 'all') {
+                    experimentsData = await getExperimentsData();
+                } else {
+                    experimentsData = await fetchDataByGender(selectedGender);
+                }
+
                 console.log('fetched data: ', experimentsData);
-
-
 
                 if (Array.isArray(experimentsData)) {
                     const rawData = experimentsData.flatMap((item) =>
@@ -111,8 +116,10 @@ const Data = () => {
 
     const clearFilters = () => {
         cf && categoryDimension && categoryDimension.filterAll();
+        setSelectedGender('all'); // Reset selected gender to 'All'
         setData(categoryDimension.top(Infinity));
     };
+
 
     const calculateAverage = () => {
         if (!Array.isArray(data) || data.length === 0) {

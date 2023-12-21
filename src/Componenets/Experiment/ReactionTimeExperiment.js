@@ -121,14 +121,17 @@ const ReactionTimeExperiment = () => {
     };
 
     // Function to generate a random color based on color blindness setting or selected colors
+    // Function to generate a random color based on color blindness setting or selected colors
     const generateRandomColor = () => {
         const randomNumber = Math.random();
         const newShape = shapes[Math.floor(Math.random() * shapes.length)];
 
         if (!settingsData) {
             // Handle the case where settingsData is null or undefined (dummy experiment)
-            return randomNumber < 0.5 ? selectedColors.richtigColor = 'red' : selectedColors.falschColor = 'green';
+            const probabilityRichtig = 0.6; // Adjust this value to control the probability of 'richtigColor'
+            return randomNumber < probabilityRichtig ? selectedColors.richtigColor : selectedColors.falschColor;
         }
+
         // Color generation for the experiment levels
         if (isColorBlind && settingsData.difficultyLevel === 'Easy') {
             return randomNumber < 0.5 ? 'blue' : 'yellow';
@@ -400,7 +403,7 @@ const ReactionTimeExperiment = () => {
             } else if (timeRemaining === 0 && !isWaiting) {
                 setBackgroundColor("white");
             }
-        }, 1000);
+        }, 500);
 
         return () => {
             clearTimeout(timeoutId);
@@ -585,9 +588,10 @@ const ReactionTimeExperiment = () => {
                         content: {
                             top: '50%',
                             left: '50%',
+                            width: '1000px',
                             right: 'auto',
                             bottom: 'auto',
-                            marginRight: '-50%',
+                            marginRight: '-60%',
                             transform: 'translate(-50%, -50%)',
                         },
                     }}
