@@ -348,7 +348,7 @@ const DemoData = () => {
     return (
         <div className='data-container'>
             <Navbar />
-            <h1 className='title-data'>Crossfilter</h1>
+            <h1 className='title-data'>Visualisation</h1>
             <div className='sec'>
                 <Row>
                     <Col>
@@ -390,3 +390,5 @@ const DemoData = () => {
 };
 
 export default DemoData;
+
+

@@ -26,7 +26,7 @@ const SettingsPage = ({selectedShape}) => {
         difficultyLevel: defaultDifficultyLevels[0],
         color1: '#ff0000', // Default color 1
         color2: '#00ff00', // Default color 2
-        color3: '#0000ff', // Default color 3
+        color3: '#00ffff', // Default color 3
     });
     const [sessionLength, setSessionLength] = useState(1800); // Default session length in seconds (30 minutes)
 
@@ -220,7 +220,7 @@ const SettingsPage = ({selectedShape}) => {
                 {settingsData.difficultyLevel === 'Easy' && settingsData.isColorBlind !== 'colorBlind' && (
                     <>
                         <div className="form-group">
-                            <label>Color 1:</label>
+                            <label>Color 1: (Correct answer)</label>
                             <input
                                 type="color"
                                 className="form-control"

@@ -1,4 +1,4 @@
-import React, {lazy, Suspense} from 'react';
+import React, { lazy, Suspense } from 'react';
 import Modal from 'react-modal';
 const ExperimentInstructionsBox = lazy(() => import('./ExperimentInstructionBox'));
 
@@ -33,6 +33,13 @@ const InstructionBox = ({ showContentBox, toggleContentBox, experimentInstructio
                 >
                     {/* Include the ExperimentInstructionsBox component here */}
                     <ExperimentInstructionsBox />
+
+                    {/* Button to close the modal */}
+                    <div style={{paddingTop: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                    <button onClick={() => setExperimentInstructionsBoxVisible(false)} className="btn btn-dark">
+                        Close
+                    </button>
+                    </div>
                 </Modal>
             )}
         </Suspense>

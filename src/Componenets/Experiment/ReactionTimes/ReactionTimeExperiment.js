@@ -128,11 +128,11 @@ const ReactionTimeExperiment = () => {
             setSelectedColors({richtigColor: settingsData.color1, falschColor: settingsData.color2});
         } else if (settingsData.difficultyLevel === 'Medium') {
             setSelectedColors({
-                richtigColor: settingsData.color1, falschColor: settingsData.color2, color2: settingsData.color3,
+                richtigColor: settingsData.color1, falschColor: settingsData.color2, color3: settingsData.color3,
             });
         } else if (settingsData.difficultyLevel === 'Hard') {
             setSelectedColors({
-                richtigColor: settingsData.color1, falschColor: settingsData.color2, color2: settingsData.color3,
+                richtigColor: settingsData.color1, falschColor: settingsData.color2, color3: settingsData.color3,
             });
         }
 
@@ -159,10 +159,10 @@ const ReactionTimeExperiment = () => {
             if (settingsData.difficultyLevel === 'Easy') {
                 return randomNumber < 0.5 ? selectedColors.richtigColor : selectedColors.falschColor;
             } else if (settingsData.difficultyLevel === 'Medium') {
-                const selectedColorOptions = [selectedColors.richtigColor, selectedColors.falschColor, selectedColors.color2];
+                const selectedColorOptions = [selectedColors.richtigColor, selectedColors.falschColor, selectedColors.color3];
                 return selectedColorOptions[Math.floor(Math.random() * selectedColorOptions.length)];
             } else if (settingsData.difficultyLevel === 'Hard') {
-                const selectedColorOptions = [selectedColors.richtigColor, selectedColors.falschColor, selectedColors.color2];
+                const selectedColorOptions = [selectedColors.richtigColor, selectedColors.falschColor, selectedColors.color3];
                 setShape(newShape);
                 return selectedColorOptions[Math.floor(Math.random() * selectedColorOptions.length)];
             }
@@ -293,7 +293,7 @@ const ReactionTimeExperiment = () => {
                 status = `correct`;
             } else if (backgroundColor === (isColorBlind ? "yellow" : selectedColors.falschColor)) {
                 status = `incorrect`;
-            } else if (backgroundColor === selectedColors.color2) {
+            } else if (backgroundColor === selectedColors.color3) {
                 // Add condition for the third color in the medium difficulty level
                 status = `incorrect`;
             } else {
@@ -405,7 +405,7 @@ const ReactionTimeExperiment = () => {
     // Effect to check conditions and start a new experiment if needed
     useEffect(() => {
         const timeoutId = setTimeout(() => {
-            if (!isWaiting && backgroundColor === (isColorBlind ? "yellow" : selectedColors.falschColor)) {
+            if (!isWaiting && (backgroundColor === (isColorBlind ? "yellow" : selectedColors.falschColor) ||  backgroundColor ===  selectedColors.color3)) {
                 startNewExperiment();
             } else if (timeRemaining === 0 && !isWaiting) {
                 setBackgroundColor("white");

@@ -140,10 +140,10 @@ const DemoExperiment = () => {
             if (settingsData.difficultyLevel === 'Easy') {
                 return randomNumber < 0.5 ? selectedColors.richtigColor : selectedColors.falschColor;
             } else if (settingsData.difficultyLevel === 'Medium') {
-                const selectedColorOptions = [selectedColors.richtigColor, selectedColors.falschColor, selectedColors.color2];
+                const selectedColorOptions = [selectedColors.richtigColor, selectedColors.falschColor, selectedColors.color3];
                 return selectedColorOptions[Math.floor(Math.random() * selectedColorOptions.length)];
             } else if (settingsData.difficultyLevel === 'Hard') {
-                const selectedColorOptions = [selectedColors.richtigColor, selectedColors.falschColor, selectedColors.color2];
+                const selectedColorOptions = [selectedColors.richtigColor, selectedColors.falschColor, selectedColors.color3];
                 setShape(newShape);
                 return selectedColorOptions[Math.floor(Math.random() * selectedColorOptions.length)];
             }
@@ -382,7 +382,7 @@ const DemoExperiment = () => {
     // Effect to check conditions and start a new experiment if needed
     useEffect(() => {
         const timeoutId = setTimeout(() => {
-            if (!isWaiting && backgroundColor === (isColorBlind ? "yellow" : selectedColors.falschColor)) {
+            if (!isWaiting && (backgroundColor === (isColorBlind ? "yellow" : selectedColors.falschColor) ||  backgroundColor ===  selectedColors.color3)) {
                 startNewExperiment();
             } else if (timeRemaining === 0 && !isWaiting) {
                 setBackgroundColor("white");
