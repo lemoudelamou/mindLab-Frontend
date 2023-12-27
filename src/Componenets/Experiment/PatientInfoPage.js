@@ -2,8 +2,7 @@ import React, {useState} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Form, Button} from 'react-bootstrap';
 import {useNavigate} from 'react-router-dom';
-import {DatePicker} from 'rsuite';
-import {savePatientData} from '../../Api/Api'; // Import the savePatientData function
+import {savePatientData} from '../../Api/Api';
 import 'rsuite/dist/rsuite.min.css';
 import '../../style/PatientInfoPage.css';
 import {calculateAge} from '../../utils/ExperimentUtils'
@@ -75,15 +74,15 @@ function PatientInfoPage() {
                 <Form onSubmit={handleSubmit}>
                     <h3 className='title-patient'>Patient Information Form</h3>
                     <Form.Group controlId="formGroup">
-                        <Form.Label>Group:</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="groupe"
-                            value={patientData.groupe}
-                            onChange={handleInputChange}
-                            placeholder="Enter group Name"
-                        />
-                    </Form.Group>
+                    <Form.Label>Group:</Form.Label>
+                    <Form.Control
+                        type="text"
+                        name="groupe"
+                        value={patientData.groupe}
+                        onChange={handleInputChange}
+                        placeholder="Enter group Name"
+                    />
+                </Form.Group>
                     <Form.Group controlId="formName">
                         <Form.Label>Fullame:</Form.Label>
                         <Form.Control

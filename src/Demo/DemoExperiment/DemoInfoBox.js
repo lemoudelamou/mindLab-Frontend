@@ -1,4 +1,3 @@
-// src/InfoBox.js
 import React from 'react';
 import '../../style/InfoBox.css';
 import { calculateAge} from "../../utils/ExperimentUtils";

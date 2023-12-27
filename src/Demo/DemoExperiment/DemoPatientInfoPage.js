@@ -20,6 +20,8 @@ function DemoPatientInfoPage() {
         strongHand: 'Right',
         hasDiseases: false,
         diseases: '',
+        expDate: '',
+        groupe: '',
     });
 
     const navigate = useNavigate();
@@ -65,6 +67,16 @@ function DemoPatientInfoPage() {
             <div className="container-patient">
                 <Form onSubmit={handleSubmit}>
                     <h3 className='title-patient'>Patient Information Form</h3>
+                    <Form.Group controlId="formGroup">
+                        <Form.Label>Group:</Form.Label>
+                        <Form.Control
+                            type="text"
+                            name="groupe"
+                            value={patientData.groupe}
+                            onChange={handleInputChange}
+                            placeholder="Enter group Name"
+                        />
+                    </Form.Group>
                     <Form.Group controlId="formName">
                         <Form.Label>Fullame:</Form.Label>
                         <Form.Control

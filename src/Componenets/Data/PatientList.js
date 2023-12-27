@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { deletePatientById, getAllPatients, updatePatientById } from '../../Api/Api';
 import Navbar from '../Navbar/Navbar';
-
 import '../../style/PatientList.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Pagination from "../../utils/Pagination";

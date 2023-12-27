@@ -37,7 +37,7 @@ header {
 nav a {
     margin: 0 1rem;
     font-size: 14pt;
-    padding-right: 20px;
+    padding-right: 50px;
     color: var(--textColor);
     text-decoration: none;
     transition: border-bottom 0.3s;

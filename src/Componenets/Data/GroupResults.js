@@ -15,6 +15,8 @@ const GroupResults = () => {
                 const result = await fetchDataForGroup(group);
                 setData(result);
                 setLoading(false);
+                console.log("Group results", result);
+
             } catch (error) {
                 console.error('Error in component:', error);
                 setLoading(false);
@@ -58,7 +60,7 @@ const GroupResults = () => {
                         {groupData.reactionTimes?.length > 0 && (
 
                             <>
-                                <h3>Person: {groupData.patient.fullname}</h3>
+                                <h3>Patient: {groupData.patient.fullname}</h3>
 
                                 <h3>Reaction Times (in ms)</h3>
                                 <table>

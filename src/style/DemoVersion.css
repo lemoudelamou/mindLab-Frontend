@@ -1,0 +1,73 @@
+/* UserGuide.css */
+
+.demo-menu-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow-y: scroll;
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7));
+
+}
+
+.custom-box {
+    margin-bottom: 20px;
+    width: 50%;
+    height: 700px;
+    border: 1px solid #ccc; /* Border color */
+    border-radius: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.7), 0 4px 8px rgba(0, 0, 0, 0.4);
+    transition: height 0.3s ease; /* Add transition for smooth height change */
+}
+
+.custom-box img {
+    height: 240px;
+    object-fit: cover;
+    width: 100%;
+    border: 0 solid;
+    border-radius: 20px 20px 0 0;
+}
+
+.custom-box h2 {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.custom-box ol {
+    list-style-type: decimal;
+    padding-left: 20px;
+    padding-bottom: 20px;
+}
+
+.custom-box ul {
+    list-style-type: disc;
+    padding-left: 20px;
+}
+
+.custom-box li {
+    margin-bottom: 10px;
+    font-size: 16px;
+    color: white; /* Set list text color to white */
+}
+
+.custom-box.expanded {
+    height: auto; /* Set auto height when expanded */
+}
+
+.custom-box button {
+    background-color: #4caf50; /* Green background */
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.custom-box button:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+.demo-text {
+    color: #FFFFFF;
+    font-size: 12pt;
+}

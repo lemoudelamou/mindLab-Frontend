@@ -1,11 +1,10 @@
 // src/SettingsPage.js
 import React, {useState} from 'react';
-import {useNavigate, useLocation} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import {saveSettingsData} from '../../Api/Api';
 import '../../style/SettingsPage.css';
 import Navbar from "../Navbar/Navbar";
-import {Form, Modal} from "react-bootstrap";
-import ntc from "ntc";
+import {Form} from "react-bootstrap";
 
 
 

@@ -1,0 +1,371 @@
+[
+    {
+        "averageReactionTimes": {
+            "id": 802,
+            "correct": 489.9833333333954,
+            "incorrect": 511.3800000000745
+        },
+        "patient": {
+            "id": 554,
+            "fullname": "Tom Cruise",
+            "birthDate": "1982-09-30",
+            "age": "33",
+            "gender": "Male",
+            "strongHand": "Left",
+            "hasDiseases": false,
+            "diseases": "",
+            "expDate": "2023-12-20",
+            "groupe": "s1"
+        },
+        "reactionTimes": [
+            {
+                "id": 1352,
+                "time": 513.6999999992549,
+                "status": "incorrect"
+            },
+            {
+                "id": 1353,
+                "time": 454.6000000014901,
+                "status": "incorrect"
+            },
+            {
+                "id": 1354,
+                "time": 573,
+                "status": "incorrect"
+            },
+            {
+                "id": 1355,
+                "time": 627.4000000003725,
+                "status": "incorrect"
+            },
+            {
+                "id": 1356,
+                "time": 388.19999999925494,
+                "status": "incorrect"
+            },
+            {
+                "id": 1357,
+                "time": 383,
+                "status": "correct"
+            }
+        ],
+        "experimentDataId": 802,
+        "experimentSettings": {
+            "id": 552,
+            "experiment": "Reaction Time",
+            "shape": "circle",
+            "experimentLength": "10",
+            "blinkDelay": "1",
+            "isColorBlind": "",
+            "difficultyLevel": "Easy",
+            "color1": "#ff0000",
+            "color2": "#00ff00",
+            "color3": "#0000ff",
+            "patient": {
+                "id": 552,
+                "fullname": "bobby",
+                "birthDate": "1955-05-13",
+                "age": "68",
+                "gender": "Male",
+                "strongHand": "Right",
+                "hasDiseases": false,
+                "diseases": "",
+                "expDate": "2023-12-20",
+                "groupe": "s3"
+            },
+            "experimentDataList": [
+                {
+                    "id": 802,
+                    "experimentId": "a2c03a87-c588-47eb-8f93-48e28bfa3a3d",
+                    "reactionTimes": [
+                        {
+                            "id": 1352,
+                            "time": 513.6999999992549,
+                            "status": "incorrect"
+                        },
+                        {
+                            "id": 1353,
+                            "time": 454.6000000014901,
+                            "status": "incorrect"
+                        },
+                        {
+                            "id": 1354,
+                            "time": 573,
+                            "status": "incorrect"
+                        },
+                        {
+                            "id": 1355,
+                            "time": 627.4000000003725,
+                            "status": "incorrect"
+                        },
+                        {
+                            "id": 1356,
+                            "time": 388.19999999925494,
+                            "status": "incorrect"
+                        },
+                        {
+                            "id": 1357,
+                            "time": 383,
+                            "status": "correct"
+                        }
+                    ],
+                    "patient": {
+                        "id": 554,
+                        "fullname": "Tom Cruise",
+                        "birthDate": "1982-09-30",
+                        "age": "33",
+                        "gender": "Male",
+                        "strongHand": "Left",
+                        "hasDiseases": false,
+                        "diseases": "",
+                        "expDate": "2023-12-20",
+                        "groupe": "s1"
+                    },
+                    "averageReactionTimes": {
+                        "id": 802,
+                        "correct": 489.9833333333954,
+                        "incorrect": 511.3800000000745
+                    }
+                },
+                {
+                    "id": 803,
+                    "experimentId": "690a2044-42d5-487f-9f39-866f1e3f3b25",
+                    "reactionTimes": [
+                        {
+                            "id": 1358,
+                            "time": 646.4000000003725,
+                            "status": "incorrect"
+                        },
+                        {
+                            "id": 1359,
+                            "time": 429.30000000074506,
+                            "status": "incorrect"
+                        },
+                        {
+                            "id": 1360,
+                            "time": 506.09999999962747,
+                            "status": "incorrect"
+                        },
+                        {
+                            "id": 1361,
+                            "time": 538.6000000014901,
+                            "status": "incorrect"
+                        },
+                        {
+                            "id": 1362,
+                            "time": 422.5,
+                            "status": "correct"
+                        },
+                        {
+                            "id": 1363,
+                            "time": 501.19999999925494,
+                            "status": "correct"
+                        }
+                    ],
+                    "patient": {
+                        "id": 554,
+                        "fullname": "Tom Cruise",
+                        "birthDate": "1982-09-30",
+                        "age": "33",
+                        "gender": "Male",
+                        "strongHand": "Left",
+                        "hasDiseases": false,
+                        "diseases": "",
+                        "expDate": "2023-12-20",
+                        "groupe": "s1"
+                    },
+                    "averageReactionTimes": {
+                        "id": 803,
+                        "correct": 507.3500000002484,
+                        "incorrect": 530.1000000005588
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "averageReactionTimes": {
+            "id": 803,
+            "correct": 507.3500000002484,
+            "incorrect": 530.1000000005588
+        },
+        "patient": {
+            "id": 554,
+            "fullname": "Tom Cruise",
+            "birthDate": "1982-09-30",
+            "age": "33",
+            "gender": "Male",
+            "strongHand": "Left",
+            "hasDiseases": false,
+            "diseases": "",
+            "expDate": "2023-12-20",
+            "groupe": "s1"
+        },
+        "reactionTimes": [
+            {
+                "id": 1358,
+                "time": 646.4000000003725,
+                "status": "incorrect"
+            },
+            {
+                "id": 1359,
+                "time": 429.30000000074506,
+                "status": "incorrect"
+            },
+            {
+                "id": 1360,
+                "time": 506.09999999962747,
+                "status": "incorrect"
+            },
+            {
+                "id": 1361,
+                "time": 538.6000000014901,
+                "status": "incorrect"
+            },
+            {
+                "id": 1362,
+                "time": 422.5,
+                "status": "correct"
+            },
+            {
+                "id": 1363,
+                "time": 501.19999999925494,
+                "status": "correct"
+            }
+        ],
+        "experimentDataId": 803,
+        "experimentSettings": {
+            "id": 552,
+            "experiment": "Reaction Time",
+            "shape": "circle",
+            "experimentLength": "10",
+            "blinkDelay": "1",
+            "isColorBlind": "",
+            "difficultyLevel": "Easy",
+            "color1": "#ff0000",
+            "color2": "#00ff00",
+            "color3": "#0000ff",
+            "patient": {
+                "id": 554,
+                "fullname": "Tom Cruise",
+                "birthDate": "1982-09-30",
+                "age": "33",
+                "gender": "Male",
+                "strongHand": "Left",
+                "hasDiseases": false,
+                "diseases": "",
+                "expDate": "2023-12-20",
+                "groupe": "s1"
+            },
+            "experimentDataList": [
+                {
+                    "id": 802,
+                    "experimentId": "a2c03a87-c588-47eb-8f93-48e28bfa3a3d",
+                    "reactionTimes": [
+                        {
+                            "id": 1352,
+                            "time": 513.6999999992549,
+                            "status": "incorrect"
+                        },
+                        {
+                            "id": 1353,
+                            "time": 454.6000000014901,
+                            "status": "incorrect"
+                        },
+                        {
+                            "id": 1354,
+                            "time": 573,
+                            "status": "incorrect"
+                        },
+                        {
+                            "id": 1355,
+                            "time": 627.4000000003725,
+                            "status": "incorrect"
+                        },
+                        {
+                            "id": 1356,
+                            "time": 388.19999999925494,
+                            "status": "incorrect"
+                        },
+                        {
+                            "id": 1357,
+                            "time": 383,
+                            "status": "correct"
+                        }
+                    ],
+                    "patient": {
+                        "id": 554,
+                        "fullname": "Tom Cruise",
+                        "birthDate": "1982-09-30",
+                        "age": "33",
+                        "gender": "Male",
+                        "strongHand": "Left",
+                        "hasDiseases": false,
+                        "diseases": "",
+                        "expDate": "2023-12-20",
+                        "groupe": "s1"
+                    },
+                    "averageReactionTimes": {
+                        "id": 802,
+                        "correct": 489.9833333333954,
+                        "incorrect": 511.3800000000745
+                    }
+                },
+                {
+                    "id": 803,
+                    "experimentId": "690a2044-42d5-487f-9f39-866f1e3f3b25",
+                    "reactionTimes": [
+                        {
+                            "id": 1358,
+                            "time": 646.4000000003725,
+                            "status": "incorrect"
+                        },
+                        {
+                            "id": 1359,
+                            "time": 429.30000000074506,
+                            "status": "incorrect"
+                        },
+                        {
+                            "id": 1360,
+                            "time": 506.09999999962747,
+                            "status": "incorrect"
+                        },
+                        {
+                            "id": 1361,
+                            "time": 538.6000000014901,
+                            "status": "incorrect"
+                        },
+                        {
+                            "id": 1362,
+                            "time": 422.5,
+                            "status": "correct"
+                        },
+                        {
+                            "id": 1363,
+                            "time": 501.19999999925494,
+                            "status": "correct"
+                        }
+                    ],
+                    "patient": {
+                        "id": 554,
+                        "fullname": "Tom Cruise",
+                        "birthDate": "1982-09-30",
+                        "age": "33",
+                        "gender": "Male",
+                        "strongHand": "Left",
+                        "hasDiseases": false,
+                        "diseases": "",
+                        "expDate": "2023-12-20",
+                        "groupe": "s1"
+                    },
+                    "averageReactionTimes": {
+                        "id": 803,
+                        "correct": 507.3500000002484,
+                        "incorrect": 530.1000000005588
+                    }
+                }
+            ]
+        }
+    }
+]
+

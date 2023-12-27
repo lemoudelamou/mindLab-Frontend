@@ -8,7 +8,7 @@ body {
     padding: 20px;
     background-color: #f8f9fa;
     border-radius: 10px;
-    margin: 10% auto; /* Center vertically with 10% from the top */
+    margin: 6% auto; /* Center vertically with 10% from the top */
     display: flex;
     flex-direction: column;
     align-items: center;

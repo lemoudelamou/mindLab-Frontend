@@ -8,6 +8,7 @@ function Footer() {
     const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
 
     const handleImpressumClick = () => {
+        console.log('Impressum clicked');
         setShowImpressum(true);
     };
 

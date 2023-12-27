@@ -180,4 +180,13 @@ export const getPatientByFullnameAndId = async (fullname, patientId) => {
     }
 };
 
-
+export const sendEmail = async (emailData) => {
+    try {
+        const response = await axios.post(`${API_BASE_URL}/send-email`, emailData);
+        console.log('Email sent:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error sending email:', error);
+        throw error;
+    }
+};

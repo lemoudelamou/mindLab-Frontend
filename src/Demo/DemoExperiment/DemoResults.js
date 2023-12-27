@@ -1,37 +1,29 @@
-import React from "react";
-import { useLocation, useNavigate } from 'react-router-dom';
-import { Button } from 'react-bootstrap';
+import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import "../../style/Results.css";
+import { calculateAge } from "../../utils/ExperimentUtils";
 import Navbar from "../../Componenets/Navbar/Navbar";
-import '../../style/Results.css';
-import { calculateAge} from "../../utils/ExperimentUtils";
 
-
-const Results = () => {
-
-    const navigate = useNavigate();
+const DemoResults = () => {
     const location = useLocation();
-    const resultData = location.state && location.state.resultData;
+    const resultData = location.state ? location.state.resultData : null;
+    const experimentId = location.state ? location.state.experimentId : null;
 
-    if (!resultData) {
-        // Handle the case where resultData is not available
-        return <div>
-            <Navbar/>
-            <p className="no-results-message">No results available.</p>;
-        </div>
+    console.log('results:', resultData);
+
+    if (!resultData || Object.keys(resultData).length === 0) {
+        return (
+            <div>
+                <Navbar />
+                <p className="no-results-message">No results available.</p>
+            </div>
+        );
     }
 
-    // Access data from resultData
-    const { experimentSettings, patientInfo, reactionTimes, averageReactionTimes } = resultData;
-
-    console.log("the results data are", resultData);
-
-    const handleSubmit =  (event) => {
-        navigate('/demo-data', { state: { resultData } });
-        console.log('submitted resultData from results page:', resultData);
-    }
     return (
         <div className="results-container">
-            <Navbar/>
+            <Navbar />
+
             <div className="pad-container">
                 <h2>Experiment Results</h2>
 
@@ -41,28 +33,28 @@ const Results = () => {
                     <tbody>
                     <tr>
                         <td>Fullname:</td>
-                        <td>{patientInfo.fullname}</td>
+                        <td>{resultData.patientInfo.fullname}</td>
                     </tr>
                     <tr>
                         <td>Birth Date:</td>
-                        <td>{patientInfo.birthDate ? new Date(patientInfo.birthDate).toLocaleDateString() : 'N/A'}</td>
+                        <td>{resultData.patientInfo.birthDate ? new Date(resultData.patientInfo.birthDate).toLocaleDateString() : 'N/A'}</td>
                     </tr>
                     <tr>
                         <td>Age:</td>
-                        <td>{ patientInfo.age ? calculateAge(patientInfo.birthDate) : 'N/A'}</td>
+                        <td>{resultData.patientInfo.age ? calculateAge(resultData.patientInfo.birthDate) : 'N/A'}</td>
                     </tr>
                     <tr>
                         <td>Strong Hand:</td>
-                        <td>{patientInfo.strongHand}</td>
+                        <td>{resultData.patientInfo.strongHand}</td>
                     </tr>
                     <tr>
                         <td>Has Diseases:</td>
-                        <td>{patientInfo.hasDiseases  ? 'Yes' : 'No'}</td>
+                        <td>{resultData.patientInfo.hasDiseases ? 'Yes' : 'No'}</td>
                     </tr>
-                    {patientInfo.hasDiseases && (
+                    {resultData.patientInfo.hasDiseases && (
                         <tr>
                             <td>Diseases:</td>
-                            <td>{patientInfo.diseases}</td>
+                            <td>{resultData.patientInfo.diseases}</td>
                         </tr>
                     )}
                     </tbody>
@@ -74,78 +66,86 @@ const Results = () => {
                     <tbody>
                     <tr>
                         <td>Shape:</td>
-                        <td>{experimentSettings.shape}</td>
+                        <td>{resultData.experimentSettings.shape}</td>
                     </tr>
                     <tr>
                         <td>Experiment Length:</td>
-                        <td>{experimentSettings.experimentLength} seconds</td>
+                        <td>{resultData.experimentSettings.experimentLength} seconds</td>
                     </tr>
                     <tr>
                         <td>Is Color Blind:</td>
-                        <td>{experimentSettings.isColorBlind ? "Yes" : "No"}</td>
+                        <td>{resultData.experimentSettings.isColorBlind ? "Yes" : "No"}</td>
                     </tr>
                     <tr>
                         <td>Blink Delay:</td>
-                        <td>{experimentSettings.blinkDelay} seconds</td>
+                        <td>{resultData.experimentSettings.blinkDelay} seconds</td>
                     </tr>
                     <tr>
                         <td>Difficulty Level:</td>
-                        <td>{resultData.experimentSettings.difficultyLevel} </td>
+                        <td>{resultData.experimentSettings.difficultyLevel}</td>
                     </tr>
-                    {/* Add more experiment settings fields as needed */}
                     </tbody>
                 </table>
 
                 {/* Display relevant information from resultData */}
-                <h3>Reaction Times</h3>
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Time</th>
-                        <th>Status</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {reactionTimes.map((entry, index) => (
-                        <tr key={index}>
-                            <td>{entry.time}</td>
-                            <td>{entry.status}</td>
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>
+                <h3>Reaction Times (in ms)</h3>
+                {Object.keys(resultData.reactionTimes).map((experimentId) => {
+                    const data = resultData.reactionTimes[experimentId];
+                    return (
+                        data && data.length > 0 ? (
+                            <div key={experimentId}>
+                                <div style={{ color: '#FFFFFF' }}>{`Experiment Data ID ${experimentId}`}</div>
+
+                                <table style={{ marginBottom: '20px' }}>
+                                    <thead>
+                                    <tr>
+                                        <th>Time</th>
+                                        <th>Status</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {data.map((entry, index) => (
+                                        <tr key={index}>
+                                            <td>{entry.time}</td>
+                                            <td>{entry.status}</td>
+                                        </tr>
+                                    ))}
+                                    </tbody>
+                                </table>
+                                <button
+                                    style={{ marginTop: '10px', marginBottom: '10px' }}
+                                    className="btn btn-dark"
+                                >
+                                    Delete {experimentId}
+                                </button>
+                            </div>
+                        ) : null
+                    );
+                })}
 
                 {/* Display average reaction times */}
-                <h3>Average Reaction Times</h3>
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Condition</th>
-                        <th>Average Reaction Time</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>correct</td>
-                        <td>{averageReactionTimes.correct}</td>
-                    </tr>
-                    <tr>
-                        <td>incorrect</td>
-                        <td>{averageReactionTimes.incorrect}</td>
-                    </tr>
-                    </tbody>
-                </table>
-                <div className='transfer'>
-                    {/* Button to transfer resultData to /Data */}
-
-                    <Button className="transfer-button" type="submit" onClick={handleSubmit}>Transfer to Data</Button>
+                <h3>Average Reaction Times (in ms)</h3>
+                <div key="averageReactionTimes">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Condition</th>
+                            <th>Average Reaction Time</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {Object.entries(resultData.averageReactionTimes || {}).map(([condition, time], index) => (
+                            <tr key={index}>
+                                <td>{condition}</td>
+                                <td>{time}</td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
                 </div>
-
-
-
             </div>
         </div>
     );
 };
 
-export default Results;
+export default DemoResults;

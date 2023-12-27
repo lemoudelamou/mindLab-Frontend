@@ -1,17 +1,21 @@
-import React, {useState, useEffect, useRef} from "react";
+import React, {useState, useEffect, useRef, lazy, Suspense, Profiler, useCallback} from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import '../../style/ReactionTimeExperiment.css';
+import '../../../style/ReactionTimeExperiment.css';
 import {useNavigate} from 'react-router-dom';
-import RedoExperimentModal from './RedoExperimentModal'
-import {formatTime, calculateAverageReactionTime} from '../../utils/ExperimentUtils';
-import Navbar from "../Navbar/Navbar";
-import {getSettingsById, saveExperimentResults} from "../../Api/Api";
+import {formatTime, calculateAverageReactionTime} from '../../../utils/ExperimentUtils';
+import Navbar from "../../Navbar/Navbar";
+import {getSettingsById, saveExperimentResults} from "../../../Api/Api";
 import '@fortawesome/fontawesome-free/css/all.css';
-import ExperimentInstructionsBox from "./ExperimentInstructionBox";
-import Spinner from "../../utils/Spinner";
+import Spinner from "../../../utils/Spinner";
 import {v4 as uuidv4} from "uuid"; // Import the uuid library
 import Modal from 'react-modal';
+import RenderExperimentData from "./RenderExperimentData";
+import RenderAverages from "./RenderAverages";
+import InstructionBox from "./RenderInstructionsBox";
+import RenderResultsModal from "./RenderResultsModal";
 
+// Lazy load the RedoExperimentModal component
+const RedoExperimentModal = lazy(() => import('./RedoExperimentModal'));
 
 const ReactionTimeExperiment = () => {
     // State variables for the experiment
@@ -58,7 +62,19 @@ const ReactionTimeExperiment = () => {
     const currentExperimentDataRef = useRef([]);
     const [tablesVisible, setTablesVisible] = useState(false);
     const [showContentBox, setShowContentBox] = useState(false);
-
+    const [experimentInstructionsBoxVisible, setExperimentInstructionsBoxVisible] = useState(false);
+    const [isSpacebarPressed, setIsSpacebarPressed] = useState(false);
+    const onRenderCallback = (
+        id, // the "id" prop of the Profiler tree that has just committed
+        phase, // either "mount" (if the tree just mounted) or "update" (if it re-rendered)
+        actualDuration, // time spent rendering the committed update
+        baseDuration, // estimated time to render the entire subtree without memoization
+    ) => {
+        // You can log or process the profiling information here
+        console.log(`${id}'s ${phase} phase:`);
+        console.log(`Actual duration: ${actualDuration}`);
+        console.log(`Base duration: ${baseDuration}`);
+    };
 
     // Function to clear the text content of the target element
     const clearTargetText = () => {
@@ -67,8 +83,10 @@ const ReactionTimeExperiment = () => {
         }
     };
 
+    // Function to toggle the content box
     const toggleContentBox = () => {
-        setShowContentBox(!showContentBox);
+        // Lazy load the ExperimentInstructionsBox when the button is clicked
+        setExperimentInstructionsBoxVisible(!experimentInstructionsBoxVisible);
     };
 
     const handleToggleClick = () => {
@@ -77,23 +95,23 @@ const ReactionTimeExperiment = () => {
     };
 
 
-    useEffect(() => {
-        const fetchSettingsData = async () => {
-            try {
-                const data = await getSettingsById(settingsId);
-                setSettingsData(data);
-                applyExperimentSettings(data);
-                console.log("fetched settings data:", data);
-            } catch (error) {
-                setError(error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        console.log("About to fetch settings data");
-        fetchSettingsData().then(r => settingsId);
+    const fetchSettingsData = useCallback(async () => {
+        try {
+            const data = await getSettingsById(settingsId);
+            setSettingsData(data);
+            applyExperimentSettings(data);
+            console.log("fetched settings data:", data);
+        } catch (error) {
+            setError(error);
+        } finally {
+            setLoading(false);
+        }
     }, [settingsId]);
+
+    useEffect(() => {
+        console.log("About to fetch settings data");
+        fetchSettingsData();
+    }, [fetchSettingsData]);
 
 
     // Function to apply experiment settings
@@ -120,7 +138,6 @@ const ReactionTimeExperiment = () => {
 
     };
 
-    // Function to generate a random color based on color blindness setting or selected colors
     // Function to generate a random color based on color blindness setting or selected colors
     const generateRandomColor = () => {
         const randomNumber = Math.random();
@@ -171,7 +188,6 @@ const ReactionTimeExperiment = () => {
         }
     };
 
-
     // Function to reset experiment-related state variables
     const resetExperiment = () => {
         setReactionTimes([]);
@@ -186,25 +202,21 @@ const ReactionTimeExperiment = () => {
 
     // Function to start a new experiment
     const startNewExperiment = () => {
-
         setIsWaiting(true);
         clearTargetText();
         setSpacebarEnabled(true);
 
-        const fadeDuration = 200;
-
         setBackgroundColor("transparent"); // Set a transparent color for transition
 
-        setTimeout(() => {
+        requestAnimationFrame(() => {
             setBackgroundColor(() => {
                 const newColor = generateRandomColor();
                 setStartTime(performance.now().toFixed(2));
                 setIsWaiting(false);
                 return newColor;
             });
-        }, fadeDuration);
+        });
     };
-
 
     /* is responsible for applying experiment settings when the settingsData changes,
        ensuring that the component responds to updates in the settingsData prop and applies
@@ -218,17 +230,16 @@ const ReactionTimeExperiment = () => {
 
     // Effect to update main experimentData when the current experiment is completed
     useEffect(() => {
-        if (experimentId && currentExperimentDataRef.current.length > 0) {
+        if (experimentId && lastReactionTime > 0) {
             setExperimentData((prevData) => {
-                const updatedData = {
-                    ...prevData,
-                    [experimentId]: currentExperimentDataRef.current,
-                };
+                const updatedData = { ...prevData, [experimentId]: currentExperimentDataRef.current };
                 console.log("Experiment Data: ", updatedData);
                 return updatedData;
             });
+
         }
-    }, [experimentId]);
+    }, [experimentId, lastReactionTime]);
+
 
     const handleStartExperiment = () => {
         setExperimentStarted(true);
@@ -264,13 +275,11 @@ const ReactionTimeExperiment = () => {
         }, 1000);
 
         setIntervalId(id); // Save the interval ID to the state
-
         startNewExperiment();
     };
 
-
     // Function to handle a click on the experiment bar
-    const handleBarClick = () => {
+    const handleBarClick = useCallback(() => {
         if (!isWaiting && timeRemaining > 0) {
             const endTime = performance.now().toFixed(2);
             const reactionTime = endTime - startTime;
@@ -294,9 +303,7 @@ const ReactionTimeExperiment = () => {
             setBackgroundColor("white");
             setUserResponse(status);
             setReactionTimes((prevReactionTimes) => [...prevReactionTimes, {time: reactionTime, status},]);
-
             currentExperimentDataRef.current.push({time: reactionTime, status});
-
 
             setTimeout(() => {
                 setUserResponse("");
@@ -305,8 +312,7 @@ const ReactionTimeExperiment = () => {
 
             }, 1000);
         }
-    };
-
+    }, [isWaiting, timeRemaining]);
 
     const handleResultsPage = () => {
         navigate("/results")
@@ -361,39 +367,40 @@ const ReactionTimeExperiment = () => {
                     });
 
                     console.log("Experiment Data id: ", resultData)
-
-
                 } catch (error) {
                     // Handle error as needed
                     console.log('Error:', error);
-
                 }
             } else {
                 // Log the result data to the console
             }
-
         }
-
         // Reset experiment-related state variables
         resetExperiment();
     };
 
-
     // Effect to handle keydown events for spacebar
-    useEffect(() => {
-        const handleKeyDown = (event) => {
-            if (spacebarEnabled && event.key === ' ') {
-                event.preventDefault();
-                handleBarClick();
-            }
-        };
+    const handleKeyDown = useCallback((event) => {
+        if (spacebarEnabled && event.key === ' ') {
+            event.preventDefault();
+            setIsSpacebarPressed(true);
+        }
+    }, [spacebarEnabled]);
 
+    useEffect(() => {
         document.addEventListener("keydown", handleKeyDown);
 
         return () => {
             document.removeEventListener("keydown", handleKeyDown);
         };
-    }, [spacebarEnabled, startTime, backgroundColor, timeRemaining, handleBarClick]);
+    }, [handleKeyDown]);
+
+    useEffect(() => {
+        if (isSpacebarPressed) {
+            handleBarClick();
+            setIsSpacebarPressed(false); // Reset the state
+        }
+    }, [isSpacebarPressed, handleBarClick]);
 
     // Effect to check conditions and start a new experiment if needed
     useEffect(() => {
@@ -412,7 +419,7 @@ const ReactionTimeExperiment = () => {
 
 
     // Function to start the experiment countdown
-    const startExperimentCountdown = () => {
+    const startExperimentCountdown = useCallback(() => {
         setExperimentCountdown(3);
 
         const countdownInterval = setInterval(() => {
@@ -427,7 +434,7 @@ const ReactionTimeExperiment = () => {
                 }
             });
         }, 1000);
-    };
+    }, [handleStartExperiment]);
 
     // Effect to check conditions and show redo modal if needed
     useEffect(() => {
@@ -473,7 +480,7 @@ const ReactionTimeExperiment = () => {
         }
 
         return () => clearInterval(intervalId);
-    }, [countdownRunning]);
+    }, [countdownRunning, sessionCountdown]);
 
 
     const calculateAverages = () => {
@@ -568,220 +575,93 @@ const ReactionTimeExperiment = () => {
         )
     );
 
-    // Function to render the instruction box button
-    const renderInstructionBoxButton = () => (
-        showInstructionBoxButton && (
-            <div style={{paddingTop: '10px'}}>
-                {/* Button to toggle the modal */}
-                <div>
-                    <button onClick={toggleContentBox} className="btn btn-dark" style={{justifySelf: 'center'}}>
-                        {showContentBox ? 'Hide Instructions' : 'Show Instructions'}
-                    </button>
-                </div>
-
-                <Modal
-                    isOpen={showContentBox}
-                    ariaHideApp={false}
-                    onRequestClose={toggleContentBox}
-                    contentLabel="Instructions"
-                    style={{
-                        content: {
-                            top: '50%',
-                            left: '50%',
-                            width: '1000px',
-                            right: 'auto',
-                            bottom: 'auto',
-                            marginRight: '-60%',
-                            transform: 'translate(-50%, -50%)',
-                        },
-                    }}
-                >
-                    <ExperimentInstructionsBox/>
-                </Modal>
-            </div>
-        )
-    );
-
-    // Function to render the results modal
-    const renderResultsModal = () => (
-        <Modal
-            isOpen={tablesVisible}
-            ariaHideApp={false}
-            onRequestClose={handleToggleClick}
-            contentLabel="Experiment Results"
-            style={{
-                content: {
-                    top: '50%',
-                    left: '50%',
-                    right: 'auto',
-                    bottom: 'auto',
-                    marginRight: '-50%',
-                    transform: 'translate(-50%, -50%)',
-                    maxHeight: '80%', // Set the maximum height of the modal content
-                    overflowY: 'auto', // Enable vertical scrolling
-                    display: 'flex', // Use Flexbox
-                    flexDirection: 'column', // Stack items vertically
-                    alignItems: 'center', // Center items horizontally
-                },
-            }}>
-            <div>
-                <div className="results-section experiment-results">
-                    <h2>Experiment Results</h2>
-                    {renderExperimentData()}
-                </div>
-
-                <div className="results-section average-reaction-times">
-                    <h2>Average Reaction Times</h2>
-                    {renderAverages()}
-                </div>
-            </div>
-            <button onClick={handleResultsPage} className="btn btn-dark"
-                    style={{marginTop: '10px', flexDirection: 'column', alignItems: 'center'}}>
-                To Results
-            </button>
-        </Modal>
-    );
 
 
-    const renderExperimentData = () => {
-        return tablesVisible && Object.entries(experimentData).map(([experimentId, data], index) => (
-            <div key={experimentId} className={tablesVisible ? 'visible' : 'hidden'} >
-                <h3 style={{ textAlign: 'center' }}>{`Experiment ${index + 1}`}</h3>
-                <table style={{ minWidth: '700px'}}>
-                    <thead>
-                    <tr>
-                        <th>Time</th>
-                        <th>Status</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {data.map((entry, entryIndex) => (
-                        <tr key={entryIndex}>
-                            <td>{entry.time}</td>
-                            <td>{entry.status}</td>
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>
-            </div>
-        ));
-    };
 
-    const renderAverages = () => {
-        const averages = calculateAverages();
-
-        return tablesVisible && Object.entries(averages).map(([experimentId, values], index) => (
-            <div key={experimentId} className={tablesVisible ? 'visible' : 'hidden'}>
-                <h3 style={{ textAlign: 'center' }}>{`Experiment ${index + 1}`}</h3>
-                <table style={{ minWidth: '700px'}}>
-                    <thead>
-                    <tr>
-                        <th>Statistic</th>
-                        <th>Value</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>Average Correct Time</td>
-                        <td>{values.correct} ms</td>
-                    </tr>
-                    <tr>
-                        <td>Average Incorrect Time</td>
-                        <td>{values.incorrect} ms</td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        ));
-    };
 
     // Render the component
     return (
-        <div className="container-fluid">
-            <Navbar/>
-            {loading ?
-                (
-                    <Spinner/>
-                ) :
+        <Profiler id="your-component-profiler" onRender={onRenderCallback}>
+            <div className="container-fluid">
+                <Navbar/>
+                {loading ?
+                    (
+                        <Spinner/>
+                    ) :
 
-                (<div className="container" style={{overflowY: 'auto', maxHeight: '100vh'}}>
-
-
-                    <button onClick={handleToggleClick} className="btn btn-dark">
-                        {tablesVisible ? 'Hide results Tables' : 'Show results Tables'}
-                    </button>
-
-                    {/* Instruction box button */}
-                    {renderInstructionBoxButton()}
-
-
-                    {/* Combined container with button and session countdown */}
-                    <div>
-                        <div className="experiment-status-box">
-                            <button
-                                className={`btn session-status ${countdownRunning ? 'running' : 'stopped'}`}
-                                onClick={handleToggleCountdown}
-                                disabled={sessionCountdown === 0}
-                            >
-                                <i className="fas fa-power-off shutdown-icon"></i>
-                                <span style={{
-                                    height: '50px',
-                                    borderRight: '1px solid white',
-                                    marginRight: '8px',
-                                    paddingLeft: '10px'
-                                }}></span>
-                                {renderSessionCountdown()}
-                            </button>
+                    (<div className="container" style={{overflowY: 'auto', maxHeight: '100vh'}}>
+                        <button onClick={handleToggleClick} className="btn btn-dark">
+                            {tablesVisible ? 'Hide results Tables' : 'Show results Tables'}
+                        </button>
+                        {/* Instruction box button */}
+                        { showInstructionBoxButton && (
+                        <InstructionBox
+                            showContentBox={showContentBox}
+                            toggleContentBox={toggleContentBox}
+                            experimentInstructionsBoxVisible={experimentInstructionsBoxVisible}
+                            setExperimentInstructionsBoxVisible={setExperimentInstructionsBoxVisible}
+                        />
+                        )}
+                        {/* Combined container with button and session countdown */}
+                        <div>
+                            <div className="experiment-status-box">
+                                <button
+                                    className={`btn session-status ${countdownRunning ? 'running' : 'stopped'}`}
+                                    onClick={handleToggleCountdown}
+                                    disabled={sessionCountdown === 0}
+                                >
+                                    <i className="fas fa-power-off shutdown-icon"></i>
+                                    <span style={{
+                                        height: '50px',
+                                        borderRight: '1px solid white',
+                                        marginRight: '8px',
+                                        paddingLeft: '10px'
+                                    }}></span>
+                                    {renderSessionCountdown()}
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                        {/* Experiment container */}
+                        <div className="experiment-container">
+                            {/* Shape container */}
+                            <div className={`shape-container ${shape}`} style={{backgroundColor}} onClick={handleBarClick}>
+                                <div ref={target}></div>
+                            </div>
+                            {/* Countdown container */}
+                            <div className="countdown-container-123">
+                                {renderExperimentCountdown()}
+                            </div>
+                            {/* Save button */}
+                            <div className="button-container">
+                                {renderSaveButton()}
+                            </div>
+                            {/* Experiment status box */}
+                            {experimentStarted &&   (<div className="countdown-container">
+                                {renderExperimentStatusBox()}
+                            </div>)}
+                            {/* Start experiment button */}
+                            <div className="button-container">
+                                {!experimentStarted && renderStartExperimentButton()}
+                            </div>
+                            {/* Results modal */}
+                            <RenderResultsModal
+                                tablesVisible={tablesVisible}
+                                experimentData={experimentData}
+                                calculateAverages={calculateAverages}
+                                handleToggleClick={handleToggleClick}
+                                handleResultsPage={handleResultsPage}
+                            />
+                            {/* Render the RedoExperimentModal */}
+                            <RedoExperimentModal show={showRedoModal} onHide={() => setShowRedoModal(false)}
+                                                 onRedo={handleRedoExperiment}/>
 
-
-                    {/* Experiment container */}
-                    <div className="experiment-container">
-
-
-                        {/* Shape container */}
-                        <div className={`shape-container ${shape}`} style={{backgroundColor}} onClick={handleBarClick}>
-                            <div ref={target}></div>
                         </div>
-
-                        {/* Countdown container */}
-                        <div className="countdown-container-123">
-                            {renderExperimentCountdown()}
-                        </div>
-
-                        {/* Save button */}
-                        <div className="button-container">
-                            {renderSaveButton()}
-                        </div>
-
-                        {/* Experiment status box */}
-                        {experimentStarted &&   (<div className="countdown-container">
-                            {renderExperimentStatusBox()}
-                        </div>)}
-
-
-                        {/* Start experiment button */}
-                        <div className="button-container">
-                            {!experimentStarted && renderStartExperimentButton()}
-                        </div>
-
-
-
-                        {/* Results modal */}
-                        {renderResultsModal()}
-
-                        {/* Render the RedoExperimentModal */}
-                        <RedoExperimentModal show={showRedoModal} onHide={() => setShowRedoModal(false)}
-                                             onRedo={handleRedoExperiment}/>
-
-                    </div>
-                </div>)}
-
-
-        </div>
+                    </div>)}
+            </div>
+        </Profiler>
     );
 };
 export default ReactionTimeExperiment;
+
 
 

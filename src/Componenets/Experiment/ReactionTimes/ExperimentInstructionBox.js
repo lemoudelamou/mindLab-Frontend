@@ -1,8 +1,6 @@
-// ExperimentInstructionsBox.jsx
-
 import React from "react";
-import '../../style/ExperimentInstructionBox.css'
-import HexToColorPreview from '../../utils/HexToColorPreview';
+import '../../../style/ExperimentInstructionBox.css'
+import HexToColorPreview from '../../../utils/HexToColorPreview';
 
 
 const ExperimentInstructionsBox = () => {
@@ -19,7 +17,7 @@ const ExperimentInstructionsBox = () => {
                     <li>To be able to start the experiment you have to click on start the session. The start experiment will be activated.</li>
                     <li>When clicking on start experiment a counter down will be displayed. So be prepared!</li>
                     <li>When it reaches 1 the experiment is about to start.</li>
-                    <li>When you see the color below appears, you have to click on the space bar. <HexToColorPreview hexColor={hexColor}/></li>
+                    <li>When you see the color below, you have to click on the space bar. <HexToColorPreview hexColor={hexColor}/></li>
                 </ul>
                 <p style={{paddingTop: '20px', paddingBottom: '20px'}}>
                     <b>Please do not click on the Button save results</b>

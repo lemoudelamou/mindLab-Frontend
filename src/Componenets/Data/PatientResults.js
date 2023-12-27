@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {fetchDataByGender, getExperimentsData, getPatientByFullnameAndId} from '../../Api/Api';
+import {getPatientByFullnameAndId} from '../../Api/Api';
 import Navbar from '../Navbar/Navbar';
 import Spinner from '../../utils/Spinner';
 import '../../style/GroupResults.css';

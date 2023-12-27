@@ -2,10 +2,10 @@
 import React from "react";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
-import Navbar from "../Navbar/Navbar";
+import Navbar from "../../Navbar/Navbar";
 
 
-const RedoExperimentModal = ({show, onHide, onRedo}) => {
+const RedoExperimentModal =  React.memo(({ show, onHide, onRedo }) => {
 
 
     return (
@@ -26,6 +26,6 @@ const RedoExperimentModal = ({show, onHide, onRedo}) => {
             </Modal.Footer>
         </Modal>
     );
-};
+});
 
 export default RedoExperimentModal;
