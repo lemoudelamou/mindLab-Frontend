@@ -12,7 +12,7 @@ const DemoGroupResults = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const result = await import(`../../json/${demoGroup}.json`);
+                const result = await import(`../json/${demoGroup}.json`);
                 console.log('fetched data: ', result.default);
 
                 setData(result.default);

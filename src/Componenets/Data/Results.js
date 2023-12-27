@@ -65,7 +65,7 @@ const Results = () => {
     if (!experimentDetails || experimentDetails.length === 0) {
 
         return (
-            <div>
+            <div className="results-container">
                 <Navbar />
                 <p className="no-results-message">No results available.</p>
             </div>

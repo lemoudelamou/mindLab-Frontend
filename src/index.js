@@ -22,8 +22,8 @@ import DemoPatientInfoPage from './Demo/DemoExperiment/DemoPatientInfoPage';
 import DemoSettings from './Demo/DemoExperiment/DemoSettings';
 import DemoExperiment from './Demo/DemoExperiment/DemoExperiment';
 import DemoResults from "./Demo/DemoExperiment/DemoResults";
-import DemoData from './Demo/Data/DemoData';
-import DemoPatientList from './Demo/Data/DemoPatientList';
+import DemoData from './Demo/DemoData/DemoData';
+import DemoPatientList from './Demo/DemoData/DemoPatientList';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 import Modal from 'react-modal';
@@ -32,8 +32,8 @@ import Navbar from "./Componenets/Navbar/Navbar";
 import Benefits from "./Componenets/Sidebar/Benefits";
 import DemoVersion from "./Componenets/Sidebar/DemoVersion";
 import AboutProject from "./Componenets/Sidebar/AboutProject";
-import DemoPatientResults from "./Demo/Data/DemoPatientResults";
-import DemoGroupResults from "./Demo/Data/DemoGroupResults";
+import DemoPatientResults from "./Demo/DemoData/DemoPatientResults";
+import DemoGroupResults from "./Demo/DemoData/DemoGroupResults";
 
 
 

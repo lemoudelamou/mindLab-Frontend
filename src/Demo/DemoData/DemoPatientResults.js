@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import Spinner from '../../utils/Spinner';
 import '../../style/GroupResults.css';
 import { Bar, Line } from 'react-chartjs-2';
@@ -6,8 +6,7 @@ import { Col, Row } from 'react-bootstrap';
 import crossfilter from 'crossfilter';
 import Navbar from "../../Componenets/Navbar/Navbar";
 // Import the JSON file
-import experimentsData from '../../json/Tom_Cruise.json';
-
+import experimentsData from '../json/Tom_Cruise.json';
 
 const DemoPatientResults = () => {
     const [data, setData] = useState([]);
@@ -28,7 +27,7 @@ const DemoPatientResults = () => {
         const fetchData = async () => {
             try {
                 const formattedDemoFullname = demoFullname.replace(/\s+/g, '_');
-                const experimentsData = await import(`../../json/${formattedDemoFullname}.json`);
+                const experimentsData = await import(`../json/${formattedDemoFullname}.json`);
                 console.log('fetched data: ', experimentsData.default);
 
                 if (Array.isArray(experimentsData.default)) {
@@ -117,8 +116,6 @@ const DemoPatientResults = () => {
             setData(allData);
         }
     };
-
-
 
     const calculateAverage = () => {
         if (!Array.isArray(data) || data.length === 0) {
@@ -231,113 +228,99 @@ const DemoPatientResults = () => {
         );
     };
 
+    const renderContent = () => {
+        if (loading) {
+            return (
+                <div className='text-center mt-5'>
+                    <Spinner />
+                </div>
+            );
+        }
+
+        if (Array.isArray(data) && data.length > 0) {
+            return (
+                <>
+                    <div>
+                        <h2>Data Table</h2>
+                        <table className='table table-bordered table-container'>
+                            <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Value</th>
+                            </tr>
+                            </thead>
+                            <tbody>{renderTableRows()}</tbody>
+                        </table>
+                    </div>
+
+                    <div>
+                        <h2>Chart Type</h2>
+                        <select className='form-select' value={chartType} onChange={(e) => setChartType(e.target.value)}>
+                            <option value='bar'>Bar Chart</option>
+                            <option value='line'>Line Chart</option>
+                        </select>
+                    </div>
+
+                    <div className='chart-container-wrapper'>
+                        <div className={`diag-box ${isFullscreen ? 'fullscreen' : ''}`} onClick={toggleFullscreen}>
+                            {renderChart()}
+                        </div>
+
+                        <div className='manual-scaling'>
+                            <h2>Manual Scaling</h2>
+                            <div className='form-group'>
+                                <label className="label-axe">X-Axis Min:</label>
+                                <input type='number' className='form-control' value={xAxisMin} onChange={(e) => setXAxisMin(e.target.value)} />
+                            </div>
+                            <div className='form-group'>
+                                <label className="label-axe">X-Axis Max:</label>
+                                <input type='number' className='form-control' value={xAxisMax} onChange={(e) => setXAxisMax(e.target.value)} />
+                            </div>
+                            <div className='form-group'>
+                                <label className="label-axe">Y-Axis Min:</label>
+                                <input type='number' className='form-control' value={yAxisMin} onChange={(e) => setYAxisMin(e.target.value)} />
+                            </div>
+                            <div className='form-group'>
+                                <label className="label-axe">Y-Axis Max:</label>
+                                <input type='number' className='form-control' value={yAxisMax} onChange={(e) => setYAxisMax(e.target.value)} />
+                            </div>
+                        </div>
+                    </div>
+                </>
+            );
+        }
+
+        return <p className='no-data-message'>No data available for the selected gender</p>;
+    };
+
     return (
         <div className='data-container'>
             <Navbar />
-            <h1 className='title-data'>Crossfilter</h1>
+            <h1 className='title-data'>Visualisation</h1>
             <div className='sec'>
-                {loading ? (
-                    <div className='text-center mt-5'>
-                        <Spinner />
-                    </div>
-                ) : Array.isArray(data) && data.length > 0 ? (
-                    <>
-                        <Row>
-                            <Col>
+                <Row>
+                    <Col>
 
-                                <div>
-                                    <h3> <b>Patient:</b> {demoFullname} </h3>
-                                    <button className='btn btn-primary m-1' onClick={() => filterData('correct')}>
-                                        correct
-                                    </button>
-                                    <button className='btn btn-primary m-1' onClick={() => filterData('incorrect')}>
-                                        incorrect
-                                    </button>
-                                    <button className='btn btn-secondary m-1' onClick={clearFilters}>
-                                        Clear Filters
-                                    </button>
-                                </div>
-                                <div>
-                                    <h2>Data Table</h2>
-                                    <table className='table table-bordered table-container'>
-                                        <thead>
-                                        <tr>
-                                            <th>Category</th>
-                                            <th>Value</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>{renderTableRows()}</tbody>
-                                    </table>
-                                </div>
 
-                                <div>
-                                    <h2>Chart Type</h2>
-                                    <select
-                                        className='form-select'
-                                        value={chartType}
-                                        onChange={(e) => setChartType(e.target.value)}
-                                    >
-                                        <option value='bar'>Bar Chart</option>
-                                        <option value='line'>Line Chart</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <h2>{chartType === 'bar' ? 'Bar Chart' : 'Line Chart'}</h2>
-                                    <div
-                                        id='chart-container'
-                                        className={`diag-box ${isFullscreen ? 'fullscreen' : ''}`}
-                                        onClick={toggleFullscreen}
-                                    >
-                                        {renderChart()}
-                                    </div>
-                                    <div>
-                                        <h2>Manual Scaling</h2>
-                                        <div className='form-group'>
-                                            <label>X-Axis Min:</label>
-                                            <input
-                                                type='number'
-                                                className='form-control'
-                                                value={xAxisMin}
-                                                onChange={(e) => setXAxisMin(e.target.value)}
-                                            />
-                                        </div>
-                                        <div className='form-group'>
-                                            <label>X-Axis Max:</label>
-                                            <input
-                                                type='number'
-                                                className='form-control'
-                                                value={xAxisMax}
-                                                onChange={(e) => setXAxisMax(e.target.value)}
-                                            />
-                                        </div>
-                                        <div className='form-group'>
-                                            <label>Y-Axis Min:</label>
-                                            <input
-                                                type='number'
-                                                className='form-control'
-                                                value={yAxisMin}
-                                                onChange={(e) => setYAxisMin(e.target.value)}
-                                            />
-                                        </div>
-                                        <div className='form-group'>
-                                            <label>Y-Axis Max:</label>
-                                            <input
-                                                type='number'
-                                                className='form-control'
-                                                value={yAxisMax}
-                                                onChange={(e) => setYAxisMax(e.target.value)}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            </Col>
-                        </Row>
-                    </>
-                ) : (
-                    <p className='no-data-message'>No data available</p>
-                )}
+                        <div>
+                            <button className='btn btn-primary m-1' onClick={() => filterData('correct')}>
+                                correct
+                            </button>
+                            <button className='btn btn-primary m-1' onClick={() => filterData('incorrect')}>
+                                incorrect
+                            </button>
+                            <button className='btn btn-secondary m-1' onClick={clearFilters}>
+                                Clear Filters
+                            </button>
+                        </div>
+
+                        {renderContent()}
+                    </Col>
+                </Row>
             </div>
         </div>
+
     );
 };
+
 export default DemoPatientResults;

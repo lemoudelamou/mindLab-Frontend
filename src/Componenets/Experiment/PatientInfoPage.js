@@ -68,13 +68,13 @@ function PatientInfoPage() {
     };
 
     return (
-        <div>
+        <div className="pp-back">
             <Navbar/>
             <div className="container-patient">
                 <Form onSubmit={handleSubmit}>
                     <h3 className='title-patient'>Patient Information Form</h3>
                     <Form.Group controlId="formGroup">
-                    <Form.Label>Group:</Form.Label>
+                    <Form.Label style={{color: '#FFFFFF'}}>Group:</Form.Label>
                     <Form.Control
                         type="text"
                         name="groupe"

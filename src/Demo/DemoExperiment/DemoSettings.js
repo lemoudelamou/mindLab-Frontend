@@ -3,7 +3,7 @@ import React, {useState} from 'react';
 import {useNavigate, useLocation} from 'react-router-dom';
 import '../../style/SettingsPage.css';
 import Navbar from "../../Componenets/Navbar/Navbar";
-import { Form } from 'react-bootstrap';
+import {Form} from 'react-bootstrap';
 
 
 const DemoSettings = ({selectedShape}) => {
@@ -105,210 +105,213 @@ const DemoSettings = ({selectedShape}) => {
 
 
     return (
-        <div className="experiment-settings-container">
+        <div className="sp-back">
             <Navbar/>
-            <h2 className="title-settings">Experiment Settings</h2>
-            <div className="experiment-settings-form">
-                <div className="form-group">
-                    <label>Select Experiment:</label>
-                    <select
-                        className="form-control"
-                        name="selectedShape"
-                        value={settingsData.selectedExperiment}
-                    >
-                        <option value="Reaction Time" disabled>Select Experiment</option>
-                        {experiments.map((experimentOption) => (
-                            <option key={experimentOption} value={experimentOption}>
-                                {experimentOption}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-                <div className="form-group">
-                    <label>Session Duration (seconds):</label>
-                    <input
-                        type="number"
-                        className="form-control"
-                        name="sessionLength"
-                        value={sessionLength}
-                        onChange={(e) => setSessionLength(e.target.value)}
-                        min="1"
-                    />
-                </div>
-                <div className="form-group">
-                    <label>Select Shape:</label>
-                    <select
-                        className="form-control"
-                        name="selectedShape"
-                        value={settingsData.selectedShape}
-                        onChange={handleChange}
-                        disabled={settingsData.difficultyLevel === 'Hard'}
-                    >
-                        {shapes.map((shapeOption) => (
-                            <option key={shapeOption} value={shapeOption}>
-                                {shapeOption}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-                <div className="form-group">
-                    <label>Experiment Duration (seconds):</label>
-                    <input
-                        type="number"
-                        className="form-control"
-                        name="experimentLength"
-                        value={settingsData.experimentLength}
-                        onChange={handleChange}
-                        min="1"
-                    />
-                </div>
-                <div className="form-group">
-                    <label>Blink Delay (seconds):</label>
-                    <input
-                        type="number"
-                        className="form-control"
-                        name="blinkDelay"
-                        value={settingsData.blinkDelay}
-                        onChange={handleChange}
-                        min="1"
-                    />
-                </div>
-                <div className="form-group">
-                    <label>Color Vision:</label>
-                    <select
-                        className="form-control"
-                        name="isColorBlind"
-                        value={settingsData.isColorBlind}
-                        onChange={handleChange}
-                    >
-                        <option value="normal">Normal</option>
-                        <option value="colorBlind">Color Blind</option>
-                    </select>
-                </div>
-                <div className="form-group">
-                    <label>Difficulty Level:</label>
-                    <select
-                        className="form-control"
-                        name="difficultyLevel"
-                        value={settingsData.difficultyLevel}
-                        onChange={handleChange}
-                    >
-                        {defaultDifficultyLevels.map((level) => (
-                            // Disable the "Hard" difficulty level if color blindness is selected
-                            <option key={level} value={level}
-                                    disabled={settingsData.isColorBlind === 'colorBlind' && level === 'Hard'}>
-                                {level}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-                {settingsData.difficultyLevel === 'Easy' && settingsData.isColorBlind !== 'colorBlind' && (
-                    <>
-                        <div className="form-group">
-                            <label>Color 1: (Correct answer)</label>
-                            <input
-                                type="color"
-                                className="form-control"
-                                name="color1"
-                                value={settingsData.color1}
-                                onChange={handleChange}
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label>Color 2:</label>
-                            <input
-                                type="color"
-                                className="form-control"
-                                name="color2"
-                                value={settingsData.color2}
-                                onChange={handleChange}
-                            />
-                        </div>
-                    </>
-                )}
-                {settingsData.difficultyLevel === 'Medium' && settingsData.isColorBlind !== 'colorBlind' && (
-                    <>
-                        <div className="form-group">
-                            <label>Color 1:</label>
-                            <input
-                                type="color"
-                                className="form-control"
-                                name="color1"
-                                value={settingsData.color1}
-                                onChange={handleChange}
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label>Color 2:</label>
-                            <input
-                                type="color"
-                                className="form-control"
-                                name="color2"
-                                value={settingsData.color2}
-                                onChange={handleChange}
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label>Color 3:</label>
-                            <input
-                                type="color"
-                                className="form-control"
-                                name="color3"
-                                value={settingsData.color3}
-                                onChange={handleChange}
-                            />
-                        </div>
-                    </>
-                )}
-                {settingsData.difficultyLevel === 'Hard' && (
-                    <>
-                        <div className="form-group">
-                            <label>Color 1:</label>
-                            <input
-                                type="color"
-                                className="form-control"
-                                name="color1"
-                                value={settingsData.color1}
-                                onChange={handleChange}
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label>Color 2:</label>
-                            <input
-                                type="color"
-                                className="form-control"
-                                name="color2"
-                                value={settingsData.color2}
-                                onChange={handleChange}
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label>Color 3:</label>
-                            <input
-                                type="color"
-                                className="form-control"
-                                name="color3"
-                                value={settingsData.color3}
-                                onChange={handleChange}
-                            />
-                        </div>
-                    </>
-                )}
-                <div className="form-group">
-                    <Form.Check
-                        type="switch"
-                        id="showInstructionBoxButtonSwitch"
-                        label="Show Instruction Box"
-                        checked={showInstructionBoxButton}
-                        onChange={() => setShowInstructionBoxButton(!showInstructionBoxButton)}
-                    />
-                </div>
-                <div className="btn-settings">
-                    <button className="btn btn-primary" onClick={handleSaveSettings}>
-                        Save Changes
-                    </button>
-                </div>
+            <div className="experiment-settings-container">
 
+                <h2 className="title-settings">Experiment Settings</h2>
+                <div className="experiment-settings-form">
+                    <div className="form-group">
+                        <label style={{color: '#FFFFFF'}}>Select Experiment:</label>
+                        <select
+                            className="form-control"
+                            name="selectedShape"
+                            value={settingsData.selectedExperiment}
+                        >
+                            <option value="Reaction Time" disabled>Select Experiment</option>
+                            {experiments.map((experimentOption) => (
+                                <option key={experimentOption} value={experimentOption}>
+                                    {experimentOption}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="form-group">
+                        <label style={{color: '#FFFFFF'}}>Session Duration (seconds):</label>
+                        <input
+                            type="number"
+                            className="form-control"
+                            name="sessionLength"
+                            value={sessionLength}
+                            onChange={(e) => setSessionLength(e.target.value)}
+                            min="1"
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Select Shape:</label>
+                        <select
+                            className="form-control"
+                            name="selectedShape"
+                            value={settingsData.selectedShape}
+                            onChange={handleChange}
+                            disabled={settingsData.difficultyLevel === 'Hard'}
+                        >
+                            {shapes.map((shapeOption) => (
+                                <option key={shapeOption} value={shapeOption}>
+                                    {shapeOption}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="form-group">
+                        <label>Experiment Duration (seconds):</label>
+                        <input
+                            type="number"
+                            className="form-control"
+                            name="experimentLength"
+                            value={settingsData.experimentLength}
+                            onChange={handleChange}
+                            min="1"
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Blink Delay (seconds):</label>
+                        <input
+                            type="number"
+                            className="form-control"
+                            name="blinkDelay"
+                            value={settingsData.blinkDelay}
+                            onChange={handleChange}
+                            min="1"
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Color Vision:</label>
+                        <select
+                            className="form-control"
+                            name="isColorBlind"
+                            value={settingsData.isColorBlind}
+                            onChange={handleChange}
+                        >
+                            <option value="normal">Normal</option>
+                            <option value="colorBlind">Color Blind</option>
+                        </select>
+                    </div>
+                    <div className="form-group">
+                        <label>Difficulty Level:</label>
+                        <select
+                            className="form-control"
+                            name="difficultyLevel"
+                            value={settingsData.difficultyLevel}
+                            onChange={handleChange}
+                        >
+                            {defaultDifficultyLevels.map((level) => (
+                                // Disable the "Hard" difficulty level if color blindness is selected
+                                <option key={level} value={level}
+                                        disabled={settingsData.isColorBlind === 'colorBlind' && level === 'Hard'}>
+                                    {level}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    {settingsData.difficultyLevel === 'Easy' && settingsData.isColorBlind !== 'colorBlind' && (
+                        <>
+                            <div className="form-group">
+                                <label>Color 1: (Correct answer)</label>
+                                <input
+                                    type="color"
+                                    className="form-control"
+                                    name="color1"
+                                    value={settingsData.color1}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Color 2:</label>
+                                <input
+                                    type="color"
+                                    className="form-control"
+                                    name="color2"
+                                    value={settingsData.color2}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                        </>
+                    )}
+                    {settingsData.difficultyLevel === 'Medium' && settingsData.isColorBlind !== 'colorBlind' && (
+                        <>
+                            <div className="form-group">
+                                <label>Color 1:</label>
+                                <input
+                                    type="color"
+                                    className="form-control"
+                                    name="color1"
+                                    value={settingsData.color1}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Color 2:</label>
+                                <input
+                                    type="color"
+                                    className="form-control"
+                                    name="color2"
+                                    value={settingsData.color2}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Color 3:</label>
+                                <input
+                                    type="color"
+                                    className="form-control"
+                                    name="color3"
+                                    value={settingsData.color3}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                        </>
+                    )}
+                    {settingsData.difficultyLevel === 'Hard' && (
+                        <>
+                            <div className="form-group">
+                                <label>Color 1:</label>
+                                <input
+                                    type="color"
+                                    className="form-control"
+                                    name="color1"
+                                    value={settingsData.color1}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Color 2:</label>
+                                <input
+                                    type="color"
+                                    className="form-control"
+                                    name="color2"
+                                    value={settingsData.color2}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Color 3:</label>
+                                <input
+                                    type="color"
+                                    className="form-control"
+                                    name="color3"
+                                    value={settingsData.color3}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                        </>
+                    )}
+                    <div className="form-group">
+                        <Form.Check
+                            type="switch"
+                            id="showInstructionBoxButtonSwitch"
+                            label="Show Instruction Box"
+                            checked={showInstructionBoxButton}
+                            onChange={() => setShowInstructionBoxButton(!showInstructionBoxButton)}
+                        />
+                    </div>
+                    <div className="btn-settings">
+                        <button className="btn btn-primary" onClick={handleSaveSettings}>
+                            Save Changes
+                        </button>
+                    </div>
+
+                </div>
             </div>
         </div>
     );

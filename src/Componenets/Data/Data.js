@@ -1,14 +1,13 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import crossfilter from 'crossfilter';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Bar, Line } from 'react-chartjs-2';
-import { registerables, Chart } from "chart.js";
+import { registerables, Chart } from 'chart.js';
 import { fetchDataByGender, getExperimentsData } from '../../Api/Api';
 import Navbar from '../Navbar/Navbar';
 import { Row, Col } from 'react-bootstrap';
 import '../../style/Data.css';
 import Spinner from '../../utils/Spinner';
-
 
 Chart.register(...registerables);
 
@@ -138,7 +137,6 @@ const Data = () => {
         fetchData();
     }, [cf, categoryDimension, fetchData]);
 
-
     const calculateAverage = useCallback(() => {
         if (!Array.isArray(data) || data.length === 0) {
             return 0;
@@ -210,9 +208,6 @@ const Data = () => {
         },
     };
 
-
-
-
     const renderChart = useCallback(() => {
         if (!Array.isArray(data)) {
             return null;
@@ -280,61 +275,34 @@ const Data = () => {
 
                     <div>
                         <h2>Chart Type</h2>
-                        <select
-                            className='form-select'
-                            value={chartType}
-                            onChange={(e) => setChartType(e.target.value)}
-                        >
+                        <select className='form-select' value={chartType} onChange={(e) => setChartType(e.target.value)}>
                             <option value='bar'>Bar Chart</option>
                             <option value='line'>Line Chart</option>
                         </select>
                     </div>
-                    <div>
-                        <h2>{chartType === 'bar' ? 'Bar Chart' : 'Line Chart'}</h2>
-                        <div
-                            id='chart-container'
-                            className={`diag-box ${isFullscreen ? 'fullscreen' : ''}`}
-                            onClick={toggleFullscreen}
-                        >
+
+                    <div className='chart-container-wrapper'>
+                        <div className={`diag-box ${isFullscreen ? 'fullscreen' : ''}`} onClick={toggleFullscreen}>
                             {renderChart()}
                         </div>
-                        <div>
+
+                        <div className='manual-scaling'>
                             <h2>Manual Scaling</h2>
                             <div className='form-group'>
-                                <label>X-Axis Min:</label>
-                                <input
-                                    type='number'
-                                    className='form-control'
-                                    value={xAxisMin}
-                                    onChange={(e) => setXAxisMin(e.target.value)}
-                                />
+                                <label className="label-axe">X-Axis Min:</label>
+                                <input type='number' className='form-control' value={xAxisMin} onChange={(e) => setXAxisMin(e.target.value)} />
                             </div>
                             <div className='form-group'>
-                                <label>X-Axis Max:</label>
-                                <input
-                                    type='number'
-                                    className='form-control'
-                                    value={xAxisMax}
-                                    onChange={(e) => setXAxisMax(e.target.value)}
-                                />
+                                <label className="label-axe">X-Axis Max:</label>
+                                <input type='number' className='form-control' value={xAxisMax} onChange={(e) => setXAxisMax(e.target.value)} />
                             </div>
                             <div className='form-group'>
-                                <label>Y-Axis Min:</label>
-                                <input
-                                    type='number'
-                                    className='form-control'
-                                    value={yAxisMin}
-                                    onChange={(e) => setYAxisMin(e.target.value)}
-                                />
+                                <label className="label-axe">Y-Axis Min:</label>
+                                <input type='number' className='form-control' value={yAxisMin} onChange={(e) => setYAxisMin(e.target.value)} />
                             </div>
                             <div className='form-group'>
-                                <label>Y-Axis Max:</label>
-                                <input
-                                    type='number'
-                                    className='form-control'
-                                    value={yAxisMax}
-                                    onChange={(e) => setYAxisMax(e.target.value)}
-                                />
+                                <label className="label-axe">Y-Axis Max:</label>
+                                <input type='number' className='form-control' value={yAxisMax} onChange={(e) => setYAxisMax(e.target.value)} />
                             </div>
                         </div>
                     </div>

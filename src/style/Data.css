@@ -3,6 +3,7 @@
 .data-container {
     display: flex;
     background-image: url("/src/assets/back2.png");
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7));
     color: #FFF;
     flex-direction: column;
     justify-content: center;
@@ -79,3 +80,19 @@
     width: 150px;
 }
 
+
+.chart-container-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+
+.manual-scaling {
+    width: 200px; /* Adjust the width as needed */
+    margin-left: 20px; /* Adjust the margin as needed */
+}
+
+.label-axe {
+    color: #FFFFFF;
+}
