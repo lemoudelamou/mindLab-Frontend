@@ -1,0 +1,36 @@
+.modal-header {
+    background-color: #f8f9fa;  /* Light grey background */
+    border-bottom: 1px solid #dee2e6;  /* Slightly darker border */
+}
+
+.modal-body {
+    font-size: 14px;  /* Smaller font size for the body */
+    line-height: 1.5;  /* Slightly increased line height for readability */
+    color: #212529;  /* Dark grey color for the text */
+}
+
+.modal-body h2, .modal-body h3 {
+    color: #007bff;  /* Bootstrap primary color for headings */
+}
+
+.modal-body ul {
+    padding-left: 20px;  /* Add some padding to list elements */
+}
+
+.modal-body li {
+    margin-bottom: 10px;  /* Add some margin to each list item */
+}
+
+.close-instructions-button {
+    background-color: #007bff;  /* Bootstrap primary background color */
+    color: white;  /* White text color */
+    border: none;  /* Remove border */
+    padding: 5px 10px;  /* Padding inside the button */
+    margin-top: 20px;  /* Margin at the top */
+    cursor: pointer;  /* Cursor to pointer on hover */
+    border-radius: 5px;  /* Slightly rounded corners for the button */
+}
+
+.close-instructions-button:hover {
+    background-color: #0056b3;  /* Slightly darker color on hover */
+}
