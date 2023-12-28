@@ -73,6 +73,14 @@ const PatientList = () => {
         navigate(`/patient-results`);
     };
 
+    const handleModifyData = (fullname , patientById) => {
+
+        localStorage.setItem("fullname", fullname);
+        localStorage.setItem("patientById", patientById)
+
+        navigate(`/modify-patient-data`);
+    };
+
     const mapSearchResultsToOriginalIndices = (searchResults, originalData) => {
         const indexMapping = searchResults.map((result) =>
             originalData.findIndex((item) => item.id === result.id)
@@ -229,7 +237,15 @@ const PatientList = () => {
                     className='btn btn-primary'
                     onClick={() => handleViewDetails(result.fullname, result.id)}
                 >
-                    View Details
+                    View Data
+                </button>
+            </div>
+            <div className='mt-3'>
+                <button
+                    className='btn btn-primary'
+                    onClick={() => handleModifyData(result.fullname, result.id)}
+                >
+                    Modify/Display Data
                 </button>
             </div>
         </>

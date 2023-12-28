@@ -34,6 +34,7 @@ import DemoVersion from "./Componenets/Sidebar/DemoVersion";
 import AboutProject from "./Componenets/Sidebar/AboutProject";
 import DemoPatientResults from "./Demo/DemoData/DemoPatientResults";
 import DemoGroupResults from "./Demo/DemoData/DemoGroupResults";
+import ModifyPatientResults from "./Componenets/Data/ModifyPatientResults";
 
 
 
@@ -56,6 +57,7 @@ function AppRouter() {
         <Route path="/results" element={<Results />} />
         <Route path="/group-results" element={<GroupResults />} />
         <Route path="/patient-results" element={<PatientResults />} />
+        <Route path="/modify-patient-data" element={<ModifyPatientResults />} />
         <Route path="/home" element={<Home/>}/>
         <Route path="/data" element={<Data />}/>
         <Route path="/about" element={<AboutProject />}/>
