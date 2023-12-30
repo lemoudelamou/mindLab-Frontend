@@ -407,7 +407,7 @@ const ReactionTimeExperiment = () => {
         const timeoutId = setTimeout(() => {
             if (!isWaiting && (backgroundColor === (isColorBlind ? "yellow" : selectedColors.falschColor) ||  backgroundColor ===  selectedColors.color3)) {
                 startNewExperiment();
-            } else if (timeRemaining === 0 && !isWaiting) {
+            } else if (timeRemaining === 0 && !isWaiting && userResponse !== "correct" && userResponse !== "incorrect" && userResponse !== "No Reaction") {
                 setBackgroundColor("white");
             }
         }, 500);
@@ -415,7 +415,7 @@ const ReactionTimeExperiment = () => {
         return () => {
             clearTimeout(timeoutId);
         };
-    }, [isWaiting, backgroundColor, lastReactionTime, timeRemaining, startNewExperiment, setShowSaveButton]);
+    }, [isWaiting, backgroundColor, lastReactionTime, timeRemaining, startNewExperiment, setShowSaveButton, userResponse]);
 
 
     // Function to start the experiment countdown

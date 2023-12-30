@@ -4,7 +4,8 @@ import HexToColorPreview from '../../utils/HexToColorPreview';
 
 
 const DemoExperimentInstructionsBox = () => {
-    const DemoHexColor = localStorage.getItem("hexaColor1");
+    const isColorBlind =  localStorage.getItem("DemoColorBlind")
+    const DemoHexColor = isColorBlind ? "blue" : localStorage.getItem("DemoHexColor1");
 
 
     return (

@@ -74,6 +74,7 @@ const SettingsPage = ({selectedShape}) => {
                 localStorage.setItem("sessionLength", sessionLength);
                 localStorage.setItem("showInstructionsBox", showInstructionBoxButton);
                 localStorage.setItem("color1", savedSettingsData.color1);
+                localStorage.setItem("colorBlind", savedSettingsData.isColorBlind);
 
 
                 // Redirect to the experiment page with patient and settings data

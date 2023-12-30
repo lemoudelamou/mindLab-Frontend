@@ -62,7 +62,8 @@ const DemoSettings = ({selectedShape}) => {
 
         console.log('Saved data:', savedData);
         console.log('patient data:', patientData);
-         localStorage.setItem("hexaColor1", settingsData.color1);
+        localStorage.setItem("DemoHexColor1", settingsData.color1);
+        localStorage.setItem("DemoColorBlind", settingsData.isColorBlind)
 
 
 

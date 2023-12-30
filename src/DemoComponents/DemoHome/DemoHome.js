@@ -18,7 +18,7 @@ function DemoHome() {
     const [selectedCard, setSelectedCard] = useState(null);
     const currentMode = JSON.parse(secureLocalStorage.getItem('isDemoMode'));
 
-    
+
 
     const cardsData = [
         {

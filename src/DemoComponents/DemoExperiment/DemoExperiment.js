@@ -1,9 +1,9 @@
-import React, {useState, useEffect, useRef, useCallback, Profiler} from "react";
+import React, {useState, useEffect, useRef, useCallback} from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../../style/ReactionTimeExperiment.css';
 import {useNavigate} from 'react-router-dom';
 import {useLocation} from 'react-router-dom';
-import {formatTime, saveToFile, calculateAverageReactionTime} from '../../utils/ExperimentUtils';
+import {formatTime, calculateAverageReactionTime} from '../../utils/ExperimentUtils';
 import '@fortawesome/fontawesome-free/css/all.css';
 import {v4 as uuidv4} from "uuid";
 import InstructionBox from "./DemoRenderInstructionsBox";
@@ -195,6 +195,9 @@ const DemoExperiment = () => {
     }, [settingsData]);
 
 
+
+
+
     // Effect to update main experimentData when the current experiment is completed
     useEffect(() => {
         if (experimentId && lastReactionTime > 0) {
@@ -206,6 +209,8 @@ const DemoExperiment = () => {
 
         }
     }, [experimentId, lastReactionTime]);
+
+
 
 
     const handleStartExperiment = () => {
@@ -281,9 +286,48 @@ const DemoExperiment = () => {
         }
     }, [isWaiting, timeRemaining]);
 
-    const handleResultsPage = () => {
-        navigate("/demo-results")
-        ;
+    const handleResultsPage = ( ) => {
+
+        const resultData = {
+            experimentSettings: {
+                shape,
+                experimentLength,
+                isColorBlind,
+                blinkDelay,
+                difficultyLevel: experimentSettings.difficultyLevel,
+            },
+            patientInfo: {
+                fullname: patientData?.fullname || null,
+                birthDate: patientData?.birthDate || null,
+                age: patientData?.age || null,
+                strongHand: patientData?.strongHand || null,
+                groupe: patientData?.groupe || null,
+                hasDiseases: patientData?.hasDiseases || null,
+                diseases: patientData?.diseases || null,
+            },
+            experiments: {},
+        };
+
+        Object.keys(experimentData).forEach((experimentId) => {
+            const data = experimentData[experimentId];
+
+            // Calculate average reaction time for "correct" and "incorrect" tries
+            const correctTimes = data.filter((entry) => entry.status === 'correct');
+            const incorrectTimes = data.filter((entry) => entry.status === 'incorrect');
+
+            const averageReactionTimes = {
+                correct: calculateAverageReactionTime(correctTimes),
+                incorrect: calculateAverageReactionTime(incorrectTimes),
+            };
+
+            // Add the calculated averages to the experiment data
+            resultData.experiments[experimentId] = {
+                reactionTimes: data,
+                averageReactionTimes,
+            };
+        });
+
+        navigate("/demo-results", { state: { resultData } });
     }
 
     const handleSaveResults = () => {
@@ -333,6 +377,7 @@ const DemoExperiment = () => {
 
 
 
+
         console.log('Payload:', resultData);
 
         // Navigate to the results page with the calculated resultData
@@ -370,7 +415,7 @@ const DemoExperiment = () => {
         const timeoutId = setTimeout(() => {
             if (!isWaiting && (backgroundColor === (isColorBlind ? "yellow" : selectedColors.falschColor) ||  backgroundColor ===  selectedColors.color3)) {
                 startNewExperiment();
-            } else if (timeRemaining === 0 && !isWaiting) {
+            } else if (timeRemaining === 0 && !isWaiting && userResponse !== "correct" && userResponse !== "incorrect" && userResponse !== "No Reaction") {
                 setBackgroundColor("white");
             }
         }, 500);
@@ -378,7 +423,7 @@ const DemoExperiment = () => {
         return () => {
             clearTimeout(timeoutId);
         };
-    }, [isWaiting, backgroundColor, lastReactionTime, timeRemaining, startNewExperiment, setShowSaveButton]);
+    }, [isWaiting, backgroundColor, lastReactionTime, timeRemaining, startNewExperiment, setShowSaveButton, userResponse]);
 
 
     // Function to start the experiment countdown
