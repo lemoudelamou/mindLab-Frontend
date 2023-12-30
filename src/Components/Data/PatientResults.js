@@ -1,14 +1,15 @@
 import React, {useState, useEffect, useCallback} from 'react';
+import {getPatientByFullnameAndId} from '../../Api/Api';
+import Navbar from '../Navbar/Navbar';
 import Spinner from '../../utils/Spinner';
-import '../../style/GroupResults.css';
-import { Bar, Line } from 'react-chartjs-2';
-import { Col, Row } from 'react-bootstrap';
-import crossfilter from 'crossfilter';
-import Navbar from "../../Componenets/Navbar/Navbar";
-// Import the JSON file
-import experimentsData from '../json/Tom_Cruise.json';
+import '../../style/Data.css';
+import {Bar, Line} from "react-chartjs-2";
+import {Col, Row} from "react-bootstrap";
+import crossfilter from "crossfilter";
 
-const DemoPatientResults = () => {
+const PatientResults = () => {
+    const fullname = localStorage.getItem('fullname'); // Change 'groupName' to 'fullname'
+    const patientId = localStorage.getItem("patientById");
     const [data, setData] = useState([]);
     const [cf, setCrossfilter] = useState(null);
     const [categoryDimension, setCategoryDimension] = useState(null);
@@ -21,17 +22,21 @@ const DemoPatientResults = () => {
     const [yAxisMax, setYAxisMax] = useState('');
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [loading, setLoading] = useState(true);
-    const demoFullname = localStorage.getItem("demoFullname");
+    const [selectedGender, setSelectedGender] = useState('all');
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const formattedDemoFullname = demoFullname.replace(/\s+/g, '_');
-                const experimentsData = await import(`../json/${formattedDemoFullname}.json`);
-                console.log('fetched data: ', experimentsData.default);
+                let experimentsData;
 
-                if (Array.isArray(experimentsData.default)) {
-                    const rawData = experimentsData.default.flatMap((item) =>
+
+                    experimentsData = await getPatientByFullnameAndId(fullname, patientId);
+
+
+                console.log('fetched data: ', experimentsData);
+
+                if (Array.isArray(experimentsData)) {
+                    const rawData = experimentsData.flatMap((item) =>
                         item.reactionTimes.map((reactionTime) => ({
                             category: reactionTime.status,
                             value: reactionTime.time,
@@ -59,7 +64,7 @@ const DemoPatientResults = () => {
         };
 
         fetchData();
-    }, []);
+    }, [selectedGender]);
 
     useEffect(() => {
         const handleFullscreenChange = () => {
@@ -102,20 +107,15 @@ const DemoPatientResults = () => {
     };
 
     const filterData = (category) => {
-        if (cf && categoryDimension) {
-            categoryDimension.filter(category);
-            const filteredData = categoryDimension.top(Infinity);
-            setData(filteredData);
-        }
+        cf && categoryDimension && categoryDimension.filter(category);
+        setData(categoryDimension.top(Infinity));
     };
 
     const clearFilters = () => {
-        if (cf && categoryDimension) {
-            categoryDimension.filterAll();
-            const allData = categoryDimension.top(Infinity);
-            setData(allData);
-        }
+        cf && categoryDimension && categoryDimension.filterAll();
+        setData(categoryDimension.top(Infinity));
     };
+
 
     const calculateAverage = () => {
         if (!Array.isArray(data) || data.length === 0) {
@@ -228,7 +228,7 @@ const DemoPatientResults = () => {
         );
     };
 
-    const renderContent = () => {
+    const renderContent = useCallback(() => {
         if (loading) {
             return (
                 <div className='text-center mt-5'>
@@ -262,7 +262,11 @@ const DemoPatientResults = () => {
                     </div>
 
                     <div className='chart-container-wrapper'>
-                        <div className={`diag-box ${isFullscreen ? 'fullscreen' : ''}`} onClick={toggleFullscreen}>
+                        <div
+                            id='chart-container'
+                            className={`diag-box ${isFullscreen ? 'fullscreen' : ''}`}
+                            onClick={(e) => toggleFullscreen(e)}
+                        >
                             {renderChart()}
                         </div>
 
@@ -291,16 +295,32 @@ const DemoPatientResults = () => {
         }
 
         return <p className='no-data-message'>No data available for the selected gender</p>;
-    };
+    }, [loading, data, isFullscreen, chartType, xAxisMin, xAxisMax, yAxisMin, yAxisMax]);
+
 
     return (
         <div className='data-container'>
             <Navbar />
-            <h1 className='title-data'>Visualisation</h1>
+            <h1 className='title-data'>Visualisation {fullname}</h1>
             <div className='sec'>
                 <Row>
                     <Col>
-
+                        <div>
+                            <label htmlFor='genderSelect' className='form-label'>
+                                Select Gender:
+                            </label>
+                            <select
+                                id='genderSelect'
+                                className='form-select narrow-select'
+                                value={selectedGender}
+                                onChange={(e) => setSelectedGender(e.target.value)}
+                            >
+                                <option value='all'>All</option>
+                                <option value='Male'>Male</option>
+                                <option value='Female'>Female</option>
+                                <option value='Other'>Other</option>
+                            </select>
+                        </div>
 
                         <div>
                             <button className='btn btn-primary m-1' onClick={() => filterData('correct')}>
@@ -319,8 +339,6 @@ const DemoPatientResults = () => {
                 </Row>
             </div>
         </div>
-
     );
 };
-
-export default DemoPatientResults;
+export default PatientResults;

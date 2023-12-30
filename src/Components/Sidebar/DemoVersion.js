@@ -4,14 +4,16 @@ import '../../style/DemoVersion.css';
 
 const DemoVersion = () => {
     const [isExpanded, setIsExpanded] = useState(false);
-    const [isTextOverflowed, setIsTextOverflowed] = useState(false);
+    const [hasOverflowedOnce, setHasOverflowedOnce] = useState(false);
 
     const contentRef = useRef(null);
 
     useEffect(() => {
         const isOverflowed = contentRef.current.scrollHeight > contentRef.current.clientHeight;
-        setIsTextOverflowed(isOverflowed);
-    }, [isExpanded]);
+        if (isOverflowed) {
+            setHasOverflowedOnce(true); // Set it to true if the content has ever overflowed.
+        }
+    }, []);
 
     const handleExpand = () => {
         setIsExpanded(!isExpanded);
@@ -69,9 +71,9 @@ const DemoVersion = () => {
                         <p className="demo-text" style={{paddingBottom: '25px'}}>Thank you for choosing our demo version. We look forward to hearing your feedback and assisting you on your journey with our innovative platform.</p>
 
                     </div>
-                    {isTextOverflowed && !isExpanded && (
-                        <div style={{ textAlign: 'center', marginTop: '20px' }}>
-                            <button onClick={handleExpand}>Read More</button>
+                    {(hasOverflowedOnce || isExpanded) && ( // Updated condition to show the button
+                        <div style={{ textAlign: 'center', marginTop: '10px', marginBottom: '10px' }}> {/* Reduced margin for the button */}
+                            <button onClick={handleExpand}>{isExpanded ? 'Read Less' : 'Read More'}</button>
                         </div>
                     )}
                 </div>

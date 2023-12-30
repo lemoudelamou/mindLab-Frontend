@@ -282,7 +282,11 @@ const Data = () => {
                     </div>
 
                     <div className='chart-container-wrapper'>
-                        <div className={`diag-box ${isFullscreen ? 'fullscreen' : ''}`} onClick={toggleFullscreen}>
+                        <div
+                            id='chart-container'
+                            className={`diag-box ${isFullscreen ? 'fullscreen' : ''}`}
+                            onClick={(e) => toggleFullscreen(e)}
+                        >
                             {renderChart()}
                         </div>
 

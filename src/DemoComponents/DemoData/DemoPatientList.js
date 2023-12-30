@@ -3,7 +3,7 @@ import '../../style/PatientList.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Pagination from '../../utils/Pagination';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../../Componenets/Navbar/Navbar';
+import Navbar from '../../Components/Navbar/Navbar';
 
 const PatientList = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -124,6 +124,14 @@ const PatientList = () => {
         setEditedIndex(null);
         setEditedData({});
         setEditedGroupe('');
+    };
+
+    const handleModifyData = (fullname , patientById) => {
+
+        localStorage.setItem("DemoFullname", fullname);
+        localStorage.setItem("DemoPatientById", patientById)
+
+        navigate(`/demo-modify-patient-data`);
     };
 
     const handleGroupDataButtonClick = (groupName) => {
@@ -280,6 +288,15 @@ const PatientList = () => {
                                             onClick={() => handleViewDetails(result.fullname)}
                                         >
                                             View Details
+                                        </button>
+                                    </div>
+                                    <div className='mt-3'>
+                                        <button
+                                            className='btn btn-primary'
+                                            onClick={() => handleModifyData(result.fullname, result.id)}
+
+                                        >
+                                            Modify/Display Data
                                         </button>
                                     </div>
                                 </div>

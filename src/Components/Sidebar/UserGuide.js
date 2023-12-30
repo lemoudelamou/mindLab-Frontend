@@ -125,7 +125,7 @@ const UserGuide = () => {
 
                     </div>
                     {(hasOverflowedOnce || isExpanded) && ( // Updated condition to show the button
-                        <div style={{ textAlign: 'center', marginTop: '10px' }}> {/* Reduced margin for the button */}
+                        <div style={{ textAlign: 'center', marginTop: '10px', marginBottom: '10px' }}> {/* Reduced margin for the button */}
                             <button onClick={handleExpand}>{isExpanded ? 'Read Less' : 'Read More'}</button>
                         </div>
                     )}

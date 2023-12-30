@@ -2,39 +2,37 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route, useLocation} from "react-router-dom";
 import './index.css';
 import reportWebVitals from './reportWebVitals';
-import Home from './Componenets/Home/Home';
-import Data from './Componenets/Data/Data';
-import Footer from './Componenets/Footer/Footer';
-import PatientInfoPage from './Componenets/Experiment/PatientInfoPage';
-import SettingsPage from './Componenets/Experiment/SettingsPage';
-import ReactionTimeExperiment from './Componenets/Experiment/ReactionTimes/ReactionTimeExperiment'
-import Results from './Componenets/Data/Results';
-import GroupResults from "./Componenets/Data/GroupResults";
-import PatientResults from "./Componenets/Data/PatientResults";
-import LevelsDescription from './Componenets/Sidebar/LevelsDescription';
-import UserGuide from './Componenets/Sidebar/UserGuide';
-import Contact from './Componenets/Sidebar/Contact'
+import Home from './Components/Home/Home';
+import Data from './Components/Data/Data';
+import Footer from './Components/Footer/Footer';
+import PatientInfoPage from './Components/Experiment/PatientInfoPage';
+import SettingsPage from './Components/Experiment/SettingsPage';
+import ReactionTimeExperiment from './Components/Experiment/ReactionTimes/ReactionTimeExperiment'
+import Results from './Components/Data/Results';
+import GroupResults from "./Components/Data/GroupResults";
+import PatientResults from "./Components/Data/PatientResults";
+import LevelsDescription from './Components/Sidebar/LevelsDescription';
+import UserGuide from './Components/Sidebar/UserGuide';
+import Contact from './Components/Sidebar/Contact'
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
-import PatientList from './Componenets/Data/PatientList';
-import DemoHome from './Demo/DemoHome'
-import DemoPatientInfoPage from './Demo/DemoExperiment/DemoPatientInfoPage';
-import DemoSettings from './Demo/DemoExperiment/DemoSettings';
-import DemoExperiment from './Demo/DemoExperiment/DemoExperiment';
-import DemoResults from "./Demo/DemoExperiment/DemoResults";
-import DemoData from './Demo/DemoData/DemoData';
-import DemoPatientList from './Demo/DemoData/DemoPatientList';
+import PatientList from './Components/Data/PatientList';
+import DemoHome from './DemoComponents/DemoHome/DemoHome'
+import DemoPatientInfoPage from './DemoComponents/DemoExperiment/DemoPatientInfoPage';
+import DemoSettings from './DemoComponents/DemoExperiment/DemoSettings';
+import DemoExperiment from './DemoComponents/DemoExperiment/DemoExperiment';
+import DemoResults from "./DemoComponents/DemoData/DemoResults";
+import DemoData from './DemoComponents/DemoData/DemoData';
+import DemoPatientList from './DemoComponents/DemoData/DemoPatientList';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
-import Modal from 'react-modal';
-import {StrictMode} from "react";
-import Navbar from "./Componenets/Navbar/Navbar";
-import Benefits from "./Componenets/Sidebar/Benefits";
-import DemoVersion from "./Componenets/Sidebar/DemoVersion";
-import AboutProject from "./Componenets/Sidebar/AboutProject";
-import DemoPatientResults from "./Demo/DemoData/DemoPatientResults";
-import DemoGroupResults from "./Demo/DemoData/DemoGroupResults";
-import ModifyPatientResults from "./Componenets/Data/ModifyPatientResults";
+import Benefits from "./Components/Sidebar/Benefits";
+import DemoVersion from "./Components/Sidebar/DemoVersion";
+import AboutProject from "./Components/Sidebar/AboutProject";
+import DemoPatientResults from "./DemoComponents/DemoData/DemoPatientResults";
+import DemoGroupResults from "./DemoComponents/DemoData/DemoGroupResults";
+import ModifyPatientResults from "./Components/Data/ModifyPatientResults";
+import DemoModifyPatientResults from "./DemoComponents/DemoData/DemoModifyPatientResults";
 
 
 
@@ -73,6 +71,7 @@ function AppRouter() {
         <Route path="/demo-results" element={<DemoResults />} />
         <Route path="/demo-patientList" element={<DemoPatientList />} />
         <Route path="/demo-patient-results" element={<DemoPatientResults />} />
+        <Route path="/demo-modify-patient-data" element={<DemoModifyPatientResults />} />
         <Route path="/demo-group-results" element={<DemoGroupResults />} />
         <Route path="/demo-data" element={<DemoData />} />
       </Routes>

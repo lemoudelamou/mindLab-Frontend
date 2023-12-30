@@ -6,10 +6,10 @@ import {useLocation} from 'react-router-dom';
 import {formatTime, saveToFile, calculateAverageReactionTime} from '../../utils/ExperimentUtils';
 import '@fortawesome/fontawesome-free/css/all.css';
 import {v4 as uuidv4} from "uuid";
-import InstructionBox from "../../Componenets/Experiment/ReactionTimes/RenderInstructionsBox";
-import RenderResultsModal from "../../Componenets/Experiment/ReactionTimes/RenderResultsModal";
-import RedoExperimentModal from "../../Componenets/Experiment/ReactionTimes/RedoExperimentModal";
-import Navbar from "../../Componenets/Navbar/Navbar";
+import InstructionBox from "./DemoRenderInstructionsBox";
+import RenderResultsModal from "../../Components/Experiment/ReactionTimes/RenderResultsModal";
+import RedoExperimentModal from "../../Components/Experiment/ReactionTimes/RedoExperimentModal";
+import Navbar from "../../Components/Navbar/Navbar";
 
 
 
@@ -39,18 +39,15 @@ const DemoExperiment = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const {state} = location;
-    const patientData = state?.patientData || null;
-    const patientId = state?.patientData || null;
+    const patientData = state && state.patientData  || null;;
     const settingsData = state?.settingsData || null;
-    const settingsId = state?.settingsId || null;
     const sessionLength = state?.sessionLength || null;
     const showInstructionBoxButton = state?.showInstructionBoxButton || null;
     const [experimentSettings, setExperimentSettings] = useState({
         shape: "circle", experimentLength: 60, isColorBlind: '', blinkDelay: 1, difficultyLevel: 'Easy',
     }); // State variables for experiment settings and patient information
-    const [patientInfo, setPatientInfo] = useState({
-        fullname: '', birthDate: new Date(), age: '', strongHand: 'Right', hasDiseases: false, diseases: '',
-    });
+
+
     // New state variable for session countdown
     const [sessionCountdown, setSessionCountdown] = useState(sessionLength ?? 180);
     const [allAttempts, setAllAttempts] = useState([]);
@@ -62,17 +59,6 @@ const DemoExperiment = () => {
     const [experimentInstructionsBoxVisible, setExperimentInstructionsBoxVisible] = useState(false);
     const [isSpacebarPressed, setIsSpacebarPressed] = useState(false);
 
-    const onRenderCallback = (
-        id, // the "id" prop of the Profiler tree that has just committed
-        phase, // either "mount" (if the tree just mounted) or "update" (if it re-rendered)
-        actualDuration, // time spent rendering the committed update
-        baseDuration, // estimated time to render the entire subtree without memoization
-    ) => {
-        // You can log or process the profiling information here
-        console.log(`${id}'s ${phase} phase:`);
-        console.log(`Actual duration: ${actualDuration}`);
-        console.log(`Base duration: ${baseDuration}`);
-    };
 
     // Function to clear the text content of the target element
     const clearTargetText = () => {
@@ -303,33 +289,9 @@ const DemoExperiment = () => {
     const handleSaveResults = () => {
         setShowSaveButton(false);
 
-        // Initialize an object to store average reaction times for each condition
-        const averageReactionTimes = {
-            correct: 0,
-            incorrect: 0,
-        };
-
-        // Iterate through each experiment data
-        for (const [experimentId, data] of Object.entries(experimentData)) {
-            // Calculate average reaction time for "correct" and "incorrect" tries
-            const correctTimes = data.filter((entry) => entry.status === 'correct');
-            const incorrectTimes = data.filter((entry) => entry.status === 'incorrect');
-
-            const averageCorrectTime = calculateAverageReactionTime(correctTimes);
-            const averageIncorrectTime = calculateAverageReactionTime(incorrectTimes);
-
-            // Add the calculated averages to the overall averageReactionTimes object
-            averageReactionTimes.correct += averageCorrectTime;
-            averageReactionTimes.incorrect += averageIncorrectTime;
-        }
-
-        // Calculate the final average by dividing the sums by the number of experiments
-        const totalExperiments = Object.keys(experimentData).length;
-
-        averageReactionTimes.correct /= totalExperiments;
-        averageReactionTimes.incorrect /= totalExperiments;
 
         // Combine experiment settings, patient info, and reaction times
+        // Assuming experimentData is an object where each key is an experiment ID
         const resultData = {
             experimentSettings: {
                 shape,
@@ -339,13 +301,37 @@ const DemoExperiment = () => {
                 difficultyLevel: experimentSettings.difficultyLevel,
             },
             patientInfo: {
-                ...patientInfo,
-                birthDate: patientInfo.birthDate,
-                age: patientInfo.age,
+                fullname: patientData?.fullname || null,
+                birthDate: patientData?.birthDate || null,
+                age: patientData?.age || null,
+                strongHand: patientData?.strongHand || null,
+                groupe: patientData?.groupe || null,
+                hasDiseases: patientData?.hasDiseases || null,
+                diseases: patientData?.diseases || null,
             },
-            reactionTimes: experimentData,
-            averageReactionTimes,
+            experiments: {},
         };
+
+        Object.keys(experimentData).forEach((experimentId) => {
+            const data = experimentData[experimentId];
+
+            // Calculate average reaction time for "correct" and "incorrect" tries
+            const correctTimes = data.filter((entry) => entry.status === 'correct');
+            const incorrectTimes = data.filter((entry) => entry.status === 'incorrect');
+
+            const averageReactionTimes = {
+                correct: calculateAverageReactionTime(correctTimes),
+                incorrect: calculateAverageReactionTime(incorrectTimes),
+            };
+
+            // Add the calculated averages to the experiment data
+            resultData.experiments[experimentId] = {
+                reactionTimes: data,
+                averageReactionTimes,
+            };
+        });
+
+
 
         console.log('Payload:', resultData);
 
@@ -555,7 +541,6 @@ const DemoExperiment = () => {
 
     // Render the component
     return (
-        <Profiler id="your-component-profiler" onRender={onRenderCallback}>
             <div className="container-fluid">
                 <Navbar/>
 
@@ -629,7 +614,6 @@ const DemoExperiment = () => {
                         </div>
                     </div>
             </div>
-        </Profiler>
     );
 };
 export default DemoExperiment;

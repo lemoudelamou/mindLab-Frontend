@@ -2,7 +2,7 @@
 import React, {useState} from 'react';
 import {useNavigate, useLocation} from 'react-router-dom';
 import '../../style/SettingsPage.css';
-import Navbar from "../../Componenets/Navbar/Navbar";
+import Navbar from "../../Components/Navbar/Navbar";
 import {Form} from 'react-bootstrap';
 
 
@@ -34,7 +34,7 @@ const DemoSettings = ({selectedShape}) => {
     const location = useLocation();
     const patientData = location.state && location.state.patientData;
 
-
+   console.log("patient data in settings page", patientData)
     const handleSaveSettings = () => {
 
         setSessionLength(sessionLength);
@@ -62,10 +62,13 @@ const DemoSettings = ({selectedShape}) => {
 
         console.log('Saved data:', savedData);
         console.log('patient data:', patientData);
+         localStorage.setItem("hexaColor1", settingsData.color1);
+
 
 
         // Check if patient data is available
         if (patientData) {
+
 
             console.log('Saving settings data...');
 

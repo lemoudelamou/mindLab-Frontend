@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { fetchDataForGroup } from '../../Api/Api';
 import Spinner from '../../utils/Spinner';
 import '../../style/GroupResults.css'
-import Navbar from "../../Componenets/Navbar/Navbar";
+import Navbar from "../../Components/Navbar/Navbar";
 
 const DemoGroupResults = () => {
     const [loading, setLoading] = useState(true);

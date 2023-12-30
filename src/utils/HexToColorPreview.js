@@ -7,7 +7,7 @@ const HexToColorPreview = ({ hexColor }) => {
         width: '60px',
         height: '40px',
         marginLeft: '250px',
-        border: '1px solid #000', // Add border for better visibility
+        border: '1px solid #000',
     };
 
     return (

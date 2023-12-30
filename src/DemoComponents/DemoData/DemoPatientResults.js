@@ -1,15 +1,14 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import crossfilter from 'crossfilter';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import {Bar, Line} from 'react-chartjs-2';
-import { Row, Col } from 'react-bootstrap';
-import '../../style/Data.css';
+import React, {useState, useEffect, useCallback} from 'react';
 import Spinner from '../../utils/Spinner';
-import Navbar from "../../Componenets/Navbar/Navbar";
+import '../../style/GroupResults.css';
+import { Bar, Line } from 'react-chartjs-2';
+import { Col, Row } from 'react-bootstrap';
+import crossfilter from 'crossfilter';
+import Navbar from "../../Components/Navbar/Navbar";
+// Import the JSON file
+import experimentsData from '../json/Tom_Cruise.json';
 
-
-
-const DemoData = () => {
+const DemoPatientResults = () => {
     const [data, setData] = useState([]);
     const [cf, setCrossfilter] = useState(null);
     const [categoryDimension, setCategoryDimension] = useState(null);
@@ -22,72 +21,57 @@ const DemoData = () => {
     const [yAxisMax, setYAxisMax] = useState('');
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [selectedGender, setSelectedGender] = useState('all');
-
-    const fetchData = async () => {
-
-
-        console.log('Starting fetch data with gender:', selectedGender);
-        try {
-            const experimentsData = await import(`../json/allData.json`);
-            console.log('fetched data: ', experimentsData.default);
-
-            if (Array.isArray(experimentsData.default) && experimentsData.default.length > 0) {
-                // Filter data based on the selected gender
-                const filteredData = selectedGender === 'all'
-                    ? experimentsData.default
-                    : experimentsData.default.filter(item => item.patient.gender === selectedGender);
-
-                const rawData = filteredData.flatMap((item) =>
-                    item.reactionTimes.map((reactionTime) => ({
-                        category: reactionTime.status,
-                        value: reactionTime.time,
-                    }))
-                );
-
-                const crossfilterInstance = crossfilter(rawData);
-                const dimension = crossfilterInstance.dimension((d) => d.category);
-                const correctDimension = crossfilterInstance.dimension((d) => d.category === 'correct');
-                const incorrectDimension = crossfilterInstance.dimension((d) => d.category === 'incorrect');
-
-                setData(rawData);
-                setCrossfilter(crossfilterInstance);
-                setCategoryDimension(dimension);
-                setCorrectDimension(correctDimension);
-                setIncorrectDimension(incorrectDimension);
-
-                return () => crossfilterInstance.remove();
-            } else {
-                // No data available for the selected gender
-                setData([]);
-                setCrossfilter(null);
-                setCategoryDimension(null);
-                setCorrectDimension(null);
-                setIncorrectDimension(null);
-            }
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    const demoFullname = localStorage.getItem("demoFullname");
 
     useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const formattedDemoFullname = demoFullname.replace(/\s+/g, '_');
+                const experimentsData = await import(`../json/${formattedDemoFullname}.json`);
+                console.log('fetched data: ', experimentsData.default);
+
+                if (Array.isArray(experimentsData.default)) {
+                    const rawData = experimentsData.default.flatMap((item) =>
+                        item.reactionTimes.map((reactionTime) => ({
+                            category: reactionTime.status,
+                            value: reactionTime.time,
+                        }))
+                    );
+
+                    const crossfilterInstance = crossfilter(rawData);
+                    const dimension = crossfilterInstance.dimension((d) => d.category);
+                    const correctDimension = crossfilterInstance.dimension((d) => d.category === 'correct');
+                    const incorrectDimension = crossfilterInstance.dimension((d) => d.category === 'incorrect');
+
+                    setData(rawData);
+                    setCrossfilter(crossfilterInstance);
+                    setCategoryDimension(dimension);
+                    setCorrectDimension(correctDimension);
+                    setIncorrectDimension(incorrectDimension);
+
+                    return () => crossfilterInstance.remove();
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
 
         fetchData();
-    }, [selectedGender]);
-
-    const handleFullscreenChange = useCallback(() => {
-        setIsFullscreen(!!document.fullscreenElement);
     }, []);
 
     useEffect(() => {
+        const handleFullscreenChange = () => {
+            setIsFullscreen(!!document.fullscreenElement);
+        };
+
         document.addEventListener('fullscreenchange', handleFullscreenChange);
 
         return () => {
             document.removeEventListener('fullscreenchange', handleFullscreenChange);
         };
-    }, [handleFullscreenChange]);
+    }, []);
 
     const toggleFullscreen = () => {
         const chartContainer = document.getElementById('chart-container');
@@ -120,22 +104,18 @@ const DemoData = () => {
     const filterData = (category) => {
         if (cf && categoryDimension) {
             categoryDimension.filter(category);
-            setData(categoryDimension.top(Infinity));
+            const filteredData = categoryDimension.top(Infinity);
+            setData(filteredData);
         }
     };
 
-    const clearFilters = async () => {
+    const clearFilters = () => {
         if (cf && categoryDimension) {
-            cf && categoryDimension && categoryDimension.filterAll();
+            categoryDimension.filterAll();
+            const allData = categoryDimension.top(Infinity);
+            setData(allData);
         }
-
-        // Reset selected gender to 'All'
-        setSelectedGender('all');
-
-        // Fetch data again
-        fetchData();
     };
-
 
     const calculateAverage = () => {
         if (!Array.isArray(data) || data.length === 0) {
@@ -171,6 +151,7 @@ const DemoData = () => {
     const chartOptions = {
         scales: {
             x: {
+                type: 'category',
                 labels: Array.isArray(data) ? data.map((item) => item.category) : [],
                 beginAtZero: true,
                 min: xAxisMin !== '' ? parseFloat(xAxisMin) : undefined,
@@ -207,11 +188,9 @@ const DemoData = () => {
         },
     };
 
-
-
     const renderChart = () => {
-        if (!Array.isArray(data) || data.length === 0) {
-            return <p className='no-data-message'>No data available for the selected gender</p>;
+        if (!Array.isArray(data)) {
+            return null;
         }
 
         switch (chartType) {
@@ -223,8 +202,6 @@ const DemoData = () => {
                 return null;
         }
     };
-
-
 
     const renderTableRows = () => {
         if (!Array.isArray(data)) {
@@ -276,13 +253,9 @@ const DemoData = () => {
                         </table>
                     </div>
 
-                    <div className='chart-options'>
+                    <div>
                         <h2>Chart Type</h2>
-                        <select
-                            className='form-select'
-                            value={chartType}
-                            onChange={(e) => setChartType(e.target.value)}
-                        >
+                        <select className='form-select' value={chartType} onChange={(e) => setChartType(e.target.value)}>
                             <option value='bar'>Bar Chart</option>
                             <option value='line'>Line Chart</option>
                         </select>
@@ -297,44 +270,22 @@ const DemoData = () => {
                             <h2>Manual Scaling</h2>
                             <div className='form-group'>
                                 <label className="label-axe">X-Axis Min:</label>
-                                <input
-                                    type='number'
-                                    className='form-control'
-                                    value={xAxisMin}
-                                    onChange={(e) => setXAxisMin(e.target.value)}
-                                />
+                                <input type='number' className='form-control' value={xAxisMin} onChange={(e) => setXAxisMin(e.target.value)} />
                             </div>
                             <div className='form-group'>
                                 <label className="label-axe">X-Axis Max:</label>
-                                <input
-                                    type='number'
-                                    className='form-control'
-                                    value={xAxisMax}
-                                    onChange={(e) => setXAxisMax(e.target.value)}
-                                />
+                                <input type='number' className='form-control' value={xAxisMax} onChange={(e) => setXAxisMax(e.target.value)} />
                             </div>
                             <div className='form-group'>
                                 <label className="label-axe">Y-Axis Min:</label>
-                                <input
-                                    type='number'
-                                    className='form-control'
-                                    value={yAxisMin}
-                                    onChange={(e) => setYAxisMin(e.target.value)}
-                                />
+                                <input type='number' className='form-control' value={yAxisMin} onChange={(e) => setYAxisMin(e.target.value)} />
                             </div>
                             <div className='form-group'>
                                 <label className="label-axe">Y-Axis Max:</label>
-                                <input
-                                    type='number'
-                                    className='form-control'
-                                    value={yAxisMax}
-                                    onChange={(e) => setYAxisMax(e.target.value)}
-                                />
+                                <input type='number' className='form-control' value={yAxisMax} onChange={(e) => setYAxisMax(e.target.value)} />
                             </div>
                         </div>
                     </div>
-
-
                 </>
             );
         }
@@ -349,22 +300,7 @@ const DemoData = () => {
             <div className='sec'>
                 <Row>
                     <Col>
-                        <div>
-                            <label htmlFor='genderSelect' className='form-label'>
-                                Select Gender:
-                            </label>
-                            <select
-                                id='genderSelect'
-                                className='form-select narrow-select'
-                                value={selectedGender}
-                                onChange={(e) => setSelectedGender(e.target.value)}
-                            >
-                                <option value='all'>All</option>
-                                <option value='Male'>Male</option>
-                                <option value='Female'>Female</option>
-                                <option value='Other'>Other</option>
-                            </select>
-                        </div>
+
 
                         <div>
                             <button className='btn btn-primary m-1' onClick={() => filterData('correct')}>
@@ -383,9 +319,8 @@ const DemoData = () => {
                 </Row>
             </div>
         </div>
+
     );
 };
 
-export default DemoData;
-
-
+export default DemoPatientResults;

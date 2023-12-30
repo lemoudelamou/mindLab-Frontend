@@ -5,6 +5,7 @@ import HexToColorPreview from '../../../utils/HexToColorPreview';
 
 const ExperimentInstructionsBox = () => {
     const hexColor = localStorage.getItem("color1");
+
     return (
         <div className="instructions-container" >
 

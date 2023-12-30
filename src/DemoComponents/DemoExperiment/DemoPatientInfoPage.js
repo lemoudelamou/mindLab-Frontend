@@ -7,7 +7,7 @@ import {savePatientData} from '../../Api/Api'; // Import the savePatientData fun
 import 'rsuite/dist/rsuite.min.css';
 import '../../style/PatientInfoPage.css';
 import {calculateAge} from '../../utils/ExperimentUtils'
-import Navbar from "../../Componenets/Navbar/Navbar";
+import Navbar from "../../Components/Navbar/Navbar";
 
 
 function DemoPatientInfoPage() {
@@ -18,10 +18,10 @@ function DemoPatientInfoPage() {
         birthDate: new Date(),
         gender: '',
         strongHand: 'Right',
+        groupe: '',
         hasDiseases: false,
         diseases: '',
         expDate: '',
-        groupe: '',
     });
 
     const navigate = useNavigate();
@@ -40,12 +40,16 @@ function DemoPatientInfoPage() {
     const handleDateChange = (value) => {
 
         const age = calculateAge(value);
+        const experimentDate = Date.now();
+        const expDateObject = new Date(experimentDate);
+        const expDate = expDateObject.toISOString().split('T')[0];
 
 
         setPatientData({
             ...patientData,
             birthDate: value,
             age: age,
+            expDate ,
         });
     };
 
