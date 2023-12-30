@@ -314,9 +314,60 @@ const ReactionTimeExperiment = () => {
         }
     }, [isWaiting, timeRemaining]);
 
-    const handleResultsPage = () => {
-        navigate("/results")
-        ;
+    const handleResultsPage = async () => {
+        for (const [experimentId, data] of Object.entries(experimentData)) {
+            // Calculate average reaction time for "correct" and "incorrect" tries
+            const correctTimes = data.filter((entry) => entry.status.includes("correct"));
+            const incorrectTimes = data.filter((entry) => entry.status.includes("incorrect"));
+            const averageCorrectTime = calculateAverageReactionTime(correctTimes);
+            const averageIncorrectTime = calculateAverageReactionTime(incorrectTimes);
+
+            // Combine experiment settings, patient info, and reaction times
+            const resultData = {
+                experimentSettings: {
+                    shape,
+                    experimentLength,
+                    isColorBlind,
+                    blinkDelay,
+                    difficultyLevel: experimentSettings.difficultyLevel,
+                },
+                patientInfo: {
+                    ...patientInfo, birthDate: patientInfo.birthDate, age: patientInfo.age,
+                },
+                reactionTimes: experimentData,
+                averageReactionTimes: {
+                    correct: averageCorrectTime,
+                    incorrect: averageIncorrectTime,
+                },
+            };
+
+            console.log('Payload:', resultData);
+
+            //saveToFile(resultData);
+
+            // Check if experimentId is available
+            if (settingsId) {
+                try {
+                    console.log('Saving settings data...');
+
+                    // Save settings data to the server using the currentExperimentId
+                    await saveExperimentResults(patientId, settingsId, experimentId,{
+                        reactionTimes: experimentData,
+                        averageReactionTimes: {
+                            correct: averageCorrectTime, incorrect: averageIncorrectTime,
+                        },
+                    });
+
+                    console.log("Experiment Data id: ", resultData)
+                } catch (error) {
+                    // Handle error as needed
+                    console.log('Error:', error);
+                }
+            } else {
+                // Log the result data to the console
+            }
+        }
+        navigate("/results");
     }
 
     const handleSaveResults = async () => {

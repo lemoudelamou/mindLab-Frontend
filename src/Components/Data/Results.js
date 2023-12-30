@@ -108,6 +108,10 @@ const Results = () => {
                             <td>{experimentDetails[0].patientInfo.strongHand}</td>
                         </tr>
                         <tr>
+                            <td>Group:</td>
+                            <td>{experimentDetails[0].patientInfo.groupe}</td>
+                        </tr>
+                        <tr>
                             <td>Has Diseases:</td>
                             <td>{experimentDetails[0].patientInfo.hasDiseases  ? 'Yes' : 'No'}</td>
                         </tr>
@@ -117,6 +121,10 @@ const Results = () => {
                                 <td>{experimentDetails[0].patientInfo.diseases}</td>
                             </tr>
                         )}
+                        <tr>
+                            <td>Exp taken on:</td>
+                            <td>{experimentDetails[0].patientInfo.expDate}</td>
+                        </tr>
                         </tbody>
                     </table>
 
