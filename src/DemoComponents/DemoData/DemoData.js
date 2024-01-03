@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import crossfilter from 'crossfilter';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {Bar, Line} from 'react-chartjs-2';
+import {Bar, Line, Pie} from 'react-chartjs-2';
 import { Row, Col } from 'react-bootstrap';
 import '../../style/Data.css';
 import Spinner from '../../utils/Spinner';
@@ -23,6 +23,8 @@ const DemoData = () => {
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [loading, setLoading] = useState(true);
     const [selectedGender, setSelectedGender] = useState('all');
+    // Add a state for gender data
+    const [genderData, setGenderData] = useState({ males: 0, females: 0 });
 
     const fetchData = async () => {
 
@@ -49,6 +51,13 @@ const DemoData = () => {
                 const dimension = crossfilterInstance.dimension((d) => d.category);
                 const correctDimension = crossfilterInstance.dimension((d) => d.category === 'correct');
                 const incorrectDimension = crossfilterInstance.dimension((d) => d.category === 'incorrect');
+                // After fetching data, calculate gender distribution
+                const maleCount = experimentsData.default.filter(item => item.patient.gender === 'Male').length;
+                const femaleCount = experimentsData.default.filter(item => item.patient.gender === 'Female').length;
+                const otherCount = experimentsData.default.filter(item => item.patient.gender === 'Other').length;
+
+                setGenderData({ males: maleCount, females: femaleCount, others: otherCount });
+
 
                 setData(rawData);
                 setCrossfilter(crossfilterInstance);
@@ -88,6 +97,19 @@ const DemoData = () => {
             document.removeEventListener('fullscreenchange', handleFullscreenChange);
         };
     }, [handleFullscreenChange]);
+// Function to prepare data for the pie chart
+const preparePieChartData = () => {
+    return {
+        labels: ['Male', 'Female', 'Other'],
+        datasets: [
+            {
+                data: [genderData.males, genderData.females, genderData.others],
+                backgroundColor: ['#36A2EB', '#FF6384', '#7C7F7E'],
+                hoverBackgroundColor: ['#36A2EB', '#FF6384', '#7C7F7E'],
+            },
+        ],
+    };
+};
 
     const toggleFullscreen = () => {
         const chartContainer = document.getElementById('chart-container');
@@ -263,78 +285,31 @@ const DemoData = () => {
         if (Array.isArray(data) && data.length > 0) {
             return (
                 <>
-                    <div>
-                        <h2>Data Table</h2>
-                        <table className='table table-bordered table-container'>
-                            <thead>
-                            <tr>
-                                <th>Category</th>
-                                <th>Value</th>
-                            </tr>
-                            </thead>
-                            <tbody>{renderTableRows()}</tbody>
-                        </table>
-                    </div>
-
-                    <div className='chart-options'>
-                        <h2>Chart Type</h2>
-                        <select
-                            className='form-select'
-                            value={chartType}
-                            onChange={(e) => setChartType(e.target.value)}
-                        >
-                            <option value='bar'>Bar Chart</option>
-                            <option value='line'>Line Chart</option>
-                        </select>
-                    </div>
-
-                    <div className='chart-container-wrapper'>
-                        <div className={`diag-box ${isFullscreen ? 'fullscreen' : ''}`} onClick={toggleFullscreen}>
-                            {renderChart()}
-                        </div>
-
-                        <div className='manual-scaling'>
-                            <h2>Manual Scaling</h2>
-                            <div className='form-group'>
-                                <label className="label-axe">X-Axis Min:</label>
-                                <input
-                                    type='number'
-                                    className='form-control'
-                                    value={xAxisMin}
-                                    onChange={(e) => setXAxisMin(e.target.value)}
-                                />
+                    <Row>
+                        <Col md={6}>
+                            <div className='chart-options'>
+                                <h2>Chart Type</h2>
+                                <select
+                                    className='form-select'
+                                    value={chartType}
+                                    onChange={(e) => setChartType(e.target.value)}
+                                >
+                                    <option value='bar'>Bar Chart</option>
+                                    <option value='line'>Line Chart</option>
+                                </select>
+                                <div className={`diag-box ${isFullscreen ? 'fullscreen' : ''}`} onClick={toggleFullscreen}>
+                                    {renderChart()}
+                                </div>
                             </div>
-                            <div className='form-group'>
-                                <label className="label-axe">X-Axis Max:</label>
-                                <input
-                                    type='number'
-                                    className='form-control'
-                                    value={xAxisMax}
-                                    onChange={(e) => setXAxisMax(e.target.value)}
-                                />
+                        </Col>
+                        <Col md={6}>
+                            <div className="pie-chart-container">
+                                <h2>Gender Distribution</h2>
+                                <Pie data={preparePieChartData()} />
                             </div>
-                            <div className='form-group'>
-                                <label className="label-axe">Y-Axis Min:</label>
-                                <input
-                                    type='number'
-                                    className='form-control'
-                                    value={yAxisMin}
-                                    onChange={(e) => setYAxisMin(e.target.value)}
-                                />
-                            </div>
-                            <div className='form-group'>
-                                <label className="label-axe">Y-Axis Max:</label>
-                                <input
-                                    type='number'
-                                    className='form-control'
-                                    value={yAxisMax}
-                                    onChange={(e) => setYAxisMax(e.target.value)}
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-
+                        </Col>
+                    </Row>
+                    {/* ... rest of your existing renderContent code */}
                 </>
             );
         }
@@ -365,19 +340,17 @@ const DemoData = () => {
                                 <option value='Other'>Other</option>
                             </select>
                         </div>
-
                         <div>
                             <button className='btn btn-primary m-1' onClick={() => filterData('correct')}>
-                                correct
+                                Correct
                             </button>
                             <button className='btn btn-primary m-1' onClick={() => filterData('incorrect')}>
-                                incorrect
+                                Incorrect
                             </button>
                             <button className='btn btn-secondary m-1' onClick={clearFilters}>
                                 Clear Filters
                             </button>
                         </div>
-
                         {renderContent()}
                     </Col>
                 </Row>
