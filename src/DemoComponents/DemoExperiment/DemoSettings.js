@@ -168,17 +168,7 @@ const DemoSettings = ({selectedShape}) => {
                             min="1"
                         />
                     </div>
-                    <div className="form-group">
-                        <label>Blink Delay (seconds):</label>
-                        <input
-                            type="number"
-                            className="form-control"
-                            name="blinkDelay"
-                            value={settingsData.blinkDelay}
-                            onChange={handleChange}
-                            min="1"
-                        />
-                    </div>
+
                     <div className="form-group">
                         <label>Color Vision:</label>
                         <select

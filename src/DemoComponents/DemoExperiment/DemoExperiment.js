@@ -95,11 +95,11 @@ const DemoExperiment = () => {
             setSelectedColors({richtigColor: settingsData.color1, falschColor: settingsData.color2});
         } else if (settingsData.difficultyLevel === 'Medium') {
             setSelectedColors({
-                richtigColor: settingsData.color1, falschColor: settingsData.color2, color2: settingsData.color3,
+                richtigColor: settingsData.color1, falschColor: settingsData.color2, color3: settingsData.color3,
             });
         } else if (settingsData.difficultyLevel === 'Hard') {
             setSelectedColors({
-                richtigColor: settingsData.color1, falschColor: settingsData.color2, color2: settingsData.color3,
+                richtigColor: settingsData.color1, falschColor: settingsData.color2, color3: settingsData.color3,
             });
         }
 
@@ -265,7 +265,7 @@ const DemoExperiment = () => {
                 status = `correct`;
             } else if (backgroundColor === (isColorBlind ? "yellow" : selectedColors.falschColor)) {
                 status = `incorrect`;
-            } else if (backgroundColor === selectedColors.color2) {
+            } else if (backgroundColor === selectedColors.color3) {
                 // Add condition for the third color in the medium difficulty level
                 status = `incorrect`;
             } else {
