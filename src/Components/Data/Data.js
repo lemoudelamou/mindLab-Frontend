@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import crossfilter from 'crossfilter';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Bar, Line } from 'react-chartjs-2';
+import { Bar, Line,Pie } from 'react-chartjs-2';
 import { registerables, Chart } from 'chart.js';
 import { fetchDataByGender, getExperimentsData } from '../../Api/Api';
 import Navbar from '../Navbar/Navbar';
@@ -25,6 +25,8 @@ const Data = () => {
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [loading, setLoading] = useState(true);
     const [selectedGender, setSelectedGender] = useState('all');
+    const [genderData, setGenderData] = useState({ males: 0, females: 0 , other: 0});
+
 
     const fetchData = useCallback(async () => {
         console.log('Starting fetch data with gender:', selectedGender);
@@ -51,12 +53,22 @@ const Data = () => {
                 const dimension = crossfilterInstance.dimension((d) => d.category);
                 const correctDimension = crossfilterInstance.dimension((d) => d.category === 'correct');
                 const incorrectDimension = crossfilterInstance.dimension((d) => d.category === 'incorrect');
+// After fetching data, calculate gender distribution
+                const maleCount = experimentsData.filter(item => item.patient.gender === 'Male').length;
+                const femaleCount = experimentsData.filter(item => item.patient.gender === 'Female').length;
+                const otherCount = experimentsData.filter(item => item.patient.gender === 'Other').length;
+
+                setGenderData({ males: maleCount, females: femaleCount, others: otherCount });
+
+
 
                 setData(rawData);
                 setCrossfilter(crossfilterInstance);
                 setCategoryDimension(dimension);
                 setCorrectDimension(correctDimension);
                 setIncorrectDimension(incorrectDimension);
+
+
 
                 return () => crossfilterInstance.remove();
             } else {
@@ -77,6 +89,7 @@ const Data = () => {
     useEffect(() => {
         fetchData();
     }, [selectedGender, fetchData]);
+
 
     const handleFullscreenChange = useCallback(() => {
         setIsFullscreen(!!document.fullscreenElement);
@@ -145,6 +158,20 @@ const Data = () => {
         const sum = data.reduce((accumulator, item) => accumulator + item.value, 0);
         return sum / data.length;
     }, [data]);
+
+    // Function to prepare data for the pie chart
+    const preparePieChartData = () => {
+        return {
+            labels: ['Male', 'Female', 'Other'],
+            datasets: [
+                {
+                    data: [genderData.males, genderData.females, genderData.others],
+                    backgroundColor: ['#36A2EB', '#FF6384', '#7C7F7E'],
+                    hoverBackgroundColor: ['#36A2EB', '#FF6384', '#7C7F7E'],
+                },
+            ],
+        };
+    };
 
     const prepareChartData = useCallback(() => {
         if (!Array.isArray(data)) {
@@ -273,43 +300,30 @@ const Data = () => {
                         </table>
                     </div>
 
-                    <div>
-                        <h2>Chart Type</h2>
-                        <select className='form-select' value={chartType} onChange={(e) => setChartType(e.target.value)}>
-                            <option value='bar'>Bar Chart</option>
-                            <option value='line'>Line Chart</option>
-                        </select>
-                    </div>
-
-                    <div className='chart-container-wrapper'>
-                        <div
-                            id='chart-container'
-                            className={`diag-box ${isFullscreen ? 'fullscreen' : ''}`}
-                            onClick={(e) => toggleFullscreen(e)}
-                        >
-                            {renderChart()}
-                        </div>
-
-                        <div className='manual-scaling'>
-                            <h2>Manual Scaling</h2>
-                            <div className='form-group'>
-                                <label className="label-axe">X-Axis Min:</label>
-                                <input type='number' className='form-control' value={xAxisMin} onChange={(e) => setXAxisMin(e.target.value)} />
+                    <Row>
+                        <Col md={6}>
+                            <div className='chart-options'>
+                                <h2>Chart Type</h2>
+                                <select
+                                    className='form-select'
+                                    value={chartType}
+                                    onChange={(e) => setChartType(e.target.value)}
+                                >
+                                    <option value='bar'>Bar Chart</option>
+                                    <option value='line'>Line Chart</option>
+                                </select>
+                                <div className={`diag-box ${isFullscreen ? 'fullscreen' : ''}`} onClick={toggleFullscreen}>
+                                    {renderChart()}
+                                </div>
                             </div>
-                            <div className='form-group'>
-                                <label className="label-axe">X-Axis Max:</label>
-                                <input type='number' className='form-control' value={xAxisMax} onChange={(e) => setXAxisMax(e.target.value)} />
+                        </Col>
+                        <Col md={6}>
+                            <div className="pie-chart-container">
+                                <h2>Gender Distribution</h2>
+                                <Pie data={preparePieChartData()} />
                             </div>
-                            <div className='form-group'>
-                                <label className="label-axe">Y-Axis Min:</label>
-                                <input type='number' className='form-control' value={yAxisMin} onChange={(e) => setYAxisMin(e.target.value)} />
-                            </div>
-                            <div className='form-group'>
-                                <label className="label-axe">Y-Axis Max:</label>
-                                <input type='number' className='form-control' value={yAxisMax} onChange={(e) => setYAxisMax(e.target.value)} />
-                            </div>
-                        </div>
-                    </div>
+                        </Col>
+                    </Row>
                 </>
             );
         }
