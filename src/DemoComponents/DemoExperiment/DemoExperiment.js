@@ -286,8 +286,17 @@ const DemoExperiment = () => {
         }
     }, [isWaiting, timeRemaining]);
 
-    const handleResultsPage = ( ) => {
 
+
+
+    const handleResultsPage = () => {
+        // Generate a numerical ID (using a timestamp in this example)
+        const patientId = new Date().getTime();
+        const experimentDate = Date.now();
+        const expDateObject = new Date(experimentDate);
+        const expDate = expDateObject.toISOString().split("T")[0];
+
+        // Combine experiment settings, patient info, and reaction times
         const resultData = {
             experimentSettings: {
                 shape,
@@ -297,6 +306,7 @@ const DemoExperiment = () => {
                 difficultyLevel: experimentSettings.difficultyLevel,
             },
             patientInfo: {
+                id: patientId || null,
                 fullname: patientData?.fullname || null,
                 birthDate: patientData?.birthDate || null,
                 age: patientData?.age || null,
@@ -304,11 +314,13 @@ const DemoExperiment = () => {
                 groupe: patientData?.groupe || null,
                 hasDiseases: patientData?.hasDiseases || null,
                 diseases: patientData?.diseases || null,
+                expDate: expDate || null,
+
             },
             experiments: {},
         };
 
-        Object.keys(experimentData).forEach((experimentId) => {
+        Object.keys(experimentData).forEach((experimentId, index) => {
             const data = experimentData[experimentId];
 
             // Calculate average reaction time for "correct" and "incorrect" tries
@@ -316,26 +328,40 @@ const DemoExperiment = () => {
             const incorrectTimes = data.filter((entry) => entry.status === 'incorrect');
 
             const averageReactionTimes = {
+                id: index + 1,
                 correct: calculateAverageReactionTime(correctTimes),
                 incorrect: calculateAverageReactionTime(incorrectTimes),
             };
 
             // Add the calculated averages to the experiment data
             resultData.experiments[experimentId] = {
+                id: index +1,
                 reactionTimes: data,
                 averageReactionTimes,
             };
         });
 
+
+        const jsonResultData = JSON.stringify(resultData);
+
+        // Save the JSON string in localStorage
+        localStorage.setItem('DemoResultData', jsonResultData);
+
         navigate("/demo-results", { state: { resultData } });
-    }
+    };
+
 
     const handleSaveResults = () => {
         setShowSaveButton(false);
+        const patientId = new Date().getTime();
+        const experimentDate = Date.now();
+        const expDateObject = new Date(experimentDate);
+        const expDate = expDateObject.toISOString().split("T")[0];
+
+
 
 
         // Combine experiment settings, patient info, and reaction times
-        // Assuming experimentData is an object where each key is an experiment ID
         const resultData = {
             experimentSettings: {
                 shape,
@@ -345,6 +371,7 @@ const DemoExperiment = () => {
                 difficultyLevel: experimentSettings.difficultyLevel,
             },
             patientInfo: {
+                id: patientId || null,
                 fullname: patientData?.fullname || null,
                 birthDate: patientData?.birthDate || null,
                 age: patientData?.age || null,
@@ -352,11 +379,12 @@ const DemoExperiment = () => {
                 groupe: patientData?.groupe || null,
                 hasDiseases: patientData?.hasDiseases || null,
                 diseases: patientData?.diseases || null,
+                expDate: expDate || null,
             },
             experiments: {},
         };
 
-        Object.keys(experimentData).forEach((experimentId) => {
+        Object.keys(experimentData).forEach((experimentId, index) => {
             const data = experimentData[experimentId];
 
             // Calculate average reaction time for "correct" and "incorrect" tries
@@ -364,21 +392,27 @@ const DemoExperiment = () => {
             const incorrectTimes = data.filter((entry) => entry.status === 'incorrect');
 
             const averageReactionTimes = {
+                id: index + 1,
                 correct: calculateAverageReactionTime(correctTimes),
                 incorrect: calculateAverageReactionTime(incorrectTimes),
             };
 
             // Add the calculated averages to the experiment data
             resultData.experiments[experimentId] = {
+                id: index +1,
                 reactionTimes: data,
                 averageReactionTimes,
             };
         });
 
-
-
-
         console.log('Payload:', resultData);
+
+
+        // Save the JSON string in localStorage
+        localStorage.setItem('DemoResultData', JSON.stringify(resultData));
+
+
+
 
         // Navigate to the results page with the calculated resultData
         navigate('/demo-results', { state: { resultData } });

@@ -9,6 +9,7 @@ function QuitDemoButton() {
 
     const handleQuitDemo = () => {
         exitDemoMode();
+        localStorage.removeItem('DemoResultData');
         navigate('/home');
     };
 

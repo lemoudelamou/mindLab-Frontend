@@ -50,6 +50,18 @@
             "id": 802,
             "correct": 489.9833333333954,
             "incorrect": 511.3800000000745
+        },
+        "experimentSettings": {
+            "id": 552,
+            "experiment": "Reaction Time",
+            "shape": "circle",
+            "experimentLength": "10",
+            "blinkDelay": "1",
+            "isColorBlind": "",
+            "difficultyLevel": "Easy",
+            "color1": "#ff0000",
+            "color2": "#00ff00",
+            "color3": "#0000ff"
         }
     },
     {
@@ -103,6 +115,18 @@
             "id": 803,
             "correct": 507.3500000002484,
             "incorrect": 530.1000000005588
+        },
+        "experimentSettings": {
+            "id": 552,
+            "experiment": "Reaction Time",
+            "shape": "circle",
+            "experimentLength": "10",
+            "blinkDelay": "1",
+            "isColorBlind": "",
+            "difficultyLevel": "Easy",
+            "color1": "#ff0000",
+            "color2": "#00ff00",
+            "color3": "#0000ff"
         }
     },
     {
@@ -156,6 +180,18 @@
             "id": 804,
             "correct": 426.9166666666667,
             "incorrect": 339.5
+        },
+        "experimentSettings": {
+            "id": 552,
+            "experiment": "Reaction Time",
+            "shape": "circle",
+            "experimentLength": "10",
+            "blinkDelay": "1",
+            "isColorBlind": "",
+            "difficultyLevel": "Easy",
+            "color1": "#ff0000",
+            "color2": "#00ff00",
+            "color3": "#0000ff"
         }
     },
     {
@@ -209,6 +245,18 @@
             "id": 805,
             "correct": 528.7999999998137,
             "incorrect": 493.65000000037253
+        },
+        "experimentSettings": {
+            "id": 552,
+            "experiment": "Reaction Time",
+            "shape": "circle",
+            "experimentLength": "10",
+            "blinkDelay": "1",
+            "isColorBlind": "",
+            "difficultyLevel": "Easy",
+            "color1": "#ff0000",
+            "color2": "#00ff00",
+            "color3": "#0000ff"
         }
     },
     {
@@ -227,7 +275,19 @@
             "expDate": "2023-12-20",
             "groupe": "s13"
         },
-        "averageReactionTimes": null
+        "averageReactionTimes": null ,
+        "experimentSettings": {
+            "id": 552,
+            "experiment": "Reaction Time",
+            "shape": "circle",
+            "experimentLength": "10",
+            "blinkDelay": "1",
+            "isColorBlind": "",
+            "difficultyLevel": "Easy",
+            "color1": "#ff0000",
+            "color2": "#00ff00",
+            "color3": "#0000ff"
+        }
     },
     {
         "id": 809,
@@ -355,6 +415,18 @@
             "id": 809,
             "correct": 607.738095238096,
             "incorrect": 538.089999999998
+        },
+        "experimentSettings": {
+            "id": 552,
+            "experiment": "Reaction Time",
+            "shape": "circle",
+            "experimentLength": "10",
+            "blinkDelay": "1",
+            "isColorBlind": "",
+            "difficultyLevel": "Easy",
+            "color1": "#ff0000",
+            "color2": "#00ff00",
+            "color3": "#0000ff"
         }
     },
     {
@@ -458,6 +530,18 @@
             "id": 810,
             "correct": 472.98749999999745,
             "incorrect": 1013.1000000000058
+        },
+        "experimentSettings": {
+            "id": 552,
+            "experiment": "Reaction Time",
+            "shape": "circle",
+            "experimentLength": "10",
+            "blinkDelay": "1",
+            "isColorBlind": "",
+            "difficultyLevel": "Easy",
+            "color1": "#ff0000",
+            "color2": "#00ff00",
+            "color3": "#0000ff"
         }
     },
     {
@@ -556,6 +640,18 @@
             "id": 811,
             "correct": 398.0933333333271,
             "incorrect": 584.6000000000349
+        },
+        "experimentSettings": {
+            "id": 552,
+            "experiment": "Reaction Time",
+            "shape": "circle",
+            "experimentLength": "10",
+            "blinkDelay": "1",
+            "isColorBlind": "",
+            "difficultyLevel": "Easy",
+            "color1": "#ff0000",
+            "color2": "#00ff00",
+            "color3": "#0000ff"
         }
     },
     {
@@ -684,6 +780,18 @@
             "id": 812,
             "correct": 408.1047619047652,
             "incorrect": 329.5
+        },
+        "experimentSettings": {
+            "id": 552,
+            "experiment": "Reaction Time",
+            "shape": "circle",
+            "experimentLength": "10",
+            "blinkDelay": "1",
+            "isColorBlind": "",
+            "difficultyLevel": "Easy",
+            "color1": "#ff0000",
+            "color2": "#00ff00",
+            "color3": "#0000ff"
         }
     },
     {
@@ -742,6 +850,18 @@
             "id": 852,
             "correct": 517.7857142857143,
             "incorrect": 534.1600000000093
+        },
+        "experimentSettings": {
+            "id": 552,
+            "experiment": "Reaction Time",
+            "shape": "circle",
+            "experimentLength": "10",
+            "blinkDelay": "1",
+            "isColorBlind": "",
+            "difficultyLevel": "Easy",
+            "color1": "#ff0000",
+            "color2": "#00ff00",
+            "color3": "#0000ff"
         }
     },
     {
@@ -805,6 +925,18 @@
             "id": 853,
             "correct": 340.07500000000437,
             "incorrect": 293.3500000000349
+        },
+        "experimentSettings": {
+            "id": 552,
+            "experiment": "Reaction Time",
+            "shape": "circle",
+            "experimentLength": "10",
+            "blinkDelay": "1",
+            "isColorBlind": "",
+            "difficultyLevel": "Easy",
+            "color1": "#ff0000",
+            "color2": "#00ff00",
+            "color3": "#0000ff"
         }
     },
     {
@@ -863,6 +995,18 @@
             "id": 854,
             "correct": 355.0428571428721,
             "incorrect": 0
+        },
+        "experimentSettings": {
+            "id": 552,
+            "experiment": "Reaction Time",
+            "shape": "circle",
+            "experimentLength": "10",
+            "blinkDelay": "1",
+            "isColorBlind": "",
+            "difficultyLevel": "Easy",
+            "color1": "#ff0000",
+            "color2": "#00ff00",
+            "color3": "#0000ff"
         }
     }
 ]

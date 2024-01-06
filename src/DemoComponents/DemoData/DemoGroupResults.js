@@ -9,16 +9,45 @@ const DemoGroupResults = () => {
     const [data, setData] = useState(null);
     const demoGroup = localStorage.getItem('DemoGroup');
 
+
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const result = await import(`../json/${demoGroup}.json`);
-                console.log('fetched data: ', result.default);
+                const result = await import(`../json/allData.json`);
+                console.log('fetched data:', result.default);
+                console.log('demo group:', demoGroup);
 
-                setData(result.default);
+                let combinedData = [];
+
+                const storedDemoResult = JSON.parse(localStorage.getItem('DemoResultData'));
+
+                if (storedDemoResult && storedDemoResult.patientInfo.groupe === demoGroup) {
+                    console.log('DemoGroup found in local storage.');
+
+                    // If demoGroup is found in local storage, use that data
+                    combinedData = Object.entries(storedDemoResult.experiments).map(([experimentId, experiment]) => ({
+                        experimentId,
+                        experimentSettings: storedDemoResult.experimentSettings,
+                        patient: storedDemoResult.patientInfo,
+                        id: experiment.id,
+                        reactionTimes: experiment.reactionTimes,
+                        averageReactionTimes: {
+                            id: experiment.averageReactionTimes.id,
+                            correct: experiment.averageReactionTimes.correct || 0,
+                            incorrect: experiment.averageReactionTimes.incorrect || 0,
+                        },
+                    }));
+                }
+
+                // Filter data based on demoGroup in the JSON file
+                const filteredDataFromJSON = result.default.filter(item => item.patient.groupe === demoGroup);
+
+                // Add additional data from JSON file
+                combinedData = [...combinedData, ...filteredDataFromJSON];
+
+                console.log('Combined Group Results:', combinedData);
+                setData(combinedData);
                 setLoading(false);
-                console.log("Group results", result.default);
-
             } catch (error) {
                 console.error('Error in component:', error);
                 setLoading(false);

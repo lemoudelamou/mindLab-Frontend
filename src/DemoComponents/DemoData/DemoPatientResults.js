@@ -1,12 +1,10 @@
 import React, {useState, useEffect, useCallback} from 'react';
 import Spinner from '../../utils/Spinner';
 import '../../style/GroupResults.css';
-import { Bar, Line } from 'react-chartjs-2';
-import { Col, Row } from 'react-bootstrap';
+import {Bar, Line} from 'react-chartjs-2';
+import {Col, Row} from 'react-bootstrap';
 import crossfilter from 'crossfilter';
 import Navbar from "../../Components/Navbar/Navbar";
-// Import the JSON file
-import experimentsData from '../json/Tom_Cruise.json';
 
 const DemoPatientResults = () => {
     const [data, setData] = useState([]);
@@ -26,30 +24,73 @@ const DemoPatientResults = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const formattedDemoFullname = demoFullname.replace(/\s+/g, '_');
-                const experimentsData = await import(`../json/${formattedDemoFullname}.json`);
+                const experimentsData = await import('../json/allData.json');
                 console.log('fetched data: ', experimentsData.default);
 
                 if (Array.isArray(experimentsData.default)) {
-                    const rawData = experimentsData.default.flatMap((item) =>
-                        item.reactionTimes.map((reactionTime) => ({
-                            category: reactionTime.status,
-                            value: reactionTime.time,
-                        }))
+                    const matchingData = experimentsData.default.find(
+                        (item) => item.patient && item.patient.fullname === demoFullname
                     );
 
-                    const crossfilterInstance = crossfilter(rawData);
-                    const dimension = crossfilterInstance.dimension((d) => d.category);
-                    const correctDimension = crossfilterInstance.dimension((d) => d.category === 'correct');
-                    const incorrectDimension = crossfilterInstance.dimension((d) => d.category === 'incorrect');
+                    if (matchingData) {
+                        const rawData = matchingData.reactionTimes.map((reactionTime) => ({
+                            category: reactionTime.status,
+                            value: reactionTime.time,
+                        }));
 
-                    setData(rawData);
-                    setCrossfilter(crossfilterInstance);
-                    setCategoryDimension(dimension);
-                    setCorrectDimension(correctDimension);
-                    setIncorrectDimension(incorrectDimension);
+                        const crossfilterInstance = crossfilter(rawData);
+                        const dimension = crossfilterInstance.dimension((d) => d.category);
+                        const correctDimension = crossfilterInstance.dimension((d) => d.category === 'correct');
+                        const incorrectDimension = crossfilterInstance.dimension((d) => d.category === 'incorrect');
 
-                    return () => crossfilterInstance.remove();
+                        setData(rawData);
+                        setCrossfilter(crossfilterInstance);
+                        setCategoryDimension(dimension);
+                        setCorrectDimension(correctDimension);
+                        setIncorrectDimension(incorrectDimension);
+
+                        // Remove the crossfilter instance when the component is unmounted
+                        return () => crossfilterInstance.remove();
+                    } else {
+                        // Patient not found, check local storage for demoResult
+                        const storedDemoResult = JSON.parse(localStorage.getItem('DemoResultData'));
+                        if (storedDemoResult && storedDemoResult.experiments) {
+                            const reactionTimes = [];
+
+                            // Iterate over experiments
+                            Object.values(storedDemoResult.experiments).forEach((experiment) => {
+                                // Check if the experiment has reactionTimes
+                                if (experiment.reactionTimes && Array.isArray(experiment.reactionTimes)) {
+                                    // Add each reaction time entry to the array
+                                    reactionTimes.push(...experiment.reactionTimes.map((reactionTime) => ({
+                                        category: reactionTime.status,
+                                        value: reactionTime.time,
+                                    })));
+                                }
+                            });
+
+                            // Set data if reactionTimes are present
+                            if (reactionTimes.length > 0) {
+                                const crossfilterInstance = crossfilter(reactionTimes);
+                                const dimension = crossfilterInstance.dimension((d) => d.category);
+                                const correctDimension = crossfilterInstance.dimension((d) => d.category === 'correct');
+                                const incorrectDimension = crossfilterInstance.dimension((d) => d.category === 'incorrect');
+
+                                setData(reactionTimes);
+                                setCrossfilter(crossfilterInstance);
+                                setCategoryDimension(dimension);
+                                setCorrectDimension(correctDimension);
+                                setIncorrectDimension(incorrectDimension);
+
+                                // Remove the crossfilter instance when the component is unmounted
+                                return () => crossfilterInstance.remove();
+                            } else {
+                                console.error('No reactionTimes found in storedDemoResult:', storedDemoResult);
+                            }
+                        } else {
+                            console.error('Invalid or missing data in storedDemoResult:', storedDemoResult);
+                        }
+                    }
                 }
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -59,7 +100,7 @@ const DemoPatientResults = () => {
         };
 
         fetchData();
-    }, []);
+    }, [demoFullname]);
 
     useEffect(() => {
         const handleFullscreenChange = () => {
@@ -128,7 +169,7 @@ const DemoPatientResults = () => {
 
     const prepareChartData = () => {
         if (!Array.isArray(data)) {
-            return { labels: [], datasets: [] };
+            return {labels: [], datasets: []};
         }
 
         const labels = data.map((item) => item.category);
@@ -195,9 +236,9 @@ const DemoPatientResults = () => {
 
         switch (chartType) {
             case 'bar':
-                return <Bar data={prepareChartData()} options={chartOptions} />;
+                return <Bar data={prepareChartData()} options={chartOptions}/>;
             case 'line':
-                return <Line data={prepareChartData()} options={chartOptions} />;
+                return <Line data={prepareChartData()} options={chartOptions}/>;
             default:
                 return null;
         }
@@ -232,7 +273,7 @@ const DemoPatientResults = () => {
         if (loading) {
             return (
                 <div className='text-center mt-5'>
-                    <Spinner />
+                    <Spinner/>
                 </div>
             );
         }
@@ -255,7 +296,8 @@ const DemoPatientResults = () => {
 
                     <div>
                         <h2>Chart Type</h2>
-                        <select className='form-select' value={chartType} onChange={(e) => setChartType(e.target.value)}>
+                        <select className='form-select' value={chartType}
+                                onChange={(e) => setChartType(e.target.value)}>
                             <option value='bar'>Bar Chart</option>
                             <option value='line'>Line Chart</option>
                         </select>
@@ -270,19 +312,23 @@ const DemoPatientResults = () => {
                             <h2>Manual Scaling</h2>
                             <div className='form-group'>
                                 <label className="label-axe">X-Axis Min:</label>
-                                <input type='number' className='form-control' value={xAxisMin} onChange={(e) => setXAxisMin(e.target.value)} />
+                                <input type='number' className='form-control' value={xAxisMin}
+                                       onChange={(e) => setXAxisMin(e.target.value)}/>
                             </div>
                             <div className='form-group'>
                                 <label className="label-axe">X-Axis Max:</label>
-                                <input type='number' className='form-control' value={xAxisMax} onChange={(e) => setXAxisMax(e.target.value)} />
+                                <input type='number' className='form-control' value={xAxisMax}
+                                       onChange={(e) => setXAxisMax(e.target.value)}/>
                             </div>
                             <div className='form-group'>
                                 <label className="label-axe">Y-Axis Min:</label>
-                                <input type='number' className='form-control' value={yAxisMin} onChange={(e) => setYAxisMin(e.target.value)} />
+                                <input type='number' className='form-control' value={yAxisMin}
+                                       onChange={(e) => setYAxisMin(e.target.value)}/>
                             </div>
                             <div className='form-group'>
                                 <label className="label-axe">Y-Axis Max:</label>
-                                <input type='number' className='form-control' value={yAxisMax} onChange={(e) => setYAxisMax(e.target.value)} />
+                                <input type='number' className='form-control' value={yAxisMax}
+                                       onChange={(e) => setYAxisMax(e.target.value)}/>
                             </div>
                         </div>
                     </div>
@@ -295,8 +341,8 @@ const DemoPatientResults = () => {
 
     return (
         <div className='data-container'>
-            <Navbar />
-            <h1 className='title-data'>Visualisation</h1>
+            <Navbar/>
+            <h1 className='title-data'>Visualisation: {demoFullname}</h1>
             <div className='sec'>
                 <Row>
                     <Col>

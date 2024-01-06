@@ -5,6 +5,7 @@ import Pagination from '../../utils/Pagination';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../../Components/Navbar/Navbar';
 
+
 const PatientList = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState([]);
@@ -18,22 +19,55 @@ const PatientList = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [groupsPerPage] = useState(5);
     const navigate = useNavigate();
+    const [uniquePatients, setUniquePatients] = useState([]);
 
-    const dummyPatients = [
-        { id: 1, fullname: 'Johny Depp', birthDate: '1990-01-01', strongHand: 'Left', gender: 'Male', groupe: 's1', expDate: '2023-01-01' },
-        { id: 2, fullname: 'Bob Marley', birthDate: '1985-05-15', strongHand: 'Left', gender: 'Male', groupe: 's2', expDate: '2023-01-15' },
-        { id: 3, fullname: 'Tom Cruise', birthDate: '1982-09-30', strongHand: 'Left', gender: 'Male', groupe: 's3', expDate: '2023-02-01' },
-        // Add more dummy data as needed
-    ];
 
-    const setDummyData = () => {
-        const initialCollapsedState = Array(dummyPatients.length).fill(true);
-        setCollapsedItems(initialCollapsedState);
-        setSearchResults(dummyPatients);
+    const setDummyData = async () => {
+        try {
+            // Fetch your JSON file
+            const response = await import('../json/allData.json'); // Replace with the actual path
+            const jsonData = await response.default;
+
+            const initialCollapsedState = Array(jsonData.length).fill(true);
+
+            // Create an object to store patients using their ID as the key
+            const uniquePatientsObject = {};
+
+            jsonData.forEach(item => {
+                const patientId = item.patient.id;
+                if (!uniquePatientsObject[patientId]) {
+                    uniquePatientsObject[patientId] = item.patient;
+                }
+            });
+
+            // Retrieve data from localStorage
+            const localStorageData = JSON.parse(localStorage.getItem('DemoResultData'));
+
+            if (localStorageData?.patientInfo) {
+                // Include data from localStorage in uniquePatientsObject if not null
+                const patientId = localStorageData.patientInfo.id;
+                if (!uniquePatientsObject[patientId]) {
+                    uniquePatientsObject[patientId] = localStorageData.patientInfo;
+                }
+            }
+
+            const uniquePatientsArray = Object.values(uniquePatientsObject);
+
+            console.log('unique array:', uniquePatientsArray);
+            console.log('unique local:', localStorageData);
+
+            setCollapsedItems(initialCollapsedState);
+            setSearchResults(uniquePatientsArray);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            // Handle error state or show an error message
+        }
     };
+
 
     useEffect(() => {
         setDummyData();
+
     }, []);
 
     const groupPatientsByGroupe = () => {
@@ -60,19 +94,21 @@ const PatientList = () => {
         setEditedGroupe(searchResults.find((result) => result.id === patientId)?.groupe || '');
     };
 
+
     const handleDeletePatient = (patientId) => {
         const confirmDelete = window.confirm('Are you sure you want to delete this patient?');
 
         if (confirmDelete) {
-            // Assuming you want to update the dummyPatients array
-            const updatedData = dummyPatients.filter((patient) => patient.id !== patientId);
+            // Assuming uniquePatients is an array, you can use filter
+            const updatedData = uniquePatients.filter((patient) => patient.id !== patientId);
             setCollapsedItems([]);
             setSearchResults(updatedData);
         }
     };
 
+
     const handleSearch = () => {
-        const filteredItems = dummyPatients.filter(
+        const filteredItems = uniquePatients.filter(
             (item) =>
                 item.fullname.toLowerCase().includes(searchTerm.toLowerCase()) &&
                 (!filterDate || item.expDate === filterDate)
@@ -84,7 +120,7 @@ const PatientList = () => {
 
     const clearFilters = () => {
         setCollapsedItems([]);
-        setSearchResults(dummyPatients);
+        setSearchResults(uniquePatients);
         setSearchTerm('');
         setFilterDate(null);
         setSearchClicked(false);
@@ -104,19 +140,24 @@ const PatientList = () => {
     };
 
     const handleSaveChanges = () => {
-        // Implement the logic to save changes
-        // For example, update the dummyPatients array
-        const updatedData = dummyPatients.map((patient) =>
+        // Convert uniquePatients object to an array of values
+        const uniquePatientsArray = Object.values(uniquePatients);
+
+        const updatedData = uniquePatientsArray.map((patient) =>
             patient.id === editedIndex ? { ...patient, ...editedData, groupe: editedGroupe } : patient
         );
 
+       setUniquePatients(updatedData);
+
+        // Reset other states
         setCollapsedItems([]);
-        setSearchResults(updatedData);
         setIsEditingMap(new Map());
         setEditedIndex(null);
         setEditedData({});
         setEditedGroupe('');
     };
+
+
 
     const handleCancelEdit = () => {
         // Implement the logic to cancel the edit
@@ -140,11 +181,15 @@ const PatientList = () => {
     };
 
     const handleViewDetails = (fullname) => {
+        // Log the data to the console
+        console.log(localStorage.getItem('demoFullname'));
+
         // Store the fullname in localStorage
         localStorage.setItem('demoFullname', fullname);
         // Navigate to the details page
         navigate('/demo-patient-results'); // Replace 'details-page' with the actual path of your details page
     };
+
 
     const renderEditFields = (result) => (
         <>

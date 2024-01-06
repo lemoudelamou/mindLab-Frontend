@@ -1,35 +1,47 @@
-import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import React, {useEffect, useState} from "react";
+import {useLocation} from "react-router-dom";
 import "../../style/Results.css";
-import { calculateAge } from "../../utils/ExperimentUtils";
+import {calculateAge} from "../../utils/ExperimentUtils";
 import Navbar from "../../Components/Navbar/Navbar";
 
 const DemoResults = () => {
-    const location = useLocation();
-    const initialResultData = location.state ? location.state.resultData : null;
-    const [resultData, setResultData] = useState(initialResultData);
+    const storedDemoResult = JSON.parse(localStorage.getItem('DemoResultData'));
+    const [resultData, setResultData] = useState(storedDemoResult);
     const experimentDate = Date.now();
     const expDateObject = new Date(experimentDate);
     const expDate = expDateObject.toISOString().split("T")[0];
 
+
     console.log("results:", resultData);
+
+    useEffect(() => {
+
+    }, [resultData]);
 
     // Updated handleDeleteExperiment function
     const handleDeleteExperiment = (experimentId) => {
-        // Copy the existing state
-        const updatedResultData = { ...resultData };
+        const confirmDelete = window.confirm('Are you sure you want to delete all reaction times for this experiment?');
 
-        // Delete the experiment data and related averageReactionTimes
-        delete updatedResultData.experiments[experimentId];
+        if (confirmDelete) {
+            try {
+                setResultData((prevResultData) => {
+                    const updatedResultData = {...prevResultData};
 
-        // Update the state
-        setResultData(updatedResultData);
+                    delete updatedResultData.experiments[experimentId];
+
+                    return updatedResultData;
+                });
+            } catch (error) {
+                console.error('Error deleting experiment data:', error);
+            }
+        }
     };
 
-    if (!resultData || Object.keys(resultData).length === 0) {
+
+    if (!storedDemoResult || Object.keys(storedDemoResult).length === 0) {
         return (
             <div>
-                <Navbar />
+                <Navbar/>
                 <p className="no-results-message">No results available.</p>
             </div>
         );
@@ -49,7 +61,7 @@ const DemoResults = () => {
 
     return (
         <div className="results-container">
-            <Navbar />
+            <Navbar/>
 
             <div className="pad-container">
                 <h2>Experiment Results</h2>
@@ -134,8 +146,8 @@ const DemoResults = () => {
                 {/* Display reaction times */}
                 {Object.entries(resultData.experiments).map(([experimentId, experimentData], index) => (
                     <div key={experimentId}>
-                        <div style={{ color: "#FFFFFF" }}>Attempt {index + 1}</div>
-                        <table style={{ marginBottom: '20px' }}>
+                        <div style={{color: "#FFFFFF"}}>Attempt {index + 1}</div>
+                        <table style={{marginBottom: '20px'}}>
                             <thead>
                             <tr>
                                 <th>Time</th>
@@ -153,7 +165,7 @@ const DemoResults = () => {
                         </table>
                         <button
                             onClick={() => handleDeleteExperiment(experimentId)}
-                            style={{ marginTop: '10px', marginBottom: '10px' }}
+                            style={{marginTop: '10px', marginBottom: '10px'}}
                             className="btn btn-dark"
                         >
                             Delete {index + 1}
@@ -166,7 +178,7 @@ const DemoResults = () => {
                 <h3>Average reaction times (in ms)</h3>
                 {Object.entries(resultData.experiments).map(([experimentId, experimentData], index) => (
                     <div key={index}>
-                        <div style={{ color: "#FFFFFF" }}>Attempt {index + 1}</div>
+                        <div style={{color: "#FFFFFF"}}>Attempt {index + 1}</div>
                         <table>
                             <thead>
                             <tr>
