@@ -57,7 +57,6 @@ const Data = () => {
                 const maleCount = experimentsData.filter(item => item.patient.gender === 'Male').length;
                 const femaleCount = experimentsData.filter(item => item.patient.gender === 'Female').length;
                 const otherCount = experimentsData.filter(item => item.patient.gender === 'Other').length;
-
                 setGenderData({ males: maleCount, females: femaleCount, others: otherCount });
 
 

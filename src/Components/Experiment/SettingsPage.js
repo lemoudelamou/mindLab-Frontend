@@ -229,7 +229,7 @@ const SettingsPage = ({selectedShape}) => {
                     {settingsData.difficultyLevel === 'Medium' && settingsData.isColorBlind !== 'colorBlind' && (
                         <>
                             <div className="form-group">
-                                <label>Color 1:</label>
+                                <label>Color 1: (Correct answer)</label>
                                 <input
                                     type="color"
                                     className="form-control"
@@ -263,7 +263,7 @@ const SettingsPage = ({selectedShape}) => {
                     {settingsData.difficultyLevel === 'Hard' && (
                         <>
                             <div className="form-group">
-                                <label>Color 1:</label>
+                                <label>Color 1: (Correct answer)</label>
                                 <input
                                     type="color"
                                     className="form-control"
