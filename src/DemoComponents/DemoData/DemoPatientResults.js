@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useCallback} from 'react';
 import Spinner from '../../utils/Spinner';
 import '../../style/GroupResults.css';
-import {Bar, Line} from 'react-chartjs-2';
+import {Bar, Line, Pie} from 'react-chartjs-2';
 import {Col, Row} from 'react-bootstrap';
 import crossfilter from 'crossfilter';
 import Navbar from "../../Components/Navbar/Navbar";
@@ -19,6 +19,7 @@ const DemoPatientResults = () => {
     const [yAxisMax, setYAxisMax] = useState('');
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [correctnessData, setCorrectnessData] = useState({ correct: 0, incorrect: 0});
     const demoFullname = localStorage.getItem("demoFullname");
 
     useEffect(() => {
@@ -33,7 +34,17 @@ const DemoPatientResults = () => {
                     );
 
                     if (matchingData) {
-                        const rawData = matchingData.reactionTimes.map((reactionTime) => ({
+                        const reactionTimes = matchingData.reactionTimes;
+
+                        // Count correct and incorrect reactions using reduce
+                        setCorrectnessData( reactionTimes.reduce((acc, curr) => {
+                            acc[curr.status] = (acc[curr.status] || 0) + 1;
+                            return acc;
+                        }, {}));
+
+                        console.log('Correctness counts:', correctnessData);
+
+                        const rawData = reactionTimes.map((reactionTime) => ({
                             category: reactionTime.status,
                             value: reactionTime.time,
                         }));
@@ -68,6 +79,14 @@ const DemoPatientResults = () => {
                                     })));
                                 }
                             });
+
+                            // Count correct and incorrect reactions using reduce
+                            setCorrectnessData(  reactionTimes.reduce((acc, curr) => {
+                                acc[curr.category] = (acc[curr.category] || 0) + 1;
+                                return acc;
+                            }, {}));
+
+                            console.log('Correctness counts:', correctnessData);
 
                             // Set data if reactionTimes are present
                             if (reactionTimes.length > 0) {
@@ -165,6 +184,21 @@ const DemoPatientResults = () => {
 
         const sum = data.reduce((accumulator, item) => accumulator + item.value, 0);
         return sum / data.length;
+    };
+
+    const preparePieChartData = () => {
+        console.log('Correctness data:', correctnessData);
+
+        return {
+            labels: ['Correct', 'Incorrect'],
+            datasets: [
+                {
+                    data: [correctnessData.correct, correctnessData.incorrect],
+                    backgroundColor: ['#36A2EB', '#FF6384'],
+                    hoverBackgroundColor: ['#36A2EB', '#FF6384'],
+                },
+            ],
+        };
     };
 
     const prepareChartData = () => {
@@ -293,7 +327,8 @@ const DemoPatientResults = () => {
                             <tbody>{renderTableRows()}</tbody>
                         </table>
                     </div>
-
+                    <Row>
+                        <Col md={6}>
                     <div>
                         <h2>Chart Type</h2>
                         <select className='form-select' value={chartType}
@@ -307,31 +342,15 @@ const DemoPatientResults = () => {
                         <div className={`diag-box ${isFullscreen ? 'fullscreen' : ''}`} onClick={toggleFullscreen}>
                             {renderChart()}
                         </div>
-
-                        <div className='manual-scaling'>
-                            <h2>Manual Scaling</h2>
-                            <div className='form-group'>
-                                <label className="label-axe">X-Axis Min:</label>
-                                <input type='number' className='form-control' value={xAxisMin}
-                                       onChange={(e) => setXAxisMin(e.target.value)}/>
-                            </div>
-                            <div className='form-group'>
-                                <label className="label-axe">X-Axis Max:</label>
-                                <input type='number' className='form-control' value={xAxisMax}
-                                       onChange={(e) => setXAxisMax(e.target.value)}/>
-                            </div>
-                            <div className='form-group'>
-                                <label className="label-axe">Y-Axis Min:</label>
-                                <input type='number' className='form-control' value={yAxisMin}
-                                       onChange={(e) => setYAxisMin(e.target.value)}/>
-                            </div>
-                            <div className='form-group'>
-                                <label className="label-axe">Y-Axis Max:</label>
-                                <input type='number' className='form-control' value={yAxisMax}
-                                       onChange={(e) => setYAxisMax(e.target.value)}/>
-                            </div>
-                        </div>
                     </div>
+                        </Col>
+                        <Col md={6}>
+                            <div className="pie-chart-container">
+                                <h2>Response Distribution</h2>
+                                <Pie data={preparePieChartData()} />
+                            </div>
+                        </Col>
+                    </Row>
                 </>
             );
         }

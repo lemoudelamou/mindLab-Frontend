@@ -45,7 +45,7 @@ th, td {
 }
 
 tbody tr:hover {
-    background-color:aqua;
+    background-color:rgb(220,220,220,0.3);
 }
 
 

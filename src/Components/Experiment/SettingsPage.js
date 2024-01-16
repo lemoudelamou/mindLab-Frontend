@@ -27,12 +27,10 @@ const SettingsPage = ({selectedShape}) => {
         color2: '#00ff00', // Default color 2
         color3: '#0000ff', // Default color 3
     });
-    const [sessionLength, setSessionLength] = useState(1800); // Default session length in seconds (30 minutes)
 
 
     const navigate = useNavigate();
     const patientId = localStorage.getItem("patientId");
-    const [showModal, setShowModal] = useState(false);
 
 
     console.log("passed patient id: ", patientId);
@@ -71,7 +69,6 @@ const SettingsPage = ({selectedShape}) => {
                 const savedSettingsData = await saveSettingsData(patientId, savedData);
 
                 localStorage.setItem("settingsId", savedSettingsData.id);
-                localStorage.setItem("sessionLength", sessionLength);
                 localStorage.setItem("showInstructionsBox", showInstructionBoxButton);
                 localStorage.setItem("color1", savedSettingsData.color1);
                 localStorage.setItem("colorBlind", savedSettingsData.isColorBlind);
@@ -99,7 +96,6 @@ const SettingsPage = ({selectedShape}) => {
         }));
     };
 
-    const handleShowModal = () => setShowModal(true);
 
 
     const handleChange = (e) => {
@@ -134,17 +130,7 @@ const SettingsPage = ({selectedShape}) => {
                             ))}
                         </select>
                     </div>
-                    <div className="form-group">
-                        <label style={{color: '#FFFFFF'}}>Session Duration (seconds):</label>
-                        <input
-                            type="number"
-                            className="form-control"
-                            name="sessionLength"
-                            value={sessionLength}
-                            onChange={(e) => setSessionLength(e.target.value)}
-                            min="1"
-                        />
-                    </div>
+
 
                     <div className="form-group">
                         <label>Select Shape:</label>

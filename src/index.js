@@ -33,8 +33,7 @@ import DemoPatientResults from "./DemoComponents/DemoData/DemoPatientResults";
 import DemoGroupResults from "./DemoComponents/DemoData/DemoGroupResults";
 import ModifyPatientResults from "./Components/Data/ModifyPatientResults";
 import DemoModifyPatientResults from "./DemoComponents/DemoData/DemoModifyPatientResults";
-
-
+import ConfirmClose from "./utils/ConfirmClose";
 
 
 
@@ -46,6 +45,8 @@ function AppRouter() {
 
   return (
     <div>
+      <ConfirmClose />
+
       <Routes>
         <Route path="/" element={<Home/>}/>
         <Route path="/patient-info" element={<PatientInfoPage/>}/>

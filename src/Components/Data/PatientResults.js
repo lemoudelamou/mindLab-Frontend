@@ -3,7 +3,7 @@ import {getPatientByFullnameAndId} from '../../Api/Api';
 import Navbar from '../Navbar/Navbar';
 import Spinner from '../../utils/Spinner';
 import '../../style/Data.css';
-import {Bar, Line} from "react-chartjs-2";
+import {Bar, Line, Pie} from "react-chartjs-2";
 import {Col, Row} from "react-bootstrap";
 import crossfilter from "crossfilter";
 
@@ -23,6 +23,8 @@ const PatientResults = () => {
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [loading, setLoading] = useState(true);
     const [selectedGender, setSelectedGender] = useState('all');
+    const [correctnessData, setCorrectnessData] = useState({ correct: 0, incorrect: 0});
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -42,6 +44,17 @@ const PatientResults = () => {
                             value: reactionTime.time,
                         }))
                     );
+
+
+                    // Count correct and incorrect reactions using reduce
+                    setCorrectnessData(  rawData.reduce((acc, curr) => {
+                        acc[curr.category] = (acc[curr.category] || 0) + 1;
+                        return acc;
+                    }, {}));
+
+
+
+                    console.log("correctness", correctnessData);
 
                     const crossfilterInstance = crossfilter(rawData);
                     const dimension = crossfilterInstance.dimension((d) => d.category);
@@ -124,6 +137,19 @@ const PatientResults = () => {
 
         const sum = data.reduce((accumulator, item) => accumulator + item.value, 0);
         return sum / data.length;
+    };
+
+    const preparePieChartData = () => {
+        return {
+            labels: ['Correct', 'Incorrect'],
+            datasets: [
+                {
+                    data: [correctnessData.correct, correctnessData.incorrect],
+                    backgroundColor: ['#36A2EB', '#FF6384', '#7C7F7E'],
+                    hoverBackgroundColor: ['#36A2EB', '#FF6384', '#7C7F7E'],
+                },
+            ],
+        };
     };
 
     const prepareChartData = () => {
@@ -252,7 +278,8 @@ const PatientResults = () => {
                             <tbody>{renderTableRows()}</tbody>
                         </table>
                     </div>
-
+                    <Row>
+                        <Col md={6}>
                     <div>
                         <h2>Chart Type</h2>
                         <select className='form-select' value={chartType} onChange={(e) => setChartType(e.target.value)}>
@@ -269,27 +296,15 @@ const PatientResults = () => {
                         >
                             {renderChart()}
                         </div>
-
-                        <div className='manual-scaling'>
-                            <h2>Manual Scaling</h2>
-                            <div className='form-group'>
-                                <label className="label-axe">X-Axis Min:</label>
-                                <input type='number' className='form-control' value={xAxisMin} onChange={(e) => setXAxisMin(e.target.value)} />
-                            </div>
-                            <div className='form-group'>
-                                <label className="label-axe">X-Axis Max:</label>
-                                <input type='number' className='form-control' value={xAxisMax} onChange={(e) => setXAxisMax(e.target.value)} />
-                            </div>
-                            <div className='form-group'>
-                                <label className="label-axe">Y-Axis Min:</label>
-                                <input type='number' className='form-control' value={yAxisMin} onChange={(e) => setYAxisMin(e.target.value)} />
-                            </div>
-                            <div className='form-group'>
-                                <label className="label-axe">Y-Axis Max:</label>
-                                <input type='number' className='form-control' value={yAxisMax} onChange={(e) => setYAxisMax(e.target.value)} />
-                            </div>
-                        </div>
                     </div>
+                        </Col>
+                        <Col md={6}>
+                            <div className="pie-chart-container">
+                                <h2>Response Distribution</h2>
+                                <Pie data={preparePieChartData()} />
+                            </div>
+                        </Col>
+                    </Row>
                 </>
             );
         }

@@ -152,9 +152,27 @@ const Results = () => {
                             <td>Difficulty Level:</td>
                             <td>{experimentDetails[0].experimentSettings.difficultyLevel} </td>
                         </tr>
-                        {/* Add more experiment settings fields as needed */}
                         </tbody>
                     </table>
+
+
+
+                    {/* Session duration*/}
+                    <h3>Session duration</h3>
+                    <table>
+                        <tbody>
+                        <tr>
+                            <td>Start:</td>
+                            <td>{experimentDetails[0].experimentSettings.experimentDataList[0].startSession}</td>
+                        </tr>
+                        <tr>
+                            <td>End:</td>
+                            <td>{experimentDetails[0].experimentSettings.experimentDataList[0].endSession}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+
 
 
 

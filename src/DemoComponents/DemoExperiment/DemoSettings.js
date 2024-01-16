@@ -27,7 +27,6 @@ const DemoSettings = ({selectedShape}) => {
     });
 
 
-    const [sessionLength, setSessionLength] = useState(1800); // Default session length in seconds (30 minutes)
 
 
     const navigate = useNavigate();
@@ -37,7 +36,6 @@ const DemoSettings = ({selectedShape}) => {
    console.log("patient data in settings page", patientData)
     const handleSaveSettings = () => {
 
-        setSessionLength(sessionLength);
 
         console.log('Handling save changes...');
 
@@ -79,7 +77,6 @@ const DemoSettings = ({selectedShape}) => {
                 state: {
                     patientData,
                     settingsData: savedData,
-                    sessionLength,
                     showInstructionBoxButton,
                 },
             });
@@ -89,7 +86,6 @@ const DemoSettings = ({selectedShape}) => {
             navigate('/demo-experiment', {
                 state: {
                     settingsData: savedData,
-                    sessionLength,
                     showInstructionBoxButton
                 },
             });
@@ -130,17 +126,7 @@ const DemoSettings = ({selectedShape}) => {
                             ))}
                         </select>
                     </div>
-                    <div className="form-group">
-                        <label style={{color: '#FFFFFF'}}>Session Duration (seconds):</label>
-                        <input
-                            type="number"
-                            className="form-control"
-                            name="sessionLength"
-                            value={sessionLength}
-                            onChange={(e) => setSessionLength(e.target.value)}
-                            min="1"
-                        />
-                    </div>
+
                     <div className="form-group">
                         <label>Select Shape:</label>
                         <select

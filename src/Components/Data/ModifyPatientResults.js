@@ -18,6 +18,7 @@ const ModifyPatientResults = () => {
     const [fetchDataTrigger, setFetchDataTrigger] = useState(true); // Added state variable
     const fullname = localStorage.getItem('fullname'); // Change 'groupName' to 'fullname'
     const patientId = localStorage.getItem("patientById");
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -161,7 +162,20 @@ const ModifyPatientResults = () => {
                         </tbody>
                     </table>
 
-
+                    {/* Session duration*/}
+                    <h3>Session duration</h3>
+                    <table>
+                        <tbody>
+                        <tr>
+                            <td>Start:</td>
+                            <td>{experimentDetails[0].experimentSettings.experimentDataList[0].startSession}</td>
+                        </tr>
+                        <tr>
+                            <td>End:</td>
+                            <td>{experimentDetails[0].experimentSettings.experimentDataList[0].endSession}</td>
+                        </tr>
+                        </tbody>
+                    </table>
 
 
                     {/* Display relevant information from resultData */}

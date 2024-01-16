@@ -1,16 +1,13 @@
-import React, {useState, useEffect, useRef, lazy, Suspense, Profiler, useCallback} from "react";
+import React, {useState, useEffect, useRef, lazy, useCallback} from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../../../style/ReactionTimeExperiment.css';
 import {useNavigate} from 'react-router-dom';
 import {formatTime, calculateAverageReactionTime} from '../../../utils/ExperimentUtils';
 import Navbar from "../../Navbar/Navbar";
-import {getSettingsById, saveExperimentResults} from "../../../Api/Api";
+import {getSettingsById, saveExperimentResults, createSesssion} from "../../../Api/Api";
 import '@fortawesome/fontawesome-free/css/all.css';
 import Spinner from "../../../utils/Spinner";
 import {v4 as uuidv4} from "uuid"; // Import the uuid library
-import Modal from 'react-modal';
-import RenderExperimentData from "./RenderExperimentData";
-import RenderAverages from "./RenderAverages";
 import InstructionBox from "./RenderInstructionsBox";
 import RenderResultsModal from "./RenderResultsModal";
 
@@ -39,7 +36,7 @@ const ReactionTimeExperiment = () => {
     const [showRedoModal, setShowRedoModal] = useState(false);
     const [experimentCountdown, setExperimentCountdown] = useState(3);
     const [intervalId, setIntervalId] = useState(null); // New state variable to store the interval ID
-    const [countdownRunning, setCountdownRunning] = useState(false);
+    const [countUpRunning, setCountUpRunning] = useState(false);
     const navigate = useNavigate();
     const settingsId = localStorage.getItem("settingsId") || null;
     const patientId = localStorage.getItem("patientId") || null;
@@ -52,7 +49,7 @@ const ReactionTimeExperiment = () => {
         fullname: '', birthDate: new Date(), age: '', strongHand: 'Right', hasDiseases: false, diseases: '',
     });
     // New state variable for session countdown
-    const [sessionCountdown, setSessionCountdown] = useState(sessionLength ?? 180);
+    const [sessionCountUp, setSessionCountUp] = useState(0);
     const [allAttempts, setAllAttempts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -64,17 +61,10 @@ const ReactionTimeExperiment = () => {
     const [showContentBox, setShowContentBox] = useState(false);
     const [experimentInstructionsBoxVisible, setExperimentInstructionsBoxVisible] = useState(false);
     const [isSpacebarPressed, setIsSpacebarPressed] = useState(false);
-    const onRenderCallback = (
-        id, // the "id" prop of the Profiler tree that has just committed
-        phase, // either "mount" (if the tree just mounted) or "update" (if it re-rendered)
-        actualDuration, // time spent rendering the committed update
-        baseDuration, // estimated time to render the entire subtree without memoization
-    ) => {
-        // You can log or process the profiling information here
-        console.log(`${id}'s ${phase} phase:`);
-        console.log(`Actual duration: ${actualDuration}`);
-        console.log(`Base duration: ${baseDuration}`);
-    };
+    const [sessionTerminated, setSessionTerminated] = useState();
+    const [startSession, setStartSession] = useState('');
+    const [endSession, setEndSession] = useState('');
+
 
     // Function to clear the text content of the target element
     const clearTargetText = () => {
@@ -93,6 +83,7 @@ const ReactionTimeExperiment = () => {
         console.log('Button clicked!');
         setTablesVisible(!tablesVisible);
     };
+
 
 
     const fetchSettingsData = useCallback(async () => {
@@ -352,11 +343,15 @@ const ReactionTimeExperiment = () => {
 
                     // Save settings data to the server using the currentExperimentId
                     await saveExperimentResults(patientId, settingsId, experimentId,{
+                        startSession,
+                        endSession,
                         reactionTimes: experimentData,
                         averageReactionTimes: {
                             correct: averageCorrectTime, incorrect: averageIncorrectTime,
                         },
                     });
+
+
 
                     console.log("Experiment Data id: ", resultData)
                 } catch (error) {
@@ -411,11 +406,15 @@ const ReactionTimeExperiment = () => {
 
                     // Save settings data to the server using the currentExperimentId
                     await saveExperimentResults(patientId, settingsId, experimentId,{
+                        startSession,
+                        endSession,
                         reactionTimes: experimentData,
                         averageReactionTimes: {
                             correct: averageCorrectTime, incorrect: averageIncorrectTime,
                         },
                     });
+
+
 
                     console.log("Experiment Data id: ", resultData)
                 } catch (error) {
@@ -512,26 +511,23 @@ const ReactionTimeExperiment = () => {
     }, [isWaiting, backgroundColor, selectedColors.richtigColor]);
 
 
-    // Effect to update session countdown
+    // Effect to update session countUp
     useEffect(() => {
         let intervalId;
 
-        // Start the countdown when the component is mounted
-        if (countdownRunning) {
+        // Start the countUp when the component is mounted
+        if (countUpRunning) {
             intervalId = setInterval(() => {
-                setSessionCountdown((prevCountdown) => {
-                    if (prevCountdown > 0) {
-                        return prevCountdown - 1;
-                    } else {
-                        setCountdownRunning(false);  // Stop the countdown when it reaches 0
-                        return 0;
+                setSessionCountUp((prevCountUp) => {
+                    if (prevCountUp >= 0) {
+                        return prevCountUp + 1;
                     }
                 });
             }, 1000);
         }
 
         return () => clearInterval(intervalId);
-    }, [countdownRunning, sessionCountdown]);
+    }, [countUpRunning, sessionCountUp]);
 
 
     const calculateAverages = () => {
@@ -553,22 +549,34 @@ const ReactionTimeExperiment = () => {
         return averages;
     };
 
+   const handleTerminateSession = () => {
+       setCountUpRunning(false);
+       setSessionTerminated(true);
+       setSessionCountUp(0);
+       const date = new Date();
+       setEndSession( padTo2Digits(date.getHours())
+           + ':' + padTo2Digits(date.getMinutes())
+           + ":" + padTo2Digits(date.getSeconds()) ) ;
+       console.log("end session Time", endSession);
+       // eslint-disable-next-line no-restricted-globals
+        confirm("Session is terminated. Please don't forget to save the experiments data");
 
-    const handleToggleCountdown = () => {
-        setCountdownRunning((prev) => !prev);
-    };
+   }
 
-
-    let sessionCountdownContent;
-    if (sessionCountdown <= 0 && !countdownRunning) {
-        sessionCountdownContent = 'Terminated';
-    } else if (sessionCountdown === sessionLength) {
-        sessionCountdownContent = 'Start session';
-    } else if (sessionCountdown > 0 && countdownRunning) {
-        sessionCountdownContent = formatTime(sessionCountdown);
-    } else if (sessionCountdown < sessionLength && !countdownRunning) {
-        sessionCountdownContent = `Resume ${formatTime(sessionCountdown)}`;
+    function padTo2Digits(num) {
+        return String(num).padStart(2, '0');
     }
+
+    const handleToggleCountUp = () => {
+        if(sessionCountUp === 0){
+            const date = new Date();
+            setStartSession(  padTo2Digits(date.getHours())
+                + ':' + padTo2Digits(date.getMinutes())
+                + ":" + padTo2Digits(date.getSeconds()) );
+            console.log("start session Time", startSession);
+        }
+        setCountUpRunning((prev) => !prev);
+    };
 
 
     // Function to render the experiment countdown content
@@ -582,15 +590,15 @@ const ReactionTimeExperiment = () => {
     };
 
     // Function to render the session countdown content
-    const renderSessionCountdown = () => {
-        if (sessionCountdown <= 0 && !countdownRunning) {
-            return 'Terminated';
-        } else if (sessionCountdown === sessionLength) {
+    const renderSessionCountUp = () => {
+        if (sessionCountUp === 0) {
             return 'Start session';
-        } else if (sessionCountdown > 0 && countdownRunning) {
-            return formatTime(sessionCountdown);
-        } else if (sessionCountdown < sessionLength && !countdownRunning) {
-            return `Resume ${formatTime(sessionCountdown)}`;
+        } else if (sessionCountUp > 0 && countUpRunning) {
+            return formatTime(sessionCountUp);
+        } else if ( sessionCountUp > 0 && !countUpRunning) {
+            return `Resume ${formatTime(sessionCountUp)}`;
+        } else if (sessionTerminated && sessionCountUp > 0 && countUpRunning ) {
+            return 'terminated';
         }
         return null;
     };
@@ -600,7 +608,7 @@ const ReactionTimeExperiment = () => {
         <button
             className="btn btn-primary"
             onClick={startExperimentCountdown}
-            disabled={sessionCountdown <= 0 || experimentLength > sessionCountdown || !countdownRunning}
+            disabled={sessionCountUp <= 0 || !countUpRunning}
         >
             Start Experiment
         </button>
@@ -632,7 +640,6 @@ const ReactionTimeExperiment = () => {
 
     // Render the component
     return (
-        <Profiler id="your-component-profiler" onRender={onRenderCallback}>
             <div className="container-fluid">
                 <Navbar/>
                 {loading ?
@@ -657,9 +664,9 @@ const ReactionTimeExperiment = () => {
                         <div>
                             <div className="experiment-status-box">
                                 <button
-                                    className={`btn session-status ${countdownRunning ? 'running' : 'stopped'}`}
-                                    onClick={handleToggleCountdown}
-                                    disabled={sessionCountdown === 0}
+                                    className={`btn session-status ${countUpRunning ? 'running' : 'stopped'}`}
+                                    onClick={handleToggleCountUp}
+                                    disabled={false}
                                 >
                                     <i className="fas fa-power-off shutdown-icon"></i>
                                     <span style={{
@@ -668,8 +675,13 @@ const ReactionTimeExperiment = () => {
                                         marginRight: '8px',
                                         paddingLeft: '10px'
                                     }}></span>
-                                    {renderSessionCountdown()}
+                                    {renderSessionCountUp()}
                                 </button>
+                                { countUpRunning && (
+                                <button className="btn session-stop" onClick={handleTerminateSession}>
+                                    Terminate
+                                </button>
+                                )}
                             </div>
                         </div>
                         {/* Experiment container */}
@@ -709,7 +721,6 @@ const ReactionTimeExperiment = () => {
                         </div>
                     </div>)}
             </div>
-        </Profiler>
     );
 };
 export default ReactionTimeExperiment;

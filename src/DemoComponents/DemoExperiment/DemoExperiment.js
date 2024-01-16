@@ -35,7 +35,7 @@ const DemoExperiment = () => {
     const [showRedoModal, setShowRedoModal] = useState(false);
     const [experimentCountdown, setExperimentCountdown] = useState(3);
     const [intervalId, setIntervalId] = useState(null); // New state variable to store the interval ID
-    const [countdownRunning, setCountdownRunning] = useState(false);
+    const [countUpRunning, setCountUpRunning] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
     const {state} = location;
@@ -49,7 +49,7 @@ const DemoExperiment = () => {
 
 
     // New state variable for session countdown
-    const [sessionCountdown, setSessionCountdown] = useState(sessionLength ?? 180);
+    const [sessionCountUp, setSessionCountUp] = useState(0);
     const [allAttempts, setAllAttempts] = useState([]);
     const [experimentData, setExperimentData] = useState({});
     const [experimentId, setExperimentId] = useState(""); // State variable to store the experiment ID
@@ -503,26 +503,23 @@ const DemoExperiment = () => {
     }, [isWaiting, backgroundColor, selectedColors.richtigColor]);
 
 
-    // Effect to update session countdown
+    // Effect to update session countUp
     useEffect(() => {
         let intervalId;
 
-        // Start the countdown when the component is mounted
-        if (countdownRunning) {
+        // Start the countup when the component is mounted
+        if (countUpRunning) {
             intervalId = setInterval(() => {
-                setSessionCountdown((prevCountdown) => {
-                    if (prevCountdown > 0) {
-                        return prevCountdown - 1;
-                    } else {
-                        setCountdownRunning(false);  // Stop the countdown when it reaches 0
-                        return 0;
+                setSessionCountUp((prevCountUp) => {
+                    if (prevCountUp >= 0) {
+                        return prevCountUp + 1;
                     }
                 });
             }, 1000);
         }
 
         return () => clearInterval(intervalId);
-    }, [countdownRunning, sessionCountdown]);
+    }, [countUpRunning, sessionCountUp]);
 
 
     const calculateAverages = () => {
@@ -546,20 +543,11 @@ const DemoExperiment = () => {
 
 
     const handleToggleCountdown = () => {
-        setCountdownRunning((prev) => !prev);
+        setCountUpRunning((prev) => !prev);
     };
 
 
-    let sessionCountdownContent;
-    if (sessionCountdown <= 0 && !countdownRunning) {
-        sessionCountdownContent = 'Terminated';
-    } else if (sessionCountdown === sessionLength) {
-        sessionCountdownContent = 'Start session';
-    } else if (sessionCountdown > 0 && countdownRunning) {
-        sessionCountdownContent = formatTime(sessionCountdown);
-    } else if (sessionCountdown < sessionLength && !countdownRunning) {
-        sessionCountdownContent = `Resume ${formatTime(sessionCountdown)}`;
-    }
+
 
 
     // Function to render the experiment countdown content
@@ -573,15 +561,13 @@ const DemoExperiment = () => {
     };
 
     // Function to render the session countdown content
-    const renderSessionCountdown = () => {
-        if (sessionCountdown <= 0 && !countdownRunning) {
-            return 'Terminated';
-        } else if (sessionCountdown === sessionLength) {
+    const renderSessionCountUp = () => {
+        if (sessionCountUp === 0) {
             return 'Start session';
-        } else if (sessionCountdown > 0 && countdownRunning) {
-            return formatTime(sessionCountdown);
-        } else if (sessionCountdown < sessionLength && !countdownRunning) {
-            return `Resume ${formatTime(sessionCountdown)}`;
+        } else if (sessionCountUp > 0 && countUpRunning) {
+            return formatTime(sessionCountUp);
+        } else if (sessionCountUp > 0 && !countUpRunning) {
+            return `Resume ${formatTime(sessionCountUp)}`;
         }
         return null;
     };
@@ -591,7 +577,7 @@ const DemoExperiment = () => {
         <button
             className="btn btn-primary"
             onClick={startExperimentCountdown}
-            disabled={sessionCountdown <= 0 || experimentLength > sessionCountdown || !countdownRunning}
+            disabled={sessionCountUp <= 0 || !countUpRunning}
         >
             Start Experiment
         </button>
@@ -641,9 +627,9 @@ const DemoExperiment = () => {
                         <div>
                             <div className="experiment-status-box">
                                 <button
-                                    className={`btn session-status ${countdownRunning ? 'running' : 'stopped'}`}
+                                    className={`btn session-status ${countUpRunning ? 'running' : 'stopped'}`}
                                     onClick={handleToggleCountdown}
-                                    disabled={sessionCountdown === 0}
+                                    disabled={false}
                                 >
                                     <i className="fas fa-power-off shutdown-icon"></i>
                                     <span style={{
@@ -652,7 +638,7 @@ const DemoExperiment = () => {
                                         marginRight: '8px',
                                         paddingLeft: '10px'
                                     }}></span>
-                                    {renderSessionCountdown()}
+                                    {renderSessionCountUp()}
                                 </button>
                             </div>
                         </div>

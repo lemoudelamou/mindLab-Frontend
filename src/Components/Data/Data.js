@@ -28,6 +28,7 @@ const Data = () => {
     const [genderData, setGenderData] = useState({ males: 0, females: 0 , other: 0});
 
 
+
     const fetchData = useCallback(async () => {
         console.log('Starting fetch data with gender:', selectedGender);
         try {
@@ -53,12 +54,14 @@ const Data = () => {
                 const dimension = crossfilterInstance.dimension((d) => d.category);
                 const correctDimension = crossfilterInstance.dimension((d) => d.category === 'correct');
                 const incorrectDimension = crossfilterInstance.dimension((d) => d.category === 'incorrect');
-// After fetching data, calculate gender distribution
+
+
+
+                // After fetching data, calculate gender distribution
                 const maleCount = experimentsData.filter(item => item.patient.gender === 'Male').length;
                 const femaleCount = experimentsData.filter(item => item.patient.gender === 'Female').length;
                 const otherCount = experimentsData.filter(item => item.patient.gender === 'Other').length;
                 setGenderData({ males: maleCount, females: femaleCount, others: otherCount });
-
 
 
                 setData(rawData);
@@ -66,8 +69,6 @@ const Data = () => {
                 setCategoryDimension(dimension);
                 setCorrectDimension(correctDimension);
                 setIncorrectDimension(incorrectDimension);
-
-
 
                 return () => crossfilterInstance.remove();
             } else {

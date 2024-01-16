@@ -37,6 +37,16 @@
     border-radius: 0.5vw;
 }
 
+.session-stop {
+    min-width: 100px;
+    text-align: center;
+    margin-top: 2vw;
+    padding: 1vw;
+    color: #fff;
+    margin-left: 40px;
+    background: #282c34;
+    border-radius: 0.5vw;
+}
 
 
 .instructions-container {
@@ -62,12 +72,12 @@
 }
 
 .btn.session-status.running {
-    background-color: green; /* Set the background color when running */
+    background-color: rgb(211, 211, 211); /* Set the background color when running */
     color: white; /* Set the text color when running */
 }
 
 .btn.session-status.stopped {
-    background-color: red; /* Set the background color when stopped */
+    background-color: rgb(128, 128, 128); /* Set the background color when stopped */
     color: white; /* Set the text color when stopped */
 }
 
