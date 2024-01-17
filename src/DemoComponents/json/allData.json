@@ -46,6 +46,8 @@
             "expDate": "2023-12-20",
             "groupe": "s1"
         },
+        "sessionStart" : "18:02:23",
+        "sessionEnd" : "18:14:32",
         "averageReactionTimes": {
             "id": 802,
             "correct": 489.9833333333954,
@@ -111,6 +113,8 @@
             "expDate": "2023-12-20",
             "groupe": "s12"
         },
+        "sessionStart" : "18:02:23",
+        "sessionEnd" : "18:14:32",
         "averageReactionTimes": {
             "id": 803,
             "correct": 507.3500000002484,
@@ -176,6 +180,8 @@
             "expDate": "2023-12-20",
             "groupe": "s13"
         },
+        "sessionStart" : "18:02:23",
+        "sessionEnd" : "18:14:32",
         "averageReactionTimes": {
             "id": 804,
             "correct": 426.9166666666667,
@@ -241,6 +247,8 @@
             "expDate": "2023-12-20",
             "groupe": "s13"
         },
+        "sessionStart" : "18:02:23",
+        "sessionEnd" : "18:14:32",
         "averageReactionTimes": {
             "id": 805,
             "correct": 528.7999999998137,
@@ -275,6 +283,8 @@
             "expDate": "2023-12-20",
             "groupe": "s13"
         },
+        "sessionStart" : "18:02:23",
+        "sessionEnd" : "18:14:32",
         "averageReactionTimes": null ,
         "experimentSettings": {
             "id": 552,
@@ -411,6 +421,8 @@
             "expDate": "2023-12-21",
             "groupe": "s9"
         },
+        "sessionStart" : "18:02:23",
+        "sessionEnd" : "18:14:32",
         "averageReactionTimes": {
             "id": 809,
             "correct": 607.738095238096,
@@ -526,6 +538,8 @@
             "expDate": "2023-12-21",
             "groupe": "s9"
         },
+        "sessionStart" : "18:02:23",
+        "sessionEnd" : "18:14:32",
         "averageReactionTimes": {
             "id": 810,
             "correct": 472.98749999999745,
@@ -636,6 +650,8 @@
             "expDate": "2023-12-21",
             "groupe": "s9"
         },
+        "sessionStart" : "18:02:23",
+        "sessionEnd" : "18:14:32",
         "averageReactionTimes": {
             "id": 811,
             "correct": 398.0933333333271,
@@ -776,6 +792,8 @@
             "expDate": "2023-12-21",
             "groupe": "s9"
         },
+        "sessionStart" : "18:02:23",
+        "sessionEnd" : "18:14:32",
         "averageReactionTimes": {
             "id": 812,
             "correct": 408.1047619047652,
@@ -844,8 +862,10 @@
             "hasDiseases": false,
             "diseases": "",
             "expDate": "2023-12-22",
-            "groupe": "kanacke"
+            "groupe": "s20"
         },
+        "sessionStart" : "18:02:23",
+        "sessionEnd" : "18:14:32",
         "averageReactionTimes": {
             "id": 852,
             "correct": 517.7857142857143,
@@ -921,6 +941,8 @@
             "expDate": "2023-12-22",
             "groupe": "kanacke"
         },
+        "sessionStart" : "18:02:23",
+        "sessionEnd" : "18:14:32",
         "averageReactionTimes": {
             "id": 853,
             "correct": 340.07500000000437,
@@ -991,6 +1013,8 @@
             "expDate": "2023-12-22",
             "groupe": "kanacke"
         },
+        "sessionStart" : "18:02:23",
+        "sessionEnd" : "18:14:32",
         "averageReactionTimes": {
             "id": 854,
             "correct": 355.0428571428721,

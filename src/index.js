@@ -1,7 +1,6 @@
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route, useLocation} from "react-router-dom";
 import './index.css';
-import reportWebVitals from './reportWebVitals';
 import Home from './Components/Home/Home';
 import Data from './Components/Data/Data';
 import Footer from './Components/Footer/Footer';
@@ -35,18 +34,12 @@ import ModifyPatientResults from "./Components/Data/ModifyPatientResults";
 import DemoModifyPatientResults from "./DemoComponents/DemoData/DemoModifyPatientResults";
 import ConfirmClose from "./utils/ConfirmClose";
 
-
-
-
-
 function AppRouter() {
   const location = useLocation();
-
 
   return (
     <div>
       <ConfirmClose />
-
       <Routes>
         <Route path="/" element={<Home/>}/>
         <Route path="/patient-info" element={<PatientInfoPage/>}/>
@@ -76,22 +69,12 @@ function AppRouter() {
         <Route path="/demo-group-results" element={<DemoGroupResults />} />
         <Route path="/demo-data" element={<DemoData />} />
       </Routes>
-
-
-
       {location.pathname === '' ? null : <Footer/>}
-
-
-
     </div>
-
-
-
   );
 }
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
-
 root.render(
       <BrowserRouter>
           <AppRouter/>

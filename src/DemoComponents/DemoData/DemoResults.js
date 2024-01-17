@@ -141,6 +141,23 @@ const DemoResults = () => {
                     </tbody>
                 </table>
 
+
+                {/* Session duration*/}
+                <h3>Session duration</h3>
+                <table>
+                    <tbody>
+                    <tr>
+                        <td>Start:</td>
+                        <td>{resultData.startSession}</td>
+                    </tr>
+                    <tr>
+                        <td>End:</td>
+                        <td>{resultData.endSession}</td>
+                    </tr>
+                    </tbody>
+                </table>
+
+
                 {/* Display relevant information from resultData */}
                 <h3>Reaction Times (in ms)</h3>
                 {/* Display reaction times */}

@@ -58,7 +58,9 @@ const DemoExperiment = () => {
     const [showContentBox, setShowContentBox] = useState(false);
     const [experimentInstructionsBoxVisible, setExperimentInstructionsBoxVisible] = useState(false);
     const [isSpacebarPressed, setIsSpacebarPressed] = useState(false);
-
+    const [sessionTerminated, setSessionTerminated] = useState();
+    const [startSession, setStartSession] = useState('');
+    const [endSession, setEndSession] = useState('');
 
     // Function to clear the text content of the target element
     const clearTargetText = () => {
@@ -381,6 +383,8 @@ const DemoExperiment = () => {
                 diseases: patientData?.diseases || null,
                 expDate: expDate || null,
             },
+            startSession,
+            endSession,
             experiments: {},
         };
 
@@ -541,8 +545,32 @@ const DemoExperiment = () => {
         return averages;
     };
 
+    const handleTerminateSession = () => {
+        setCountUpRunning(false);
+        setSessionTerminated(true);
+        setSessionCountUp(0);
+        const date = new Date();
+        setEndSession( padTo2Digits(date.getHours())
+            + ':' + padTo2Digits(date.getMinutes())
+            + ":" + padTo2Digits(date.getSeconds()) ) ;
+        console.log("end session Time", endSession);
+        // eslint-disable-next-line no-restricted-globals
+        confirm("Session is terminated. Please don't forget to save the experiments data");
 
-    const handleToggleCountdown = () => {
+    }
+
+    function padTo2Digits(num) {
+        return String(num).padStart(2, '0');
+    }
+
+    const handleToggleCountUp = () => {
+        if(sessionCountUp === 0){
+            const date = new Date();
+            setStartSession(  padTo2Digits(date.getHours())
+                + ':' + padTo2Digits(date.getMinutes())
+                + ":" + padTo2Digits(date.getSeconds()) );
+            console.log("start session Time", startSession);
+        }
         setCountUpRunning((prev) => !prev);
     };
 
@@ -628,7 +656,7 @@ const DemoExperiment = () => {
                             <div className="experiment-status-box">
                                 <button
                                     className={`btn session-status ${countUpRunning ? 'running' : 'stopped'}`}
-                                    onClick={handleToggleCountdown}
+                                    onClick={handleToggleCountUp}
                                     disabled={false}
                                 >
                                     <i className="fas fa-power-off shutdown-icon"></i>
@@ -640,6 +668,11 @@ const DemoExperiment = () => {
                                     }}></span>
                                     {renderSessionCountUp()}
                                 </button>
+                                { countUpRunning && (
+                                    <button className="btn session-stop" onClick={handleTerminateSession}>
+                                        Terminate
+                                    </button>
+                                )}
                             </div>
                         </div>
                         {/* Experiment container */}

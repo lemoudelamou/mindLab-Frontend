@@ -54,7 +54,7 @@ export const getExperimentsData = async () => {
 
 export const getAllPatients = async () => {
     try {
-        const response = await axios.get(`${API_BASE_URL}/patients`);
+        const response = await axios.get(`${API_BASE_URL}/patients/all`);
         console.log('Server response:', response.data);
         return response.data;
     } catch (error) {
@@ -66,7 +66,7 @@ export const getAllPatients = async () => {
 
 export const getExperimentsDataById = async (patientId) => {
     try {
-        const response = await axios.get(`${API_BASE_URL}/data/data/patient/${patientId}`);
+        const response = await axios.get(`${API_BASE_URL}/data/patient/${patientId}`);
         console.log('Server response:', response.data);
         return response.data;
     } catch (error) {
