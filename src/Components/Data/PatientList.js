@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { deletePatientById, getAllPatients, updatePatientById } from '../../Api/Api';
+import {deletePatientById, getAllPatientByDoctorId, getAllPatients, updatePatientById} from '../../Api/Api';
 import Navbar from '../Navbar/Navbar';
 import '../../style/PatientList.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Pagination from "../../utils/Pagination";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../../utils/Spinner";
+import {useAuth} from "../../utils/AuthContext";
+
 
 const PatientList = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -25,6 +27,8 @@ const PatientList = () => {
     const [expandedMap, setExpandedMap] = useState(new Map());
     const [isEditingMap, setIsEditingMap] = useState(new Map());
     const [loading, setLoading] = useState(true);
+    const { userId, isLoggedIn, jwt, verify } = useAuth();
+
 
     const groupPatientsByGroupe = () => {
         const groupedPatients = {};
@@ -41,22 +45,27 @@ const PatientList = () => {
     const totalPages = Math.ceil(Object.keys(groupPatientsByGroupe()).length / groupsPerPage);
 
     useEffect(() => {
-        fetchData();
-    }, []); // Moved fetchData outside of setCollapsedItems to fetch data as soon as the component is mounted
+        if(isLoggedIn) {
+            fetchData();
+        }
+    }, [isLoggedIn]); // Moved fetchData outside of setCollapsedItems to fetch data as soon as the component is mounted
 
     useEffect(() => {
         handleSearch();
     }, [filterDate, currentPage, groupsPerPage]);
 
     const fetchData = async () => {
-        try {
-            const patientsData = await getAllPatients();
-            const initialCollapsedState = Array(patientsData.length).fill(true);
 
-            setCollapsedItems(initialCollapsedState);
-            setOriginalData(patientsData);
-            setSearchResults(patientsData);
-            setLoading(false);
+        try {
+                const patientsData = await getAllPatientByDoctorId(userId);
+                const initialCollapsedState = Array(patientsData.length).fill(true);
+
+
+                setCollapsedItems(initialCollapsedState);
+                setOriginalData(patientsData);
+                setSearchResults(patientsData);
+                setLoading(false);
+
         } catch (error) {
             console.error('Error fetching data:', error);
             setLoading(false);
@@ -327,7 +336,7 @@ const PatientList = () => {
                 </div>
                 <ul className='list-group m-5'>
                     {groupedPatients[group].map((result, resultIndex) => (
-                        <li key={resultIndex} className='list-group-item custom-list-item pb-3 mb-2'>
+                            <li key={resultIndex} className='list-group-item custom-list-item pb-3 mb-2'>
                             <div className='d-flex w-100 justify-content-between align-items-center'>
                                 <h5 className='mb-1'>
                                     {isEditingMap.get(result.id) ? renderEditFields() : result.fullname}

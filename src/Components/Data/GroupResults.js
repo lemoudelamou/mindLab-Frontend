@@ -1,20 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { fetchDataForGroup } from '../../Api/Api';
+import {fetchDataForGroup, getExperimentsDataByGroupDoctorId} from '../../Api/Api';
 import Navbar from '../Navbar/Navbar';
 import Spinner from '../../utils/Spinner';
 import '../../style/GroupResults.css'
+import {useAuth} from "../../utils/AuthContext";
+
 
 const GroupResults = () => {
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState(null);
     const group = localStorage.getItem('groupName');
+    const { isLoggedIn, user, userId } = useAuth();
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const result = await fetchDataForGroup(group);
-                setData(result);
-                setLoading(false);
+                const result = await getExperimentsDataByGroupDoctorId(group, userId);
+
+                    setData(result);
+                    setLoading(false);
+
                 console.log("Group results", result);
 
             } catch (error) {
@@ -24,7 +29,7 @@ const GroupResults = () => {
         };
 
         fetchData();
-    }, [group]);
+    }, [group, userId]);
 
     if (loading) {
         return (

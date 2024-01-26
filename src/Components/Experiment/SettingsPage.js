@@ -168,7 +168,7 @@ const SettingsPage = ({selectedShape}) => {
                             onChange={handleChange}
                         >
                             <option value="normal">Normal</option>
-                            <option value="colorBlind">Color Blind</option>
+                            <option value="colorBlind" disabled={settingsData.difficultyLevel === 'Hard' }>Color Blind</option>
                         </select>
                     </div>
                     <div className="form-group">

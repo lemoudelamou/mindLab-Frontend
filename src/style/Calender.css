@@ -1,0 +1,60 @@
+
+.fc button {
+    /* force height to include the border and padding */
+    box-sizing: border-box;
+    /* dimensions */
+    margin: 0;
+    height: 3.1em;
+    padding: 0 .6em;
+    /* text & cursor */
+    font-size: 6em;
+    /* normalize */
+    white-space: nowrap;
+    cursor: pointer; }
+
+
+
+.fc table {
+    width: 100%;
+    box-sizing: border-box;
+    /* fix scrollbar issue in firefox */
+    table-layout: fixed;
+    border-collapse: collapse;
+    border-spacing: 0;
+    font-size: 1em;
+    background-color: rgba(95, 99, 103, 0.3);
+}
+
+
+.fc table td:hover {
+    background: #989aa2;
+    font-weight: bold;
+
+}
+
+.fc table td {
+    color: #282c34;
+
+}
+
+
+
+
+.fc table b:hover {
+    background: #282c34;
+    font-weight: bold;
+
+
+}
+
+.fc table td,b:hover {
+    background: #FFFFFF;
+}
+
+.fc table th:first-child:hover {
+    background: #282c34;
+
+}
+
+
+

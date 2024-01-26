@@ -33,13 +33,22 @@ import DemoGroupResults from "./DemoComponents/DemoData/DemoGroupResults";
 import ModifyPatientResults from "./Components/Data/ModifyPatientResults";
 import DemoModifyPatientResults from "./DemoComponents/DemoData/DemoModifyPatientResults";
 import ConfirmClose from "./utils/ConfirmClose";
+import Login from "./Components/authentification/Login";
+import Register from "./Components/authentification/Register";
+import {AuthProvider} from "./utils/AuthContext";
+import Dashboard from "./Components/Dashboard/Dashbord";
+import Calender from "./Components/Dashboard/Calender";
+import Profile from "./Components/Dashboard/Profile";
+import ForgotPassword from "./Components/authentification/ForgotPassword";
+import ResetPassword from "./Components/authentification/ResetPassword";
+import VerifyAccount from "./Components/authentification/VerifyAccount";
+import List from "./Components/Dashboard/List";
 
 function AppRouter() {
   const location = useLocation();
 
   return (
     <div>
-      <ConfirmClose />
       <Routes>
         <Route path="/" element={<Home/>}/>
         <Route path="/patient-info" element={<PatientInfoPage/>}/>
@@ -50,6 +59,15 @@ function AppRouter() {
         <Route path="/group-results" element={<GroupResults />} />
         <Route path="/patient-results" element={<PatientResults />} />
         <Route path="/modify-patient-data" element={<ModifyPatientResults />} />
+        <Route path="/login" element={<Login/>}/>
+        <Route path="/forgot-password" element={<ForgotPassword/>}/>
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/verify-registration" element={<VerifyAccount />} />
+        <Route path="/dashboard" element={<Dashboard/>}/>
+        <Route path="/calender" element={<Calender/>}/>
+        <Route path="/profile" element={<Profile/>}/>
+        <Route path="/list" element={<List/>}/>
+        <Route path="/register" element={<Register/>}/>
         <Route path="/home" element={<Home/>}/>
         <Route path="/data" element={<Data />}/>
         <Route path="/about" element={<AboutProject />}/>
@@ -77,6 +95,8 @@ function AppRouter() {
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
       <BrowserRouter>
+        <AuthProvider>
           <AppRouter/>
+        </AuthProvider>
       </BrowserRouter>
 );

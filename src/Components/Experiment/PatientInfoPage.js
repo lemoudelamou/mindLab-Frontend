@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Form, Button} from 'react-bootstrap';
 import {useNavigate} from 'react-router-dom';
@@ -7,9 +7,12 @@ import 'rsuite/dist/rsuite.min.css';
 import '../../style/PatientInfoPage.css';
 import {calculateAge} from '../../utils/ExperimentUtils'
 import Navbar from "../Navbar/Navbar";
+import {useAuth} from "../../utils/AuthContext";
 
 
 function PatientInfoPage() {
+    const { isLoggedIn, userId, user } = useAuth();
+
     const [patientData, setPatientData] = useState({
         fullname: '',
         age: '',
@@ -20,10 +23,16 @@ function PatientInfoPage() {
         diseases: '',
         expDate: '',
         groupe: '',
+        user: user,
+
     });
 
     const navigate = useNavigate();
 
+
+    useEffect(() => {
+
+    }, [isLoggedIn, userId]);
 
     const handleInputChange = (event) => {
         const {name, value, type, checked} = event.target;
@@ -44,7 +53,9 @@ function PatientInfoPage() {
             ...patientData,
             birthDate: value,
             age: age,
+            user,
         });
+
     };
 
     const handleSubmit = async (event) => {
@@ -52,15 +63,18 @@ function PatientInfoPage() {
 
         try {
 
+            if(isLoggedIn === true) {
+                console.log("doctor id", userId);
+                const savedPatientData = await savePatientData({
+                    ...patientData,
 
-            const savedPatientData = await savePatientData({
-                ...patientData,
-            });
+                });
 
-            localStorage.setItem("patientId", savedPatientData.id);
+                localStorage.setItem("patientId", savedPatientData.id);
 
-            // Redirect to settings page with patient ID
-            navigate('/settings');
+                // Redirect to settings page with patient ID
+                navigate('/settings');
+            }
         } catch (error) {
             console.error('Error saving patient data:', error);
             // Handle error as needed
