@@ -1,4 +1,4 @@
-.centered-container {
+.centered-container-dash {
     max-width: 1250px;
     max-height: 1200px;
     color: #000;
@@ -15,37 +15,37 @@
     overflow: scroll;
 }
 
-.title-search {
+.title-search-dash {
     font-size: 28px;
     text-align: center;
 }
 
-.custom-search-input {
+.custom-search-input-dash {
     border-radius: 5px 0 0 5px;
 }
 
-.custom-search-button {
+.custom-search-button-dash {
     border-radius: 0 5px 5px 0;
 }
 
-.search-container {
+.search-container-dash {
     padding-bottom: 5%;
     width: 100%;
 }
 
-.no-result-text {
+.no-result-text-dash {
     text-align: center;
     font-size: 18px;
     color: #777;
 }
 
-.custom-list {
+.custom-list-dash {
     margin-bottom: 5%;
     width: 1000px;
 
 }
 
-.custom-list-item {
+.custom-list-item-dash {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -58,7 +58,6 @@
     margin: 15px 0;
     border-radius: 10px;
     font-size: 16px;
-    overflow: hidden;
 }
 
 .list-group-item-dash:hover {
@@ -68,12 +67,12 @@
 }
 
 /* Add more specific styling for your grouped patients as needed */
-.list {
+.list-dash {
     list-style-type: none;
     padding: 0;
     width: 100%;
 }
 
-.custom-list-item {
+.custom-list-item-dash {
     /* Add specific styles for each item in the list */
 }

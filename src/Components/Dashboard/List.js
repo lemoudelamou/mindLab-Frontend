@@ -124,10 +124,10 @@ const List = () => {
         const groupsToDisplay = Object.keys(groupedPatients);
 
         return groupsToDisplay.map((group, groupIndex) => (
-            <div key={groupIndex} className='list'>
+            <div key={groupIndex} className='list-dash'>
                 <ul>
                     {groupedPatients[group].map((result, resultIndex) => (
-                        <li key={resultIndex} className='list-group-item-dash custom-list-item'>
+                        <li key={resultIndex} className='list-group-item-dash custom-list-item-dash'>
                             <div>
                                     <strong> Patient: </strong> {result.fullname}
 
@@ -143,17 +143,17 @@ const List = () => {
     };
 
     return (
-        <div className="centered-container">
+        <div className="centered-container-dash">
             <Navbar />
             {loading ? (
                 <Spinner />
             ) : (
-                <div className='search-container'>
-                    <h1 className='title-search'>Patients List</h1>
+                <div className='search-container-dash'>
+                    <h1 className='title-search-dash'>Patients List</h1>
                     <div className='input-group mb-3'>
                         <input
                             type='text'
-                            className='form-control custom-search-input'
+                            className='form-control custom-search-input-dash'
                             placeholder='Search...'
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -180,12 +180,12 @@ const List = () => {
                 </div>
             )}
 
-            <div className='custom-list'>
+            <div className='custom-list-dash'>
                 {loading ? (
                     // Show nothing or loading indicator while fetching data
                     null
                 ) : searchClicked && searchResults.length === 0 ? (
-                    <p className='no-result-text'>No results found.</p>
+                    <p className='no-result-text-dash'>No results found.</p>
                 ) : (
                     renderGroupedPatients()
                 )}
